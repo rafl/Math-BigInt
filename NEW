@@ -1,18 +1,17 @@
-This lists only the changes for the current release (v1.55) over the last
+This lists only the changes for the current release (v1.56) over the last
 version, since HISTORY is now quite big:
 
-Calc  : fix in _rsft() that left empty instead of containing 0
-	fix in _sub with early out that made -1 + 10000000000001 fail
-MBI   : Math::BigInt->digit(123) works now 
-	:constant recognizes and converts binary and hexadecimal constants
-	removed needless statements in bcmp()
-MBF   : Math::Bigint::bzero => $MBi->bzero()
-	documented the use of 'lib' and 'with'
-	added support for use Math::BigFloat with => 'Package';
-	use Math::BigFloat lib => 'GMP,Pari' etc works now in various
-	combinations with Math::BigInt (e.g. with or without it)
-tests : tests for bin/hex :constant 
-	tests for the 'lib' and 'with' stuff in MBF
+Calc  : cap BASE_LEN at 7, not 8, since 64 bit systems fail random tests
+MBI   : documented config()
+	simplified import() 
+	$x->isa($upgrade) => !$x->isa($self) (ditto for ref($x) eq $upgrade)
+	one extranous line in bnan() deleted
+MBF   : import() did not work on VMS, simplified it
+	badd()/bmul() did not upgrade
+	config() was missing
+tests : testsuite tweaks from Jarkko 
+	protect agains non-portable warnings (Jarkko)
+	test "Math::BigFloat with =>"
 
 Please have Math::BigInt->new('inf')->bmul('inf') big amounts of fun.
 

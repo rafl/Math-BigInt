@@ -47,6 +47,7 @@ t/inf_nan.t			# inf and NaN handling
 t/isa.t				# isa() and new() w/ mixed classes tests
 t/upgrade.inc			# actual tests for upgrading
 t/mbi_rand.t			# do some testing w/ random inputs/outputs
+t/with_sub.t			# test Math::BigFloat with => 'package'
 t/Math/BigInt/BareCalc.pm	# for testing BigInt's simulation of Calc
 t/Math/BigInt/Subclass.pm	# empty subclass
 t/Math/BigFloat/Subclass.pm	# empty subclass

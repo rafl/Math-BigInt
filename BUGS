@@ -7,6 +7,10 @@ Known bugs:
     you need it, please bug the autor(s) about it.
 
 * BigFloat:
+  + with 'Math::BigInt::Lite' does not work as of Lite v0.08. The reason
+    is that BigFloat does unholy things with it's "BigInt" minion, and Lite
+    isn't a proper BigInt subclass. Fixes either in Lite (slow) or BigFloat
+    (slow, too).
   + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
@@ -32,6 +36,7 @@ Known bugs:
   + exponent on input is limited to a Perl int (bigger numbers won't fit
     into your memory, anyway - use BigFloat)
   + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
+    (this is solved by use bigint;)
   + Handling of undef arguments is somewhat broken (no proper warnings)
   + eval('use...') and use Math::BigInt qw/:constant/ fail on Perl prior 5.6.0
     This is likely an Exporter bug, and causes Math::BigInt to eval require on
@@ -82,23 +87,7 @@ confronted with mixed arguments, but for others it works by suprise.
 
 My new code is only partially better, I am afraid.
 
-Update: One proposed solution is to specify the class for upgrades like:
-
-	use Math::BigInt promote => 'Math::BigFloat';
-
-Certain operations (bsqrt(), bdiv(), bmod(), blog() etc) would then revert
-to the given class, while others would use a ranking system to revert to the
-given class like:
-
-	$x = $y + $z;		# $y->rank() = 10 (BigInt)
-				# $z->rank() = 20 (BigFloat)
-
-Thus $z->copy()->badd($y) is called, since $z has an higher rank and the proper
-result will be returned (BigFloat in this case). This will also work for
-
-	$x = $z + $y;
-
-The implementation of that is scheduled for v1.50.
+Update: use bignum; use bigint; and use bigrat; solve this problem.
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
