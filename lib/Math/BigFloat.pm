@@ -11,7 +11,7 @@
 
 package Math::BigFloat;
 
-$VERSION = 1.19;
+$VERSION = '1.20';
 require 5.005;
 use Exporter;
 use Math::BigInt qw/objectify/;
@@ -205,9 +205,13 @@ sub bstr
   # internal format is always normalized (no leading zeros, "-0" => "+0")
   my ($self,$x) = objectify(1,@_);
 
-  #return "Oups! e was $nan" if $x->{_e}->{sign} eq $nan;
-  #return "Oups! m was $nan" if $x->{_m}->{sign} eq $nan;
-  return $x->{sign} if $x->{sign} !~ /^[+-]$/;
+  #die "Oups! e was $nan" if $x->{_e}->{sign} eq $nan;
+  #die "Oups! m was $nan" if $x->{_m}->{sign} eq $nan;
+  if ($x->{sign} !~ /^[+-]$/)
+    {
+    return $x->{sign} unless $x->{sign} eq '+inf';      # -inf, NaN
+    return 'inf';                                       # +inf
+    }
  
   my $es = '0'; my $len = 1; my $cad = 0; my $dot = '.';
 
@@ -271,9 +275,13 @@ sub bsstr
   # internal format is always normalized (no leading zeros, "-0E0" => "+0E0")
   my ($self,$x) = objectify(1,@_);
 
-  return "Oups! e was $nan" if $x->{_e}->{sign} eq $nan;
-  return "Oups! m was $nan" if $x->{_m}->{sign} eq $nan;
-  return $x->{sign} if $x->{sign} !~ /^[+-]$/;
+  #die "Oups! e was $nan" if $x->{_e}->{sign} eq $nan;
+  #die "Oups! m was $nan" if $x->{_m}->{sign} eq $nan;
+  if ($x->{sign} !~ /^[+-]$/)
+    {
+    return $x->{sign} unless $x->{sign} eq '+inf';      # -inf, NaN
+    return 'inf';                                       # +inf
+    }
   my $sign = $x->{_e}->{sign}; $sign = '' if $sign eq '-';
   my $sep = 'e'.$sign;
   return $x->{_m}->bstr().$sep.$x->{_e}->bstr();
@@ -299,6 +307,10 @@ sub numify
 #  {
 #  $class->SUPER::bneg($class,@_);
 #  }
+
+# tels 2001-08-04 
+# todo: this must be overwritten and return NaN for non-integer values
+# band(), bior(), bxor(), too
 #sub bnot
 #  {
 #  $class->SUPER::bnot($class,@_);
@@ -322,12 +334,15 @@ sub bcmp
     }
 
   # check sign for speed first
-  return 1 if $x->{sign} eq '+' && $y->{sign} eq '-';
+  return 1 if $x->{sign} eq '+' && $y->{sign} eq '-';	# does also 0 <=> -y
   return -1 if $x->{sign} eq '-' && $y->{sign} eq '+';	# does also -x <=> 0
 
-  return 0 if $x->is_zero() && $y->is_zero();		# 0 <=> 0
-  return -1 if $x->is_zero() && $y->{sign} eq '+';	# 0 <=> +y
-  return 1 if $y->is_zero() && $x->{sign} eq '+';	# +x <=> 0
+  # shortcut 
+  my $xz = $x->is_zero();
+  my $yz = $y->is_zero();
+  return 0 if $xz && $yz;				# 0 <=> 0
+  return -1 if $xz && $y->{sign} eq '+';		# 0 <=> +y
+  return 1 if $yz && $x->{sign} eq '+';			# +x <=> 0
 
   # adjust so that exponents are equal
   my $lx = $x->{_m}->length() + $x->{_e};

@@ -19,7 +19,7 @@ package Math::BigInt;
 my $class = "Math::BigInt";
 require 5.005;
 
-$VERSION = 1.39;
+$VERSION = '1.40';
 use Exporter;
 @ISA =       qw( Exporter );
 @EXPORT_OK = qw( bneg babs bcmp badd bmul bdiv bmod bnorm bsub
@@ -421,9 +421,13 @@ sub bsstr
   # internal format is always normalized (no leading zeros, "-0E0" => "+0E0")
   my ($self,$x) = objectify(1,@_);
 
-  return $x->{sign} if $x->{sign} !~ /^[+-]$/;
+  if ($x->{sign} !~ /^[+-]$/)
+    {
+    return $x->{sign} unless $x->{sign} eq '+inf';	# -inf, NaN
+    return 'inf';					# +inf
+    }
   my ($m,$e) = $x->parts();
-  # can be only '+', so
+  # e can only be positive
   my $sign = 'e+';	
   # MBF: my $s = $e->{sign}; $s = '' if $s eq '-'; my $sep = 'e'.$s;
   return $m->bstr().$sign.$e->bstr();
@@ -433,7 +437,11 @@ sub bstr
   {
   # make a string from bigint object
   my $x = shift; $x = $class->new($x) unless ref $x;
-  return $x->{sign} if $x->{sign} !~ /^[+-]$/;
+  if ($x->{sign} !~ /^[+-]$/)
+    {
+    return $x->{sign} unless $x->{sign} eq '+inf';	# -inf, NaN
+    return 'inf';					# +inf
+    }
   my $es = ''; $es = $x->{sign} if $x->{sign} eq '-';
   return $es.${$CALC->_str($x->{value})};
   }
@@ -569,6 +577,16 @@ sub bcmp
     return -1 if $y->{sign} eq '+inf';
     return +1 if $y->{sign} eq '-inf';
     }
+  # check sign for speed first
+  return 1 if $x->{sign} eq '+' && $y->{sign} eq '-';	# does also 0 <=> -y
+  return -1 if $x->{sign} eq '-' && $y->{sign} eq '+';  # does also -x <=> 0 
+
+  # shortcut
+  my $xz = $x->is_zero();
+  my $yz = $y->is_zero();
+  return 0 if $xz && $yz;                               # 0 <=> 0
+  return -1 if $xz && $y->{sign} eq '+';                # 0 <=> +y
+  return 1 if $yz && $x->{sign} eq '+';                 # +x <=> 0
   # normal compare now
   &cmp($x->{value},$y->{value},$x->{sign},$y->{sign}) <=> 0;
   }
@@ -770,7 +788,7 @@ sub is_zero
   #my ($self,$x) = objectify(1,@_);
   my $x = shift; $x = $class->new($x) unless ref $x;
   
-  return 0 if $x->{sign} !~ /^[+-]$/;			# NaN & +-inf aren't
+  return 0 if $x->{sign} !~ /^\+$/;			# -, NaN & +-inf aren't
   return $CALC->_is_zero($x->{value});
   }
 
@@ -799,10 +817,9 @@ sub is_one
   # or -1 if sign is given
   #my ($self,$x) = objectify(1,@_); 
   my $x = shift; $x = $class->new($x) unless ref $x;
-  my $sign = shift || '+';
+  my $sign = shift || ''; $sign = '+' if $sign ne '-';
  
-  # catch also NaN, +inf, -inf
-  return 0 if $x->{sign} ne $sign || $x->{sign} !~ /^[+-]$/;
+  return 0 if $x->{sign} ne $sign; 
   return $CALC->_is_one($x->{value});
   }
 
@@ -1061,17 +1078,17 @@ sub band
   return $x->bnan() if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/);
   return $x->bzero() if $y->is_zero();
 
-  if ($CALC->can('_and'))
-    {
-    $x->{value} = $CALC->_and($x->{value},$y->{value});
-    return $x->round($a,$p,$r);
-    }
-
   my $sign = 0;					# sign of result
   $sign = 1 if ($x->{sign} eq '-') && ($y->{sign} eq '-');
   my $sx = 1; $sx = -1 if $x->{sign} eq '-';
   my $sy = 1; $sy = -1 if $y->{sign} eq '-';
   
+  if ($CALC->can('_and') && $sx == 1 && $sy == 1)
+    {
+    $x->{value} = $CALC->_and($x->{value},$y->{value});
+    return $x->round($a,$p,$r);
+    }
+
   my $m = new Math::BigInt 1; my ($xr,$yr);
   my $x10000 = new Math::BigInt (0x1000);
   my $y1 = copy(ref($x),$y);	 		# make copy
@@ -1102,15 +1119,18 @@ sub bior
 
   return $x->bnan() if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/);
   return $x if $y->is_zero();
-  if ($CALC->can('_or'))
-    {
-    $x->{value} = $CALC->_or($x->{value},$y->{value});
-    return $x->round($a,$p,$r);
-    }
+
   my $sign = 0;					# sign of result
   $sign = 1 if ($x->{sign} eq '-') || ($y->{sign} eq '-');
   my $sx = 1; $sx = -1 if $x->{sign} eq '-';
   my $sy = 1; $sy = -1 if $y->{sign} eq '-';
+
+  # don't use lib for negative values
+  if ($CALC->can('_or') && $sx == 1 && $sy == 1)
+    {
+    $x->{value} = $CALC->_or($x->{value},$y->{value});
+    return $x->round($a,$p,$r);
+    }
 
   my $m = new Math::BigInt 1; my ($xr,$yr);
   my $x10000 = new Math::BigInt (0x10000);
@@ -1145,16 +1165,17 @@ sub bxor
   return $x if $y->is_zero();
   return $x->bzero() if $x == $y; # shortcut
   
-  if ($CALC->can('_xor'))
+  my $sign = 0;					# sign of result
+  $sign = 1 if $x->{sign} ne $y->{sign};
+  my $sx = 1; $sx = -1 if $x->{sign} eq '-';
+  my $sy = 1; $sy = -1 if $y->{sign} eq '-';
+
+  # don't use lib for negative values
+  if ($CALC->can('_xor') && $sx == 1 && $sy == 1)
     {
     $x->{value} = $CALC->_xor($x->{value},$y->{value});
     return $x->round($a,$p,$r);
     }
-
-  my $sign = 0;					# sign of result
-  $sign = 1 if ($x->{sign} eq '-') || ($y->{sign} eq '-');
-  my $sx = 1; $sx = -1 if $x->{sign} eq '-';
-  my $sy = 1; $sy = -1 if $y->{sign} eq '-';
 
   my $m = new Math::BigInt 1; my ($xr,$yr);
   my $x10000 = new Math::BigInt (0x10000);

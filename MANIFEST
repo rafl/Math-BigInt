@@ -25,6 +25,7 @@ bench/factorial.pl		# see BENCHMARK
 bench/power.pl			# see BENCHMARK
 bench/round.pl
 bench/bigbench.pl		# really big benchmark suite
+bench/cmp.pl			# comparing with 0 (see BENCHMARK)
 t/mbimbf.t			# test accuracy/precision settings in MBI/MBF
 t/bigintpm.t			# OO and overload skin over Math::BigInt::*
 t/bigintc.t			# pure perl implementation of uint math core

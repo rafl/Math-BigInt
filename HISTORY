@@ -116,6 +116,9 @@ Math::BigFloat:
  * fixed +-inf handling in bacmp/bcmp/bsub/badd/bdiv and tests for that
  * padd bstr() output of numbers with set A or P
  * remove bfloat() (Math::BigInt->bfloat() did not work, anyway, see bint())
+2001-08-03 v1.20 Tels
+ * streamlined bcmp
+ * drop leading '+' for inf
 
 ############################################################################## 
 Math::BigInt:
@@ -277,6 +280,12 @@ Math::BigInt:
  * fixed +-inf handling in a lot of places and tests for that
  * band(), bxor() and bior() now work with negative inputs
  * remove bint() (Math::BigFloat->bint() just DNDWIM and no sense, either)
+2001-08-03 v1.40 Tels
+ * bxor(-$x,-$y) was broken (and not tested *sigh*)
+ * streamlined bcmp
+ * drop leading '+' for inf
+ * bxor(), band(), bior() with negative arguments don't get passed to lib
+   (makes it work with BitVect, Pari, GMP etc)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

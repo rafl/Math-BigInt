@@ -1,11 +1,11 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.398:
+v1.40:
 
  general:
   + It is subsequent faster than the original in many places
-  + Can take advantage of 64 bit architectures
+  + Can take advantage of scalars with more than 32 bits
   + Can use alternatives to drive the math via use Math::BigInt lib => 'name';
   + regression test suite greatly enlarged to cover more problematic cases
   + added example scripts (prime.pl, bigprimes.pl, hailstone.pl)
@@ -13,12 +13,13 @@ v1.398:
   + BigInt is sub-classable with very little effort, see M::S or M::BF
   + subclasses of Math::BigInt know all the same methods, so that you can call
     $x->some_method() without having to know which type of class $x is
+  + added infinity handling
  caveats:
   + bstr() and stringify now drop the leading '+' (to make overloaded cmp work
     as expected when cmp'aring to scalars and other objects (read: bugfix)
   + spaces are no longer allowed in a number (but may precede or follow it)
  input:
-  + underscores are now valid between any two digits
+  + underscores are now valid between any two digits (in hex/binary input, too)
   + integers of the form 1E2, 1.23E2, 2.00 etc now valid for BigInt.pm, too
   + hexadecimal numbers of the form 0xabcdefABCDEF0123456789
   + binary numbers of the form 0b010101011
@@ -53,7 +54,6 @@ v1.398:
   + added LICENSE section and file
  new stuff:
   + bacmp (acmp), because needed for more efficient add()
-  + bint() for writing shorter code (exportable new())
   + bzero(), bnan(), bone(), binf()
   + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf()
   + digit(), as_number(), length(), copy()

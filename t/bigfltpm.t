@@ -172,15 +172,15 @@ __END__
 -123.456:-123
 -200:-200
 &binf
-1:+:+inf
+1:+:inf
 2:-:-inf
-3:abc:+inf
+3:abc:inf
 &numify
 0:0e+1
 +1:1e+0
 1234:1234e+0
 NaN:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 &bnan
 abc:NaN
@@ -197,12 +197,12 @@ abc:NaN
 abc::1
 2:abc:1
 &bsstr
-+inf:+inf
++inf:inf
 -inf:-inf
 abcbsstr:NaN
 1234.567:1234567e-3
 &bstr
-+inf:::+inf
++inf:::inf
 -inf:::-inf
 abcbsstr:::NaN
 1234.567:9::1234.56700
@@ -213,7 +213,7 @@ abcbsstr:::NaN
 0:4::0
 0::-4:0.0000
 &fnorm
-+inf:+inf
++inf:inf
 -inf:-inf
 +infinity:NaN
 +-inf:NaN
@@ -275,14 +275,14 @@ abc:NaN
 128:-2:0.00006103515625
 abc:123.456:NaN
 123.456:abc:NaN
-+inf:123.45:+inf
++inf:123.45:inf
 -inf:123.45:-inf
-+inf:-123.45:+inf
++inf:-123.45:inf
 -inf:-123.45:-inf
 &fneg
 fnegNaN:NaN
 +inf:-inf
--inf:+inf
+-inf:inf
 +0:0
 +1:-1
 -1:1
@@ -292,8 +292,8 @@ fnegNaN:NaN
 -123456.789:123456.789
 &fabs
 fabsNaN:NaN
-+inf:+inf
--inf:+inf
++inf:inf
+-inf:inf
 +0:0
 +1:1
 -1:1
@@ -303,7 +303,7 @@ fabsNaN:NaN
 -123456.789:123456.789
 &fround
 $rnd_mode = "trunc"
-+inf:5:+inf
++inf:5:inf
 -inf:5:-inf
 0:5:0
 NaNfround:5:NaN
@@ -362,7 +362,7 @@ $rnd_mode = "even"
 -60123456789.0123:5:-60123000000
 &ffround
 $rnd_mode = "trunc"
-+inf:5:+inf
++inf:5:inf
 -inf:5:-inf
 0:5:0
 NaNffround:5:NaN
@@ -558,12 +558,12 @@ fcmpNaN:+0:
 -inf:+inf:-1
 # return undef
 +inf:NaN:
-NaN:+inf:
+NaN:inf:
 -inf:NaN:
 NaN:-inf:
 &fdec
 fdecNaN:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 +0:-1
 +1:0
@@ -572,7 +572,7 @@ fdecNaN:NaN
 -1.23:-2.23
 &finc
 fincNaN:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 +0:1
 +1:2
@@ -585,7 +585,7 @@ abc:+0:NaN
 +0:abc:NaN
 +inf:-inf:0
 -inf:+inf:0
-+inf:+inf:+inf
++inf:+inf:inf
 -inf:-inf:-inf
 baddNaN:+inf:NaN
 baddNaN:+inf:NaN
@@ -630,7 +630,7 @@ baddNaN:+inf:NaN
 abc:abc:NaN
 abc:+0:NaN
 +0:abc:NaN
-+inf:-inf:+inf
++inf:-inf:inf
 -inf:+inf:-inf
 +inf:+inf:0
 -inf:-inf:0
@@ -680,18 +680,18 @@ abc:+0:NaN
 +inf:NaNmul:NaN
 NaNmul:+inf:NaN
 NaNmul:-inf:NaN
-+inf:+inf:+inf
++inf:+inf:inf
 +inf:-inf:-inf
 +inf:-inf:-inf
-+inf:+inf:+inf
-+inf:123.34:+inf
++inf:+inf:inf
++inf:123.34:inf
 +inf:-123.34:-inf
 -inf:123.34:-inf
--inf:-123.34:+inf
-123.34:+inf:+inf
+-inf:-123.34:inf
+123.34:+inf:inf
 -123.34:+inf:-inf
 123.34:-inf:-inf
--123.34:-inf:+inf
+-123.34:-inf:inf
 +0:+0:0
 +0:+1:0
 +1:+0:0
@@ -732,8 +732,8 @@ abc:+1:abc:NaN
 0:abc:NaN
 +0:+0:NaN
 +0:+1:0
-+1:+0:+inf
-+3214:+0:+inf
++1:+0:inf
++3214:+0:inf
 +0:-1:0
 -1:+0:-inf
 -3214:+0:-inf
@@ -813,7 +813,7 @@ $div_scale = 40
 -16:NaN
 -123.45:NaN
 nanfsqrt:NaN
-+inf:+inf
++inf:inf
 -inf:NaN
 +1:1
 +2:1.41421356237309504880168872420969807857
@@ -892,7 +892,7 @@ NaNone:0
 &bfloor
 0:0
 abc:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 1:1
 -51:-51
@@ -901,7 +901,7 @@ abc:NaN
 &bceil
 0:0
 abc:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 1:1
 -51:-51

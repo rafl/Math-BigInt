@@ -201,6 +201,71 @@ Notes: v0.49 warns a lot about "used uninitialized value in '+' in line 275".
 
 ###############################################################################
 ###############################################################################
+Here are the values of a benchmark involving comparing against zero:
+
+#!/usr/bin/perl -w
+
+use Math::BigInt;
+use Math::BigFloat;
+use Benchmark;
+
+my ($x,$y,$z,$xf,$yf,$zf);
+
+my $digits = shift || 10;
+$x = '1'.'0' x $digits;
+
+$x = Math::BigInt->new($x);
+$y = -$x;
+$z = Math::BigInt->bzero();
+
+$xf = Math::BigFloat->new($x);
+$yf = -$xf;
+$zf = Math::BigFloat->bzero();
+
+timethese (40000,
+  {
+  ' 0 <=>  0' => sub { $z->bcmp($z); },			# 1
+  ' 0 <=> +x' => sub { $z->bcmp($x); },			# 2	
+  '+x <=>  0' => sub { $x->bcmp($z); },			# 3
+  ' 0 <=> -x' => sub { $z->bcmp($y); },			# 4
+  '-x <=>  0' => sub { $y->bcmp($z); },			# 5
+
+  'f  0 <=>  0' => sub { $zf->bcmp($zf); },		# 6
+  'f  0 <=> +x' => sub { $zf->bcmp($xf); },		# 7
+  'f +x <=>  0' => sub { $xf->bcmp($zf); },		# 8
+  'f  0 <=> -x' => sub { $zf->bcmp($yf); },		# 9
+  'f -x <=>  0' => sub { $yf->bcmp($zf); },		# 10
+  } );
+
+Values are operations per second, done on 800Mhz Athlon. 
+
+	Version:
+                    v0.01|v0.49  | v1.39C      BV      P| v1.40C
+   digits:  case:        |  1e7  |    1e7    1.01   1.01|    1e7
+ ------------------------+-------+----------------------+-------
+       10	1   17467|                              |  18604
+       10       2   19230|                              |  18181
+       10       3   19047|                              |  18264
+       10       4   30075|                              |  37037
+       10       5   29629|                              |  35714
+       10       6   16393|                              |  16000
+       10       7   12738|                              |  15444
+       10       8   12658|                              |  15384
+       10       9   36697|                              |  36697
+       10      10   35714|                              |  35087
+     1000	1   17316|                              |  18518
+     1000       2   19138|                              |  18264
+     1000       3   18779|                              |  18181
+     1000       4   29850|                              |  36697
+     1000       5   29850|                              |  35398
+     1000       6   16260|                              |  15936
+     1000       7   12618|                              |  15625
+     1000       8   12578|                              |  15384
+     1000       9   36697|                              |  36697
+     1000      10   35714|                              |  35714
+
+###############################################################################
+###############################################################################
 Here are some details about a rounding-shoutout. The following script creates
 some big semi-random numbers and then rounds them of in 3-some steps:
 

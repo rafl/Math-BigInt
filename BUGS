@@ -7,11 +7,11 @@ Known bugs:
 * BigFloat:
   + unfinished (fmod() is missing)
   + certain operations (div?) leave $x->{_m} as NaN! Oups! (also BS2000)
+    That is because 1e5 * (1/1e5) != 1 on these machines
   + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
   + fdiv() using F (fallback) mode does not honour local (aka $x's) A settings
-  + drop '+' for $x->binf()->bstr() to make inf eq Math::BigInt->binf() work
   + MBF uses internally MBI for calculating. This can make problems if MBI has
     set global accuracy settings, and thus rounds unexpectedly the mantissa.
     My attempt to fix it stops the following from breaking, but it might not
@@ -32,7 +32,6 @@ Known bugs:
     This is likely an Exporter bug, and causes Math::BigInt to eval require on
     earlier Perls when loading the core math lib. Thus the loading can fail on
     filesystems that can not cope with 'Math/BigInt/Calc.pm' style filenames.
-  + drop '+' for $x->binf()->bstr() to make inf eq Math::BigInt->binf() work
 
 Accuracy:
  Any operation encountering the following should result in an error:

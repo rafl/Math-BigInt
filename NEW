@@ -1,25 +1,13 @@
-This lists only the changes for the current release (v1.39) over the last
+This lists only the changes for the current release (v1.40) over the last
 version, since HISTORY is now quite big:
 
 Fixes and enhancements:
-  Some calls to $CALC were not assigning the return value back to $x->{value}
-    (This is important when the lib does not modify the args, but returns a
-     new value instead; sometimes this is ineviteable)
-  Improved infinity handling (complete with tests):
-    +-123 / +-inf => 0
-    123 / 0 => +inf, -123 / 0 => -inf in MBF
-    +inf - +inf = 0, -inf + -inf = 0, -inf - -inf = -inf, +inf + +inf = +inf
-    +inf++ or +inf-- => +inf, -inf -- or -inf ++ => -inf
-    +inf <=> -inf etc 
-    $x->binf()->bstr() => 'inf', not '+inf' (for cmp, eg etc)
-  MBF: there were no tests for fdec() and finc()
-  MBF: numbers with set precision/accuracy are zero padded
-	1234, a=3 => 1230, 1234, a=6 => 1234.00, 123, p=3 => 123.000
-  MBI: test for 1234.00 as valid input
-  _split() had accidentily 'return return ...', also streamlined it a bit
-  Negative inputs in band(), bxor(), bior() and bsrft()/blsft() were broken
-  Hexadecimal/binary inputs with underscrores were broken
-  
+  drop leading '+' for inf in bstr(), bsstr() to make $x->binf() eq inf work
+  streamlined bcmp() for comparisations with zero
+  bxor(-$x,-$y) was broken and not tested for
+  bxor(), band(), bior() with negative arguments no longer passed to
+  underlying lib (means it works with BitVect, Pari, GMP etc)
+ 
 Please have arbitrarily big amounts of fun.
 
 Tels <http://bloodgate.com/perl>

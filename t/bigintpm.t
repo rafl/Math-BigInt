@@ -8,9 +8,9 @@ BEGIN
   $| = 1;
   # chdir 't' if -d 't';
   unshift @INC, '../lib'; # for running manually
-  plan tests => 1421;
+  plan tests => 1424;
   }
-my $version = '1.39';	# for $VERSION tests, match current release (by hand!)
+my $version = '1.40';	# for $VERSION tests, match current release (by hand!)
 
 ##############################################################################
 # for testing inheritance of _swap
@@ -209,7 +209,7 @@ while (<DATA>)
   } # endwhile data tests
 close DATA;
 
-# XXX Tels 06/29/2001 following tests never fail or do not work :(
+# XXX Tels 06/29/2001 following tests never fail or do not work :( !?
 
 # test whether use Math::BigInt qw/version/ works
 $try = "use Math::BigInt ($version.'1');";
@@ -364,6 +364,9 @@ $ans = eval $try;
 print "# For '$try'\n" if (!ok "$ans" , "ok" ); 
 
 ###############################################################################
+# the followin tests only make sense with Math::BigInt::Calc
+
+###############################################################################
 # check proper length of internal arrays
 
 $x = Math::BigInt->new(99999); is_valid($x);
@@ -371,8 +374,7 @@ $x += 1; ok ($x,100000); is_valid($x);
 $x -= 1; ok ($x,99999); is_valid($x); 
 
 ###############################################################################
-# check numify, these tests only make sense with Math::BigInt::Calc, since
-# only this uses $BASE
+# check numify
 
 my $BASE = int(1e5);		# should access Math::BigInt::Calc::BASE
 $x = Math::BigInt->new($BASE-1);     ok ($x->numify(),$BASE-1); 
@@ -517,6 +519,12 @@ ok ($x,-3);
 ok (ref($x),'Math::Foo');
 
 ###############################################################################
+# test whether +inf eq inf
+
+$y = 1e1000000;	# create inf, since bareword inf does not work
+$x = Math::BigInt->new('+inf'); ok ($x,$y);
+
+###############################################################################
 # all tests done
 
 ###############################################################################
@@ -617,7 +625,7 @@ acmpNaN:acmpNaN:
 -inf:-123:1
 # return undef
 +inf:NaN:
-NaN:+inf:
+NaN:inf:
 -inf:NaN:
 NaN:-inf:
 &bnorm
@@ -646,7 +654,7 @@ NaN:-inf:
 0x1_2_3_4_56_78:305419896
 0x_123:NaN
 # inf input
-+inf:+inf
++inf:inf
 -inf:-inf
 0inf:NaN
 # normal input
@@ -710,9 +718,9 @@ boneNaN:+:+1
 2:abc:+1
 3::+1
 &binf
-1:+:+inf
+1:+:inf
 2:-:-inf
-3:abc:+inf
+3:abc:inf
 &is_inf
 +inf::1
 -inf::1
@@ -767,7 +775,7 @@ abc:NaN
 &bneg
 bnegNaN:NaN
 +inf:-inf
--inf:+inf
+-inf:inf
 abd:NaN
 +0:+0
 +1:-1
@@ -776,8 +784,8 @@ abd:NaN
 -123456789:+123456789
 &babs
 babsNaN:NaN
-+inf:+inf
--inf:+inf
++inf:inf
+-inf:inf
 +0:+0
 +1:+1
 -1:+1
@@ -820,19 +828,19 @@ bcmpNaN:+0:
 -inf:+inf:-1
 # return undef
 +inf:NaN:
-NaN:+inf:
+NaN:inf:
 -inf:NaN:
 NaN:-inf:
 &binc
 abc:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 +0:+1
 +1:+2
 -1:+0
 &bdec
 abc:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 +0:-1
 +1:+0
@@ -843,7 +851,7 @@ abc:+0:NaN
 +0:abc:NaN
 +inf:-inf:0
 -inf:+inf:0
-+inf:+inf:+inf
++inf:+inf:inf
 -inf:-inf:-inf
 baddNaN:+inf:NaN
 baddNaN:+inf:NaN
@@ -887,7 +895,7 @@ baddNaN:+inf:NaN
 abc:abc:NaN
 abc:+0:NaN
 +0:abc:NaN
-+inf:-inf:+inf
++inf:-inf:inf
 -inf:+inf:-inf
 +inf:+inf:0
 -inf:-inf:0
@@ -933,10 +941,10 @@ NaNmul:+inf:NaN
 NaNmul:-inf:NaN
 -inf:NaNmul:NaN
 +inf:NaNmul:NaN
-+inf:+inf:+inf
++inf:+inf:inf
 +inf:-inf:-inf
 -inf:+inf:-inf
--inf:-inf:+inf
+-inf:-inf:inf
 +0:+0:+0
 +0:+1:+0
 +1:+0:+0
@@ -980,9 +988,9 @@ abc:abc:NaN
 abc:+1:abc:NaN
 +1:abc:NaN
 +0:+0:NaN
-+5:0:+inf
++5:0:inf
 -5:0:-inf
-+1:+0:+inf
++1:+0:inf
 +0:+1:+0
 +0:-1:+0
 -1:+0:-inf
@@ -1139,12 +1147,13 @@ abc:0:NaN
 +281474976710656:+0:+281474976710656
 +281474976710656:+1:+281474976710657
 +281474976710656:+281474976710656:+0
--2:-3:-3
+-2:-3:3
 -1:-1:0
 -6:-6:0
 -7:4:-3
 -4:7:-5
 4:-7:-3
+-4:-7:5
 &bnot
 abc:NaN
 +0:-1
@@ -1222,9 +1231,9 @@ abc:12:NaN
 -2:-1:NaN
 2:-2:NaN
 -2:-2:NaN
-+inf:1234500012:+inf
++inf:1234500012:inf
 -inf:1234500012:-inf
-+inf:-12345000123:+inf
++inf:-12345000123:inf
 -inf:-12345000123:-inf
 # 1 ** -x => 1 / (1 ** x)
 -1:0:1
@@ -1273,7 +1282,7 @@ Nan:NaN
 $round_mode('trunc')
 0:12:0
 NaNbround:12:NaN
-+inf:12:+inf
++inf:12:inf
 -inf:12:-inf
 1234:0:1234
 1234:2:1200
@@ -1370,7 +1379,7 @@ NaNone:0
 &bfloor
 0:0
 NaNfloor:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 -1:-1
 -2:-2
@@ -1379,7 +1388,7 @@ NaNfloor:NaN
 abc:NaN
 &bceil
 NaNceil:NaN
-+inf:+inf
++inf:inf
 -inf:-inf
 0:0
 -1:-1
