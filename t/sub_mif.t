@@ -13,12 +13,9 @@ BEGIN
   my $location = $0; $location =~ s/sub_mif.t//i;
   if ($ENV{PERL_CORE})
     {
-    @INC = qw(../lib); 		# testing with the core distribution
+    @INC = qw(../t/lib); 		# testing with the core distribution
     }
-  else
-    {
-    unshift @INC, '../lib';	# for testing manually
-    }
+  unshift @INC, '../lib';	# for testing manually
   if (-d 't')
     {
     chdir 't';

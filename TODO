@@ -6,7 +6,7 @@ General:
    unset them when $CALC changes)
 
 Math::BigFloat:
- * finish 'upgrade'
+ * finish upgrading and downgrading
  * ! bround()/bfround(): some bugs may lurk in there
  * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
  * do not reduce numbers in new(), rather do it in anything that outputs it
@@ -14,6 +14,8 @@ Math::BigFloat:
    number after each op is slow with a binary core math lib like BitVect.
  * ?? add $x->bint(), that rounds with 'trunc' to an integer ??
  * tests for frsft() and flsft() with $n != 2
+ * blog() is dead slow, and doesn't work for bases != e (aka only ln() works)
+ * bsqrt(): maybe optimize the diff-compare away?
 
 Math::BigFloat::Constant:
  * really needed by someone out there?

@@ -69,6 +69,8 @@ Math::BigInt::Calc:
 2002-02-27 v0.24 Tels
  * streamlined _mod() shortcuts
  * _div() has shortcut if $y is very small
+2002-03-03 v0.25 Tels
+ * started _square() (not done yet)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -232,6 +234,9 @@ Math::BigFloat:
  * optimized as_number (nearly twice as fast)
  * $x->badd(0) forgot to round $x
  * downgrade and upgrade are valid methods for inheritance
+2002-03-03 v1.31 Tels
+ * bpow() can handle second arguments beeing non-integer (f.i. 2 ** 0.2)
+ * $x->bpow(0.5) optimized to $x->bsqrt(); 
  
 ############################################################################## 
 Math::BigInt:
@@ -463,7 +468,14 @@ Math::BigInt:
  * precisision typo
  * fixed overlong pod =item
  * added downgrade() 
- 
+2002-03-03 v1.54 Tels
+ * really fixed overlong pod =item
+ * downgrade() and upgrade() with undef as argument didn't clear the variable
+ * bmul() upgrades if second argument is non-integer 
+ * bdiv() upgrades if $x > $y
+ * bpow() upgrades if second argument is non-integer
+ * objectify disable downgrade (for MBF)
+ * new() twice as fast due to shortcut simple numbers, save _split() & _round()
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

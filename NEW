@@ -1,22 +1,24 @@
-This lists only the changes for the current release (v1.53) over the last
+This lists only the changes for the current release (v1.54) over the last
 version, since HISTORY is now quite big:
 
-Calc  : _div() has shortcut if $y < $MBASE
-MBI   : added downgrade()
-	typo: precisision vs. precision made Math::BigInt->config() whince
-MBF   : numify() on _e in bcmp/bacmp makes these about factor 5.25 faster
-	replaced some *= (10 ** $x) places in badd by blsft($x,10) for speed
-	(speedup between factor 1 and 3 (up to inf), better for large numbers)
-	optimized ffloor() and fceil()
-	opt. fpow() (15 vs 16 times is_zero(): between 2 and 15% faster)
-	opt. as_number() (replaced "< 0" with "{sign} eq '-'": factor 1..2)
-	the fix for bsub (forgot round if $x->bsub(0)) was also present in MBF
-	$x->badd(0) forgot to round result
-	added downgrade and upgrade to valid methods for inheritance
-	new() now downgrades if wanted and possible (e.g. for integers)
-tests : added some for bsub((0) and badd(0) bugs
-	tests for downgrade
-	tests for the _mod() shortcuts
+Calc  : started _square() algorithmn
+	fixed some comments
+MBI   : objectify() disables downgrade 
+	(objectify() needs an overhaul since it doesn't work to well with
+	 Math::BigFloat due to non-OO-ness)
+	Class->upgrade(undef); did not erase $upgrade, ditto for downgrade
+	bmul(3,3.5) did not upgrade properly
+	bdiv(3,2) did not upgrade properly
+	bpow(2,3.5) did not upgrade properly
+	is_inf('-inf') didn't work (only is_inf('-'))
+	fixed overlong pod items and some assorted pod things
+	new() for "simple" (aka /+-[1-9][0-9]*/) numbers is now twice as fast
+MBF   : blog() about 20% faster
+      : bsqrt() about 10% faster
+	$x->bpow($y) w/ $y beeing non-integer hung (now f.i. 2 ** 0.2 works)
+	$x ** 0.5 is optimized to bsqrt($x)
+tests : some more for blog()
+	tests for downgrade/upgrade
 
 Please have Math::BigInt->new('inf')->bmul('inf') big amounts of fun.
 

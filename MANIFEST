@@ -40,6 +40,7 @@ t/downgrade.t			# see if downgrading works
 t/constant.t			# test Math::BigInt/BigFloat ':constant'
 t/config.t			# test Math::BigInt->config()
 t/inf_nan.t			# inf and NaN handling
+t/isa.t				# isa() and new() w/ mixed classes tests
 t/upgrade.inc			# actual tests for upgrading
 t/Math/BigInt/BareCalc.pm	# for testing BigInt's simulation of Calc
 t/Math/BigInt/Subclass.pm	# empty subclass
