@@ -19,7 +19,7 @@ package Math::BigInt;
 my $class = "Math::BigInt";
 require 5.005;
 
-$VERSION = '1.43';
+$VERSION = '1.44';
 use Exporter;
 @ISA =       qw( Exporter );
 @EXPORT_OK = qw( bneg babs bcmp badd bmul bdiv bmod bnorm bsub

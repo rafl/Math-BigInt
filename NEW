@@ -1,6 +1,9 @@
-This lists only the changes for the current release (v1.43) over the last
+This lists only the changes for the current release (v1.44) over the last
 version, since HISTORY is now quite big:
 
+v1.44: Fixed MANIFEST
+
+v1.43:
 Fixes and enhancements:
   Calc: automatically determine whether to use USE_MUL or USE_DIV
         Fixed bug with hardcoded '99999' instead of $BASE-1 in _div(), thus

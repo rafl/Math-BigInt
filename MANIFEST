@@ -34,3 +34,4 @@ t/bigfltpm.t			# shell for M::BF tests
 t/bigfltpm.inc			# contains actual tests
 t/calling.t			# ensure that Class->method('string') works
 t/subclass.t			# empty subclass test for M::BF
+t/Math/Subclass.pm		# empty subclass
