@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.37:
+v1.38:
 
  general:
   + It is subsequent faster than the original in many places 
@@ -53,10 +53,11 @@ v1.37:
  new stuff:
   + bacmp (acmp), because needed for more efficient add()
   + bint() for writing shorter code (exportable new())
-  + bzero(), bnan(), sign(), binf()
+  + bzero(), bnan(), bone, binf()
   + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf()
-  + digit(), as_number(), is_positive(), is_negative()
-  + mantissa(), exponent(), parts(), length(), copy()
+  + digit(), as_number(), length(), copy()
+  + sign(), is_positive(), is_negative()
+  + mantissa(), exponent(), parts(), sign(),
   + bgcd accepts now lists
   + blcm (also accepts lists)
   + fmod() (Thanx J. Peacock) and fdiv() in list context

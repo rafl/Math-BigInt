@@ -30,6 +30,7 @@ Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * ++,-- could be faster in Bigint via hardcoded (manual) increment
  * look at div() for more speed
+ * band() etc. could use more bits (making it 32 instead of 16: double speed) 
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

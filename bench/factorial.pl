@@ -23,7 +23,7 @@ print "$Math::BigInt::VERSION ($d) base 1e$m\n";
 
 for ($k = 0; $k < 10; $k++)
   {
-  factorial($n);
+  print factorial($n),"\n";
   }
 
 sub factorial

@@ -19,6 +19,8 @@ Math::BigInt::Calc:
  * also the speedup in mul() occurs with $x having lots of zeros, not $y.
  * first argument is always classname, so removed checks and shift
  * shift in base ten by _lsft() and _rsft()
+2001-07-15 v0.08 Tels
+ * fixed bug in mul() shortcut
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -257,6 +259,8 @@ Math::BigInt:
  * tests for bnan() and bone()
  * Math::BigInt::Calc now determines biggest $BASE to use. Default should now
    be 1e7 on most systems, giving 20% to 40% speedups.
+2001-07-15 v1.18 Tels
+ * test for mul() shortcut
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

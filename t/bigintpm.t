@@ -8,9 +8,9 @@ BEGIN
   $| = 1;
   # chdir 't' if -d 't';
   unshift @INC, '../lib'; # for running manually
-  plan tests => 1247;
+  plan tests => 1248;
   }
-my $version = '1.37';	# for $VERSION tests, match current release (by hand!)
+my $version = '1.38';	# for $VERSION tests, match current release (by hand!)
 
 ##############################################################################
 # for testing inheritance of _swap
@@ -394,6 +394,25 @@ $x = Math::BigInt->new(123456); $z = Math::BigInt->new(10000); $z *= 10;
 $x -= $z;
 ok ($z, 100000);
 ok ($x, 23456);
+
+###############################################################################
+# bug in shortcut in mul()
+
+# construct a number with a zero-hole of BASE_LEN
+my $bl = Math::BigInt::Calc::_base_len();
+$x = '1' x $bl . '0' x $bl . '1' x $bl . '0' x $bl;
+$y = '1' x (2*$bl);
+#print "$x * $y\n";
+$x = Math::BigInt->new($x)->bmul($y);
+# result is 123..$bl .  $bl x (3*bl-1) . $bl...321 . '0' x $bl
+$y = ''; my $d = '';
+for (my $i = 1; $i <= $bl; $i++)
+  {
+  $y .= $i; $d = $i.$d;
+  }
+#print "$y $d\n";
+$y .= $bl x (3*$bl-1) . $d . '0' x $bl;
+ok ($x,$y);
 
 ###############################################################################
 # bug with rest "-0" in div, causing further div()s to fail

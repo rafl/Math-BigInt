@@ -19,7 +19,7 @@ use vars qw/ @ISA @EXPORT $VERSION/;
 	_check _zero _one _copy _zeros
         _rsft _lsft
 );
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -242,7 +242,7 @@ sub _mul
 
     # faster variant
     # looping through this if $xi == 0 is silly - so optimize it away!
-    @prod = (), next if $xi == 0;
+    $xi = (shift @prod || 0), next if $xi == 0;
     for $yi (@$yv)
       {
       $prod = $xi * $yi + ($prod[$cty] || 0) + $car;
