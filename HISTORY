@@ -29,6 +29,10 @@ Math::BigInt::Calc:
  * automatically USE_MUL or USE_DIV
 2001-10-03 v0.12 Tels
  * _div: 99999 => $BASE-1 ($MAX_VAL), that made some div's fail if $BASE != 5
+2001-10-23 v0.13 Tels
+ * better detection of BASELEN by matching against expected pattern
+2001-11-04 v0.14 Tels
+ * added _mod() for faster $x % $y
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -140,6 +144,8 @@ Math::BigFloat:
 2001-10-05 v1.23 Tels
  * fixed facmp() (was broken the same way as fcmp())
  * more rounding fixes from John P.
+2001-11-04 v1.25 Tels
+  * bacmp() fix for +-inf
 
 ############################################################################## 
 Math::BigInt:
@@ -321,6 +327,10 @@ Math::BigInt:
  * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op)
  * Heaploads of rounding fixes (and tests)
  * Test for 99999-bug in Calc 
+2001-11-04 v1.45 Tels
+ * tests run now in subclass, too 
+ * bmod() can use _mod in lib
+ * lots of tests fixed (assumed wrong base etc) and added
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

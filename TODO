@@ -18,8 +18,8 @@ Math::BigFloat::Constant:
  * really needed by someone out there?
 
 Math::BigInt:
- * objectify() is too slow and questionable (actually, it are only a few
-   percent overhead...still)
+ * remove rounding overhead when no rounding is done, e.g. no $object has A or
+   P and neither of bround(), bround(), accuracy() or precision() was called
  * bround() is only used by MBF for -$scale = -$len, anyway. POD is wrong for
    this, too.
  * +5 % 0 or -5 % 0 == NaN (should it be something else?)
@@ -31,6 +31,7 @@ Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * ++,-- could be faster in Bigint via hardcoded (manual) increment
  * look at div() for more speed
+ * alternative mul() method using shifts
  * band() etc. could use more bits (making it 32 instead of 16: double speed)
  * find a way to let underlying lib calculate band(), bior(), bxor() for
    negative inputs

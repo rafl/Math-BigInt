@@ -307,6 +307,34 @@ for ($i = 0; $i < $loops; $i ++)
   }
 
 ###############################################################################
+#!/usr/bin/perl -w
+
+use lib 'lib';
+
+use Math::BigInt;
+use Benchmark;
+
+my $x = Math::BigInt->new(2);
+my $u1 = Math::BigInt->new(255);
+my $u = Math::BigInt->new(150);
+my $xx = Math::BigInt->new(3);
+my $uu = Math::BigInt->new(127);
+my $z;
+
+timethese (100, {
+   bpow => sub { $z = $x->copy()->bpow($u); },
+   bpow3 => sub { $z = $xx->copy()->bpow($uu); },
+   bpow1 => sub { $z = $x->copy()->bpow($u1); }
+  } );
+
+Operations per second, 300 Mhz PIII:
+
+		bpow	bpow1	bpow3
+	------------------------------
+	 v1.44	  32	   27	   32
+	 v1.45	  37	   30	   36
+
+###############################################################################
 Old v0.01 code:
 
 Total Elapsed Time = 9.001886 Seconds

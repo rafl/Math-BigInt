@@ -1,49 +1,32 @@
-This lists only the changes for the current release (v1.44) over the last
+This lists only the changes for the current release (v1.45) over the last
 version, since HISTORY is now quite big:
 
-v1.44: Fixed MANIFEST
-
-v1.43:
-Fixes and enhancements:
-  Calc: automatically determine whether to use USE_MUL or USE_DIV
-        Fixed bug with hardcoded '99999' instead of $BASE-1 in _div(), thus
-        failing in rare cases if $BASE_LEN != 5 (was nearly always; typical 7)
-  Better install doc
-  M::BI::method(@args) works (more by accident), but M::BF::method(@args) not
-   (it never worked). The first is no longer guarantied to work, however, and
-   may be removed without further notice. Class->method(@args) should work
-   everywhere and calling.t ensures this. This change is intentional. See also:
-  Math::BigInt::bnorm($string) returned string (not obj) and wasn't tested
-  is_one(), is_zero() etc didn't work as 'Math::Big(Int|Float)->is_zero(1);'
-  MBF::fdiv() and fsqrt() were squashing subclasses as the second argument
-  $rnd_mode => $round_mode to be consistent with round_mode()
-  $x->accuracy() and $x->precision() fall back to globals if $x's A&P are undef
-  MBF::bcmp() was fixed (v1.42), but MBF::bacmp() was still broken the same way
-  MBF: facmp(), ffloor(), fceil(), fabs() did not work
-  MBF: fnorm() was untested and did not work as MBF->fnorm($string);
-  Fixed the test with '1e+129' that would fail because some stupid Perls think
-   '1.e+129' or something else is valid, also made it use 1e+65 to avoid
-   problems with systems not having so big floating point numbers
-  Various rounding fixed (thanx to John Peacock for spotting them):
-    + bug in bfround() for positive numbers, added tests 
-    + keep bigger precision P (-2 > -3!) of $x and $y, not smaller one
-    + bdiv() with already set A or P must preserve them
-    + setting A (via accuracy() or round() etc) must clear P, and vice versa
-  Fixed even more rounding issues:
-    + rounding routines not setting A or P afterwards
-    + attempting to round even if result already has less A or P
-    + further rounding to less A or P of already rounded numbers failed
-    + bstr() returned '0' instead of '0.00' for zeros after rounding
-      (this is, however, questionable as the entire padding business is)
-    + rounding modes to be used wheren't checked for beeing valid	
-    + bnot() was not rounding it's result afterwards
-  Added a lot more testcases
-
-Speedups:
-  MBF: $x->bnorm() is now 4 times faster if $x == 0
-  MBI/MBF: $x->bround($n) when $n > $x->{_a} is now 43 times faster (no-op)
-  unary op's do no longer face the objectify() penalty for $x->op() style calls
-    (is_zero() is 2.2 (MBI) or 2.5 times (MBF) faster due to this alone)
+Calc :  changed the test for the biggest possible BASE_LEN to watch for pattern
+	max BASELEN is 8 for now (cheap hack to avoid VMS/OS/390 problems)
+	min BASELEN is now 3 (to avoid for OS/390 problems)
+	added checks in _check() for correct stringification of parts
+	added _mod() for faster $x % $y
+MBI  :  John Peacock's patch to add __PACKAGE__ inside accuracy()/precision()
+	more tests for mul() to check Calc's BASE_LEN choice
+	testsuite skips tests if Calc isn't used, makes it easier for Pari etc
+	converted DOS style line-endings to unix in bigflt.inc and Subclass.pm
+	bmod() wasn't rounding result afterwards
+	bmod() gives now lib a chance to calculate reminder without _div()
+	bmod() had no +-inf or NaN handling and was wrong when $y|$x = 0 or 1
+	added tests for inf handling in div()
+	doc section about reasoning behind NaN and +-inf handling
+	reminder => remainder
+	bpow() about 15% faster (testet with 2 ** 150, 2 ** 256, 3 ** 127)
+	bmod() now a lot faster in almost all cases
+MBF  :  fixed bacmp() for $x != +-inf && $y +-inf, added tests for it
+tests:  incorporated fix from CORE to find the testing files
+	make sure to quote bare floating point values, since stringify might
+	 turn 123.46 into 123.459999999 and thus makes the test appear to fail
+	more tests in calling.t	
+	bigintpm.t now runs it's test in a subclass, too
+	tests that expected BASE of 1e5 were changed to use the real BASE
+	tests for invalid round_mode()
+	various other tests to increase coverage (thanx to Paul Johnson!)
 
 Please have arbitrarily big amounts of fun.
 
