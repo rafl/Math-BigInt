@@ -4,7 +4,7 @@ General:
  * Copy on write (helps for $x = -$x; cases etc)
 
 Math::BigFloat:
- * ! bround(): some bugs may lurk in there (warnings)
+ * ! bround()/bfround(): some bugs may lurk in there
  * have a closer look at fsqrt() and it's performance
  * ! bmod() 
  * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
@@ -12,7 +12,7 @@ Math::BigFloat:
    like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
    number after each op is slow with a binary core math lib like BitVect.
  * ?? add $x->bint(), that rounds with 'trunc' to an integer ??
- * look at performance, especially new() (sig of ->{_m} and babs there)
+ * look at performance, especially new() (sign of ->{_m} and babs there)
 
 Math::BigFloat::Constant:
  * really needed by someone out there?
@@ -20,10 +20,9 @@ Math::BigFloat::Constant:
 Math::BigInt:
  * objectify() is too slow and questionable (actually, it are only a few
    percent overhead...still)
- * bround() gives wierd results for -$scale, abs($scale) > $len), and is only
-   used by MBF for -$scale = -$len, anyway. POD is wrong for this, too.
+ * bround() is only used by MBF for -$scale = -$len, anyway. POD is wrong for
+   this, too.
  * +5 % 0 or -5 % 0 == NaN (should it be something else?)
- * as_hex(), as_bin()
 
 Given the fact that we are be able to plug-in a much faster core-lib, the
 following are pretty much ultra-low-priority:

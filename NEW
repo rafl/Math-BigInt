@@ -1,23 +1,46 @@
-This lists only the changes for the current release (v1.42) over the last
+This lists only the changes for the current release (v1.43) over the last
 version, since HISTORY is now quite big:
 
 Fixes and enhancements:
-  Fixed serious bug in MBF::bcmp which caused 1.5 to be bigger than 2 *oups*
-  fixed $x->length() for $x == 0 in Math::BigFloat
-  parts()/mantissa()/exponent() for +-inf/ NaN (failed or returned scalars)
-  new('inf') failed (expected '+inf')
-  MBF: finf() did not work (only binf() did)
-  MBF::bcmp would not only return 0,1,-1 and undef but other values, too
-  Bug in MBI overload that caused poor performance for bcmp() of subclasses
-  odd numbers can't have trailing 0's, so no conv. necc. for Pari etc
-  $CALC->import() w/ list of libs, needed by coming Math::BigInt::Cached
-  added as_hex() and as_bin()
-  MBF: added tests for length(), parts(), exponent() and mantissa()
-  MBI: test for length() in list context
+  Calc: automatically determine whether to use USE_MUL or USE_DIV
+        Fixed bug with hardcoded '99999' instead of $BASE-1 in _div(), thus
+        failing in rare cases if $BASE_LEN != 5 (was nearly always; typical 7)
+  Better install doc
+  M::BI::method(@args) works (more by accident), but M::BF::method(@args) not
+   (it never worked). The first is no longer guarantied to work, however, and
+   may be removed without further notice. Class->method(@args) should work
+   everywhere and calling.t ensures this. This change is intentional. See also:
+  Math::BigInt::bnorm($string) returned string (not obj) and wasn't tested
+  is_one(), is_zero() etc didn't work as 'Math::Big(Int|Float)->is_zero(1);'
+  MBF::fdiv() and fsqrt() were squashing subclasses as the second argument
+  $rnd_mode => $round_mode to be consistent with round_mode()
+  $x->accuracy() and $x->precision() fall back to globals if $x's A&P are undef
+  MBF::bcmp() was fixed (v1.42), but MBF::bacmp() was still broken the same way
+  MBF: facmp(), ffloor(), fceil(), fabs() did not work
+  MBF: fnorm() was untested and did not work as MBF->fnorm($string);
+  Fixed the test with '1e+129' that would fail because some stupid Perls think
+   '1.e+129' or something else is valid, also made it use 1e+65 to avoid
+   problems with systems not having so big floating point numbers
+  Various rounding fixed (thanx to John Peacock for spotting them):
+    + bug in bfround() for positive numbers, added tests 
+    + keep bigger precision P (-2 > -3!) of $x and $y, not smaller one
+    + bdiv() with already set A or P must preserve them
+    + setting A (via accuracy() or round() etc) must clear P, and vice versa
+  Fixed even more rounding issues:
+    + rounding routines not setting A or P afterwards
+    + attempting to round even if result already has less A or P
+    + further rounding to less A or P of already rounded numbers failed
+    + bstr() returned '0' instead of '0.00' for zeros after rounding
+      (this is, however, questionable as the entire padding business is)
+    + rounding modes to be used wheren't checked for beeing valid	
+    + bnot() was not rounding it's result afterwards
+  Added a lot more testcases
 
-Documentation:
-  CAVEAT doc about length in list context (print)
-  fixed doc in Math::BigInt::Calc
+Speedups:
+  MBF: $x->bnorm() is now 4 times faster if $x == 0
+  MBI/MBF: $x->bround($n) when $n > $x->{_a} is now 43 times faster (no-op)
+  unary op's do no longer face the objectify() penalty for $x->op() style calls
+    (is_zero() is 2.2 (MBI) or 2.5 times (MBF) faster due to this alone)
 
 Please have arbitrarily big amounts of fun.
 

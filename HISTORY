@@ -25,6 +25,10 @@ Math::BigInt::Calc:
  * don't use warnings for older Perls
 2001-08-24 v0.10 Tels
  * no longer export anything, ignore import calls
+2001-09-07 v0.11 Tels
+ * automatically USE_MUL or USE_DIV
+2001-10-03 v0.12 Tels
+ * _div: 99999 => $BASE-1 ($MAX_VAL), that made some div's fail if $BASE != 5
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -129,6 +133,13 @@ Math::BigFloat:
  * new('inf') produced NaN (was expecting '+inf')
  * exponent(), mantissa() & parts() failed or returned scalars for inf,-inf,NaN
  * include finf in AUTOLOAD list
+2001-10-03 v1.22 Tels
+ * Quite a lot of rounding fixes
+ * $x->bnorm() is 4 times faster if $x == 0
+ * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op) 
+2001-10-05 v1.23 Tels
+ * fixed facmp() (was broken the same way as fcmp())
+ * more rounding fixes from John P.
 
 ############################################################################## 
 Math::BigInt:
@@ -301,11 +312,15 @@ Math::BigInt:
 2001-09-03 v1.42 Tels
  * bug in overload section causing performance losses in subclasses
  * call $CALC->import() with list of libs
- * odd numbers never have trailing zeros, so don't convert them to dec to look
+ * odd numbers never have trailing zeros, so don't convert them to DEC to look
  * as_hex() and as_bin()
  * $x->bmod() did not modify $x, only returned result. Oups.
  * new('inf') produced NaN (was expecting '+inf')
  * exponent(), mantissa() & parts() failed or returned scalars for inf,-inf,NaN
+2001-10-05 v1.43 Tels
+ * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op)
+ * Heaploads of rounding fixes (and tests)
+ * Test for 99999-bug in Calc 
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

@@ -30,6 +30,14 @@ Otherwise you need to
 
 or something equally ugly to enable the new versions in your scripts.
 
+You can check whether you get the old or new versions by doing this:
+
+	perl -MMath::BigInt -e'print "v".$Math::BigInt::VERSION,"\n";'
+
+If it prints undef or v0.01 you still got the old version. Delete the files
+from the Perl core installation path manually, and make sure that you 
+delete all old versions, then try again to print the version from above. 
+
 For a quick reference on what has changed from the old versions, please see
 CHANGES. HISTORY brings you a detailed history log of the rewrite.
 

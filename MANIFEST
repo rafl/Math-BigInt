@@ -30,4 +30,7 @@ t/mbimbf.t			# test accuracy/precision settings in MBI/MBF
 t/bigintpm.t			# OO and overload skin over Math::BigInt::*
 t/bigintc.t			# pure perl implementation of uint math core
 t/bigints.t			# scalar implementation of uint math core
-t/bigfltpm.t
+t/bigfltpm.t			# shell for M::BF tests
+t/bigfltpm.inc			# contains actual tests
+t/calling.t			# ensure that Class->method('string') works
+t/subclass.t			# empty subclass test for M::BF
