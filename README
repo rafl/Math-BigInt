@@ -20,10 +20,10 @@ See INSTALL for detailed help on installing these modules.
 You can look on CPAN (http://search.cpan.org/) for modules that replace the
 core math routines of Math::BigInt (look for Math::BigInt::BitVect, f.i.).
 
-More information including HTMLified help and preliminary benchmark results
-are available under:
+More information including HTMLified help are available under:
 
-	http://bloodgate.com/perl/
+	http://bloodgate.com/perl/			# project homepage
+	http://bloodgate.com/perl/benchmarks.html	# benchmarks
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

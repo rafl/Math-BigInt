@@ -1,21 +1,39 @@
-This lists only the changes for the current release (v1.47) over the last
+This lists only the changes for the current release (v1.48) over the last
 version, since HISTORY is now quite big:
 
-Calc :  finished _mod() for the case where $y < $BASE and $BASE % $y != 0
-	streamlined _mod() loops a bit
-	can do now _pow() for much faster bpow()
-	small fix to make v5.005_03 happy
-MBI  :  $rnd_mode is back, tests for it (needed for backwards compatibility)
-	added overload for %=, |=, &= and ^=
-	two places of 'my $t = ... if ...;' => 'my $t; $t = ... if ...;'
-	fixed: 1e2e3 isn't a valid number
-MBF  :  new() streamlining didn't make it in
-        faster new() by making $e += CORE::length(...) only for non zero cases
-	replaced the 'laber schwad blah blah' pod section by a pointer to MBI
-	$rnd_mode is back, tests for it (needed for backwards compatibility)
-tests:  added some for the fixed input cases like 1e3e4
-	shortened *.inc testfiles a bit
-	completed test for overloaded /.=/ and $x /[+-*/%&|^]/ $y 
+misc :  updated TODO and BUGS
+	removed bench/ from dist (see http:/bloodgate.com/perl/bigbench.html)
+	fixed examples/bigprime.pl
+Calc :  added _sqrt() for more speed
+	_sqrt() shortcut for small (< $BASE) numbers for better performance
+	shortcut in _mul for small numbers (< $BASE_LEN2)
+	added _and, _or, and _xor and let them use more than 16 bits
+	find out how many bits _and, _or and _xor can safely use
+	div() might leave empty array, so __strip_zeros fixes these
+	streamlined _acmp()
+MBI  :  fixed pod in many places
+	bmod: use round(), not bround()
+	bsqrt: use _sqrt() from lib, if possible
+	bsqrt: would hang for certain (most?) inputs
+	bdiv: slow check for 1 || -1 replaced by much faster version
+	bdiv: call _div() only when necc. in list context, otherwise scalar
+	streamlined copy(), _find_round_parameters()
+	removed the EXPORT_OK except for objectify, _swap and bgcd/blcm
+	bzero(), bone(): take additional A and P and store 'em
+	bnan(), binf(): clear A and P
+MBF  :  fneg() failed (now hand up to MBI)
+	frsft() and flsft() were no aliases to brsft() and blsft()
+	fone() was no alias for bone()
+	blsft() and brsft() were missing altogether
+	streamlined: fpow() and fmul()
+	removed the EXPORT_OK
+	fqsrt() uses now BigInt::bsqrt() as guess: greatly improved performance
+	make fsqrt() subclass proof by using $self instead of Math::BigFloat
+	bzero(), bone(): take additional A and P and store 'em
+	bnan(), binf(): clear A and P
+tests:  added some for MBI::bsqrt(), MBF::lfst() and MBF::rsft()
+	added extensive tests for band(), bior() and bxor()
+	added t/Math/BigInt/BareCalc.pm and run bigint's test trough it
 
 Please have arbitrarily big amounts of fun.
 

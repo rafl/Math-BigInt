@@ -24,6 +24,13 @@ Known bugs:
     ok ($x,123.456);
 
   + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
+  + This hangs:
+        $x = Math::BigFloat->new(12);
+        Math::BigFloat->precision(0);
+        print $x->copy->bsqrt(),"\n";           # 4
+  + This hangs, too:
+        Math::BigFloat->precision(2);		# even (-2) hangs
+        print $x->bsqrt(),"\n";                 # 3.46
   
 * BigInt:
   + .2e2 is not yet recognized as valid input

@@ -1,40 +1,52 @@
 See also various .pm files.
 
 General:
- * Copy on write (helps for $x = -$x; cases etc)
+ * Copy on write (helps for $x = -$x; cases etc) (seems to make it slower :/
 
 Math::BigFloat:
  * ! bround()/bfround(): some bugs may lurk in there
- * have a closer look at fsqrt() and it's performance
  * ! bmod() 
  * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
  * do not reduce numbers in new(), rather do it in anything that outputs it
    like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
    number after each op is slow with a binary core math lib like BitVect.
  * ?? add $x->bint(), that rounds with 'trunc' to an integer ??
- * look at performance, especially new() (sign of ->{_m} and babs there)
+ * tests for frsft() and flsft() with $n != 2
 
 Math::BigFloat::Constant:
  * really needed by someone out there?
 
 Math::BigInt:
- * remove rounding overhead when no rounding is done, e.g. no $object has A or
+ * remove rounding overhead when no rounding is done, e.g. no $object has A nor
    P and neither of bround(), bround(), accuracy() or precision() was called
  * bround() is only used by MBF for -$scale = -$len, anyway. POD is wrong for
    this, too.
  * +5 % 0 or -5 % 0 == NaN (should it be something else?)
+ * certain shortcuts returning bzero(), bone() etc may not set the requested
+   rounding parameters, so that $x->foo($y,$a,$p,$r) may return $x without a
+   set $a or $p, thus failing later on:
+
+	use Test;
+	BEGIN { plan tests => 1; }
+	use Math::BigInt;
+	$x = Math::BigInt->bone();
+	$x->bsqrt(3,0,'odd');		# $x = 0, but _a is not 3!
+	ok ($x + '12345','12300');	# fails (12346 instead of 12300)
+
+   The shortcuts in code that return $x->bzero() or similiar things need to
+   do $x->bzero($a,$p); and this needs tests.
 
 Given the fact that we are be able to plug-in a much faster core-lib, the
 following are pretty much ultra-low-priority:
 
 Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
- * ++,-- could be faster in Bigint via hardcoded (manual) increment
  * look at div() for more speed
  * alternative mul() method using shifts
  * band() etc. could use more bits (making it 32 instead of 16: double speed)
  * find a way to let underlying lib calculate band(), bior(), bxor() for
    negative inputs
+ * use more than 16 bits for band(), bior(), bxor()
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

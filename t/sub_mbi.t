@@ -11,7 +11,7 @@ BEGIN
   if ($ENV{PERL_CORE})
     {
     # testing with the core distribution
-    @INC = qw(../lib);
+    @INC = qw(../t/lib);
     }
   unshift @INC, qw(../lib);
   if (-d 't')
@@ -26,17 +26,19 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 1669 + 4;	# +4 own tests
+  plan tests => 1865
+    + 4;	# +4 own tests
   }
 
 use Math::BigInt::Subclass;
 
-use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup);
+use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup $CL);
 $class = "Math::BigInt::Subclass";
+$CL = "Math::BigInt::Calc";
 
-my $version = '0.01';   # for $VERSION tests, match current release (by hand!)
+my $version = '0.02';   # for $VERSION tests, match current release (by hand!)
 
-require 'bigintpm.inc';	# perform same tests as bigfltpm
+require 'bigintpm.inc';	# perform same tests as bigintpm
 
 # Now do custom tests for Subclass itself
 my $ms = $class->new(23);

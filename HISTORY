@@ -1,4 +1,3 @@
-
 Complete version history of the rewrite project
 ===============================================
 
@@ -41,6 +40,16 @@ Math::BigInt::Calc:
  * streamlined _mod() loops a bit
  * added _pow() for faster bpow()
  * small fix to make 5.005_03 happy ($x = shift @prod vs $x = shift @prod || 0)
+2001-12-06 v0.17 Tels
+ * added _sqrt() for more speed
+ * _sqrt() shortcut for small (< $BASE) numbers for better performance
+ * shortcut in _mul for small numbers (< $BASE_LEN2)
+ * added _and, _or, and _xor and let them use more than 16 bits
+ * find out how many bits _and, _or and _xor can safely use (cap at 23)
+ * div() might leave empty array, so __strip_zeros fixes these
+ * streamlined _acmp() 
+ * cap of 5 for BASE for UTS and UNICOS/Cray
+ * better test to find out what BASE should be (use +0.0 to force floats)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -161,6 +170,17 @@ Math::BigFloat:
  * further streamlining in new() for 12345e1234 cases (fraction part empty)
  * added $rnd_mode support for compatibility
  * replaced the 'laber schwad blah blah' pod section by a pointer to MBI
+2001-12-06 v1.26 Tels
+ * fneg() failed (now hand up to MBI)
+ * frsft() and flsft() were no aliases to brsft() and blsft()
+ * fone() was no alias for bone()
+ * blsft() and brsft() were missing altogether
+ * streamlined: fpow() and fmul()
+ * removed the EXPORT_OK
+ * fqsrt() uses now BigInt::bsqrt() as guess: greatly improved performance
+ * make fsqrt() subclass proof by using $self instead of Math::BigFloat
+ * bzero(), bone(): take additional A and P and store 'em
+ * bnan(), binf(): clear A and P 
 
 ############################################################################## 
 Math::BigInt:
@@ -356,6 +376,17 @@ Math::BigInt:
  * two 'my $t = ... if ..;' cases to 'my $t; $t = ... if ...;'
  * added overload for %=, |=, &= and ^= for more speed
  * _split(): check for 1e2e3 and reject it
+2001-12-06 v1.48 Tels
+ * fixed pod in many places
+ * bmod: use round(), not bround()
+ * bsqrt: use _sqrt() from lib, if possible
+ * bsqrt: would hang for certain (most?) inputs
+ * bdiv: slow check for 1 || -1 replaced by much faster version
+ * bdiv: call _div() only when necc. in list context, otherwise scalar
+ * streamlined copy(), _find_round_parameters()
+ * removed the EXPORT_OK except for objectify, _swap and bgcd/blcm
+ * bzero(), bone(): take additional A and P and store 'em
+ * bnan(), binf(): clear A and P 
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
