@@ -1,14 +1,21 @@
-This lists only the changes for the current release (v1.46) over the last
+This lists only the changes for the current release (v1.47) over the last
 version, since HISTORY is now quite big:
 
-Calc :  added _inc() and _dec() for faster ++ and --
-MBI  :  call $CALC->_inc() and $CALC->_dec() for faster ++, --
-	don't round twice in bsub() (badd() already rounded), eliminate bneg()
-MBF  :  finc()/fdec()/fsub() got similiar treatment like in MBI
-	new() streamlined
-tests:  added some for _inc()/_dec()
-	adapted core changes to make the testsuite run on CPAN and in core
-	forgot to quote two floats in mbimbf.t - thus test failed in OS/390
+Calc :  finished _mod() for the case where $y < $BASE and $BASE % $y != 0
+	streamlined _mod() loops a bit
+	can do now _pow() for much faster bpow()
+	small fix to make v5.005_03 happy
+MBI  :  $rnd_mode is back, tests for it (needed for backwards compatibility)
+	added overload for %=, |=, &= and ^=
+	two places of 'my $t = ... if ...;' => 'my $t; $t = ... if ...;'
+	fixed: 1e2e3 isn't a valid number
+MBF  :  new() streamlining didn't make it in
+        faster new() by making $e += CORE::length(...) only for non zero cases
+	replaced the 'laber schwad blah blah' pod section by a pointer to MBI
+	$rnd_mode is back, tests for it (needed for backwards compatibility)
+tests:  added some for the fixed input cases like 1e3e4
+	shortened *.inc testfiles a bit
+	completed test for overloaded /.=/ and $x /[+-*/%&|^]/ $y 
 
 Please have arbitrarily big amounts of fun.
 

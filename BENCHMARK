@@ -138,7 +138,8 @@ Errors:
  1) stack overflow, stack size limit of 4Mbyte reached
 
 ###############################################################################
-The following calculates the n'th Fibonacci number:
+The following calculates the n'th Fibonacci number (very ineffecively, see
+Math::Big for a much faster algorithm):
 
 my $n = shift || 100;
 
@@ -386,31 +387,62 @@ Exclusive Times
 ###############################################################################
 #!/usr/bin/perl -w
 
-use lib 'lib';
+#se lib 'lib';
+use lib '../old/Math-BigInt-1.46/lib';
+#se lib '../old/Math-BigInt-0.01';
 
+use Math::Pari;
 use Math::BigInt;
+#use Math::BigInt lib => 'Pari';
 use Benchmark;
 
-my $x = Math::BigInt->new(2);
-my $u1 = Math::BigInt->new(255);
-my $u = Math::BigInt->new(150);
-my $xx = Math::BigInt->new(3);
-my $uu = Math::BigInt->new(127);
-my $z;
+$class = 'Math::BigInt';
+#$class = 'Math::Pari';
+print "$class v",${$class.'::VERSION'};
 
-timethese (100, {
-   bpow => sub { $z = $x->copy()->bpow($u); },
-   bpow3 => sub { $z = $xx->copy()->bpow($uu); },
-   bpow1 => sub { $z = $x->copy()->bpow($u1); }
-  } );
+if (Math::BigInt->can('_core_lib') && ($class eq 'Math::BigInt'))
+  {
+  my $lib = Math::BigInt::_core_lib();
+  print " lib => ",Math::BigInt::_core_lib();
+  $lib = eval "\$$lib\::VERSION";
+  print " v$lib";
+  }
+print "\n";
 
-Operations per second, 300 Mhz PIII:
+my $x2 = $class->new(2);
+my $x3 = $class->new(3);
+my $x150 = $class->new(150);
+my $x255 = $class->new(255);
+my $x1255 = $class->new(1255);
+my $x7 = $class->new(7);
+my $x31 = $class->new(31);
+my $x777 = $class->new(777);
 
-		bpow	bpow1	bpow3
-	------------------------------
-	 v1.44	  32	   27	   32
-	 v1.45	  37	   30	   36
+timethese ( -4,
+  {
+  'pow_2_31' => sub { $z = $x2 ** $x31; },
+  'pow_2_150' => sub { $z = $x2 ** $x150; },
+  'pow_3_255' => sub { $z = $x3 ** $x255; },
+  'pow_2_255' => sub { $z = $x2 ** $x255; },
+  'pow_2_1255' => sub { $z = $x2 ** $x1255; },
+  'pow_3_1255' => sub { $z = $x3 ** $x1255; },
+  'pow_7_777' => sub { $z = $x7 ** $x777; },
+  });
 
+Operations per second, 1Ghz Athlon:
+
+  Math::BigInt	v0.01  v1.46  v1.47  v1.47 Math::Pari
+  lib		 n/a    Calc   Calc   Pari    Pari
+  version	       v0.14  v0.16  v1.05
+ -----------------------------------------------------	
+  2**31	 	 758     274   1525   5583   141800
+  2**150	 452     192   1039   5570   139800
+  2**255	 385     160    850   5572   143300
+  3**255	 299     154    691   5378    83100
+  2**1255	  96      93    230   5561   137200
+  3**1255	  47      68    120   5040    40600
+  7**777	  42      66    110   4994    38400
+  7**7777	 0.5     1.2    1.2   1021     1268
 
 ###############################################################################
 ###############################################################################
@@ -707,3 +739,141 @@ binc_10000:  5 secs ( 5.11 usr +  0.05 sys =  5.16 CPU) @ 13505.43/s (n=69688)
 finc_10000:  ** did not finish **
   sub_1000:  5 secs ( 5.24 usr +  0.03 sys =  5.27 CPU) @ 4781.78/s (n=25200)
 
+###############################################################################
+
+In v1.47, the Calc::_mod() function was finished for the case where $y < $BASE
+and $BASE % $y != 0:
+
+##################
+#!/usr/bin/perl -w
+
+use lib 'lib';
+#use lib '../old/Math-BigInt-0.01';
+
+use Math::Pari;
+use Math::BigInt;
+#use Math::BigInt lib => 'Pari';
+use Benchmark;
+
+$class = 'Math::BigInt';
+#$class = 'Math::Pari';
+print "$class v",${$class.'::VERSION'};
+
+print " lib => ",Math::BigInt::_core_lib() if Math::BigInt->can('_core_lib')
+ && $class eq 'Math::BigInt';
+print "\n";
+
+my $x_12345 = $class->new(12345);
+my $x_100000 = $class->new('1' . '0' x 100000);
+my $x_10000 = $class->new('1' . '0' x 10000);
+my $x_1000 = $class->new('1' . '0' x 1000);
+my $x_100 = $class->new('1' . '0' x 100);
+my $x_20 = $class->new('1' . '0' x 20);
+my $three = $class->new(3);
+my $onetwothree = $class->new(127);
+my $two = $class->new(2);
+
+timethese ( -5,
+  {
+  mod_12345_3 => sub { $z = $x_12345 % $three; },
+  mod_l100000_3 => sub { $z = $x_100000 % $three; },
+  mod_l100000_2 => sub { $z = $x_100000 % $two; },
+  mod_l100000_123 => sub { $z = $x_100000 % $onetwothree; },
+  mod_l10000_3 => sub { $z = $x_10000 % $three; },
+  mod_l10000_2 => sub { $z = $x_10000 % $two; },
+  mod_l10000_123 => sub { $z = $x_10000 % $onetwothree; },
+  mod_l1000_3 => sub { $z = $x_1000 % $three; },
+  mod_l1000_2 => sub { $z = $x_1000 % $two; },
+  mod_l1000_123 => sub { $z = $x_1000 % $onetwothree; },
+  mod_l100_3 => sub { $z = $x_100 % $three; },
+  mod_l100_2 => sub { $z = $x_100 % $two; },
+  mod_l100_123 => sub { $z = $x_100 % $onetwothree; },
+  mod_l20_3 => sub { $z = $x_20 % $three; },
+  mod_l20_2 => sub { $z = $x_20 % $two; },
+  mod_l20_123 => sub { $z = $x_20 % $onetwothree; },
+  not_12345 => sub { $z = ~$x_12345; },
+  # for BigInt
+  not_l100000 => sub { $x_100000->bnot(); },
+  not_l10000 => sub { $x_10000->bnot(); },
+  not_l1000 => sub { $x_1000->bnot(); },
+  not_l100 => sub { $x_100->bnot(); },
+  not_l20 => sub { $x_20->bnot(); }, 
+  # for Pari
+  pnot_l100000 => sub { $z = ~$x_100000; },
+  pnot_l10000 => sub { $z = ~$x_10000; },
+  pnot_l1000 => sub { $z = ~$x_1000; },
+  pnot_l100 => sub { $z = ~$x_100; },
+  pnot_l20 => sub { $z = ~$x_20; }, 
+  });
+1;
+
+##################
+
+Benchmarks done on a 1Ghz Athlon, values are operations/s rounded to nearest 
+integer, factors rounded roughly to integer or to one digit after dot for
+factors < 5. lib => Pari case included only for comparisation, since it wasn't
+effected by the optimizations in Calc at all. Math::Pari is just for the
+curiuos.
+
+                                                              Factor  Factor
+  Math::BigInt   0.01    1.46   1.47  1.47  1.47    Pari      1.46=>  0.01=>
+  lib             n/a    Calc   Calc  Calc  Pari    n/a       1.47    1.47
+  lib version     n/a    0.15   0.16  0.16a 1.05    2.001804
+ ---------------------------------------------------------------------------
+ mod_12345_3      3945   7731   7571  6761  7315    155800             1.9
+ mod_l20_123      2724   3923   6587  6162  7020    138900    1.7      2.4
+ mod_l20_2        3000   7490   7425  6689  7299    155100             2.5
+ mod_l20_3        2735   3915   6737  6289  6993    136640    1.7      2.5
+ mod_l100_123     1194   2006   5128  6162  6993    129990    2.5      4.3
+ mod_l100_2       1597   7020   6953  6684  7271    146520             4.3
+ mod_l100_3       1208   1985   5512  5748  6980    131080    2.7      4.6
+ mod_l1000_123     165    320   1545  2283  6768     84800    4.8      9
+ mod_l1000_2       255   4273   4310  6655  7034     91550            17
+ mod_l1000_3       167    319   1926  3022  6775     84970    6.0     11
+ mod_l10000_123     17     33    187   337  5199     18690    5.6     11
+ mod_l10000_3       17     33    238   523  5170     18650    7.2     14 
+ mod_l10000_2       26    845    890  6707  5338     18990            34
+ mod_l100000_123   1.6    3.2     16    33  1510      2100    5.0     10
+ mod_l100000_2     2.4     60     60  6705  1530      2110            25
+ mod_l100000_3     1.6    3.2     20    51  1510      2100    6.2     12
+
+ not_12345	  6340	        9793        8320       n/a
+ not_l20	  5550		9867        8265       n/a
+ not_l100	  4005		9914        8320       n/a
+ not_l1000	   966		9909        8214       n/a
+ not_l10000	    92		9817        7664       n/a
+ not_l100000	     7		9990        4251       n/a
+ pnot_12345	  6340	        6816        6372    116307
+ pnot_l20	  5550		7470        6365    117421
+ pnot_l100	  4005		6520        5927    115567
+ pnot_l1000	   966		4292        5872    101474
+ pnot_l10000	    92		 741        5495     48655
+ pnot_l100000	     7		  61        2562      6742
+
+As you can see, going via Math::BigInt imposes quite a big constant overhead
+compared to using Math::Pari directly, although the overhead is constant and
+per operation, not dependend on data length.
+
+About 7500 operations per second is the maximum you get due to all the trips
+trough the overloaded code, the OO checks and the multiply subroutines calls
+(and all that in Perl, too). 
+
+Calc could win if the numbers start to grow, but currently the slow copy() of
+the array makes it loose. Calc v0.16a is a version which implements 'cow'
+(copy-one-write) to overcome this.
+
+Unfortunately, there is even more constant overhead - even though this version
+is quite heavily optimized and only has a very small overhead compared to my
+first version with cow.
+
+The reason why v1.47 doesn't have this as default is because it slows down the
+testsuite from 11.5 to 13.5 seconds, which is unaccepatble (at least for me).
+
+As you can see from the numbers, for some operations cow can really help, but
+these are only overloaded operations that you could write as $x %= $y and
+achive the same effect. So I am not sure whether this is really usefull.
+
+Basically cow saves you only time if there is a lot of data copying going on
+and the actual math takes much less time than the copy. It also works only for
+Calc, since that has the slow array cop, while Pari et al. sport a very fast
+memcopy.

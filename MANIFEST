@@ -10,7 +10,6 @@ MANIFEST
 NEW
 CREDITS
 TODO
-inc.pl
 Makefile.PL
 examples/hailstone.pl
 examples/prime.pl

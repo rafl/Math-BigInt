@@ -35,6 +35,12 @@ Math::BigInt::Calc:
  * added _mod() for faster $x % $y
 2001-11-11 v0.15 Tels
  * added _dec() and _inc() for much faster $x++ and $x--
+2001-11-19 v0.16 Tels
+ * fixed comments a bit
+ * finished _mod() when $y < $BASE and $BASE % $y != 0 and $BASE % $y != 1
+ * streamlined _mod() loops a bit
+ * added _pow() for faster bpow()
+ * small fix to make 5.005_03 happy ($x = shift @prod vs $x = shift @prod || 0)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -147,9 +153,14 @@ Math::BigFloat:
  * fixed facmp() (was broken the same way as fcmp())
  * more rounding fixes from John P.
 2001-11-11 v1.24 Tels
-  * bacmp() fix for +-inf
-  * streamlined new()
-  * faster finc()/fdec()
+ * bacmp() fix for +-inf
+ * streamlined new()
+ * faster finc()/fdec()
+2001-11-18 v1.25 Tels
+ * streamlining fixes in new() were missing
+ * further streamlining in new() for 12345e1234 cases (fraction part empty)
+ * added $rnd_mode support for compatibility
+ * replaced the 'laber schwad blah blah' pod section by a pointer to MBI
 
 ############################################################################## 
 Math::BigInt:
@@ -338,8 +349,13 @@ Math::BigInt:
  * bpow() about 10-15% faster for small numbers (like 2 ** 150, 3 * 200 etc)
 2001-11-11 v1.46 Tels
  * binc(),bdec() use lib (via _inc(),_dec()) => faster (see BENCHMARK)
- * avoid the unnecc. roudning bsub()/binc()/bdec() (badd() already took care)
+ * avoid the unnecc. rounding bsub()/binc()/bdec() (badd() already took care)
  * made bsub() faster by removing the bneg() overhead from it 
+2001-11-18 v1.47 Tels
+ * added $rnd_mode support for compatibility
+ * two 'my $t = ... if ..;' cases to 'my $t; $t = ... if ...;'
+ * added overload for %=, |=, &= and ^= for more speed
+ * _split(): check for 1e2e3 and reject it
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
