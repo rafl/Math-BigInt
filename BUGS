@@ -6,15 +6,15 @@ Known bugs:
   + divide by zero throws no exception
 
 * BigFloat:
-  + unfinished (fmod() is missing, fsqrt() is buggy (because div() is buggy))
-  + certain operations (div?) leave $x->{_m} as NaN! Oups! (see fsqrt())
+  + unfinished (fmod() is missing)
+  + certain operations (div?) leave $x->{_m} as NaN! Oups! (also BS2000)
   + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
   + fdiv() using F (fallback) mode does not honour local (aka $x's) A settings
   + MBF uses internally MBI for calculating. This can make problems if MBI has
     set global accuracy settings, and thus rounds unexpectedly the mantissa.
-    An attempt to fix it stops the following from breaking, but it might not
+    My attempt to fix it stops the following from breaking, but it might not
     catch every occurance:
    
     use Math::BigInt; 
@@ -28,13 +28,18 @@ Known bugs:
 * BigInt:
   + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
   + Handling of undef arguments is somewhat broken (no proper warnings)
-  + require $CALC on non / file-systems? portable way?
   + use Math::BigInt qw/0.004/;	does not fail (wrong version)
   + inf handling is not finished yet. Since you normally do not get -+inf, and
     the old code never knew about +-inf anyway, it is very low priority
+  + eval('use...') and use Math::BigInt qw/:constant/ fail on Perl prior 5.6.0
+    This is likely an Exporter bug, and causes Math::BigInt to eval require on
+    earlier Perls when loading the core math lib. Thus the loading can fail on
+    filesystems that can not cope with 'Math/BigInt/Calc.pm' style filenames.
 
 Accuracy:
-  + Engaging $x with set A, and $y with set P should result in an error
+ Any operation encountering the following should result in an error:
+  + $x with set A, and $y with set P
+  + $x with a different rounding mode than $y
 
 ###############################################################################
 

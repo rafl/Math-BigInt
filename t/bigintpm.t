@@ -8,9 +8,9 @@ BEGIN
   $| = 1;
   # chdir 't' if -d 't';
   unshift @INC, '../lib'; # for running manually
-  plan tests => 1222;
+  plan tests => 1247;
   }
-my $version = '1.36';	# for $VERSION tests, match current release (by hand!)
+my $version = '1.37';	# for $VERSION tests, match current release (by hand!)
 
 ##############################################################################
 # for testing inheritance of _swap
@@ -18,6 +18,7 @@ my $version = '1.36';	# for $VERSION tests, match current release (by hand!)
 package Math::Foo;
 
 use Math::BigInt;
+#use Math::BigInt lib => 'BitVect';	# for testing
 use vars qw/@ISA/;
 @ISA = (qw/Math::BigInt/);
 
@@ -48,7 +49,7 @@ use Math::BigInt;
 #use Math::BigInt lib => 'BitVect';	# for testing
 #use Math::BigInt lib => 'Small';	# for testing
 
-my $CALC = Math::BigInt::_core_lib();
+my $CALC = Math::BigInt::_core_lib(); ok ($CALC,'Math::BigInt::Calc');
 
 my (@args,$f,$try,$x,$y,$z,$a,$exp,$ans,$ans1,@a,$m,$e,$round_mode);
 
@@ -85,6 +86,10 @@ while (<DATA>)
       $try .= "\$x->is_inf('$args[1]')+0;";
     } elsif ($f eq "binf") {
       $try .= "\$x->binf('$args[1]');";
+    } elsif ($f eq "bone") {
+      $try .= "\$x->bone('$args[1]');";
+    } elsif ($f eq "bnan") {
+      $try .= "\$x->bnan();";
     } elsif ($f eq "bfloor") {
       $try .= '$x->bfloor();';
     } elsif ($f eq "bceil") {
@@ -199,7 +204,7 @@ while (<DATA>)
   } # endwhile data tests
 close DATA;
 
-# XXX Tels 06/29/2000 following tests never fail or do not work :(
+# XXX Tels 06/29/2001 following tests never fail or do not work :(
 
 # test whether use Math::BigInt qw/version/ works
 $try = "use Math::BigInt ($version.'1');";
@@ -214,20 +219,26 @@ $ans1 = eval $try;
 ok ( $ans1, "1427247692705959881058285969449495136382746624");
 
 # test wether Math::BigInt::Small via use works (w/ dff. spellings of calc)
-#$try = "use Math::BigInt ($version,'CALC','Small');";
+#$try = "use Math::BigInt ($version,'lib','Small');";
 #$try .= ' $x = 2**10; $x = "$x";';
 #$ans1 = eval $try;
 #ok ( $ans1, "1024");
-#$try = "use Math::BigInt ($version,'cAlC','Math::BigInt::Small');";
+#$try = "use Math::BigInt ($version,'LiB','Math::BigInt::Small');";
 #$try .= ' $x = 2**10; $x = "$x";';
 #$ans1 = eval $try;
 #ok ( $ans1, "1024");
 # test wether calc => undef (array element not existing) works
-#$try = "use Math::BigInt ($version,'CALC');";
+#$try = "use Math::BigInt ($version,'LIB');";
 #$try = "require Math::BigInt; Math::BigInt::import($version,'CALC');";
 #$try .= ' $x = Math::BigInt->new(2)**10; $x = "$x";';
 #$ans1 = eval $try;
 #ok ( $ans1, 1024);
+
+# test whether fallback to calc works
+$try = "use Math::BigInt ($version,'lib','foo, bar , ');";
+$try .= ' Math::BigInt::_core_lib();';
+$ans1 = eval $try;
+ok ( $ans1, "Math::BigInt::Calc");
 
 # test some more
 @a = ();
@@ -237,11 +248,16 @@ for (my $i = 1; $i < 10; $i++)
   }
 ok "@a", "1 2 3 4 5 6 7 8 9";
 
-# test whether selfmultiplication works correctly (result is 2**64)
+# test whether self-multiplication works correctly (result is 2**64)
 $try = '$x = new Math::BigInt "+4294967296";';
 $try .= '$a = $x->bmul($x);';
 $ans1 = eval $try;
 print "# Tried: '$try'\n" if !ok ($ans1, Math::BigInt->new(2) ** 64);
+# test self-pow
+$try = '$x = Math::BigInt->new(10);';
+$try .= '$a = $x->bpow($x);';
+$ans1 = eval $try;
+print "# Tried: '$try'\n" if !ok ($ans1, Math::BigInt->new(10) ** 10);
 
 # test whether op destroys args or not (should better not)
 
@@ -350,7 +366,7 @@ $x += 1; ok ($x,100000); is_valid($x);
 $x -= 1; ok ($x,99999); is_valid($x); 
 
 ###############################################################################
-# check numify, these tests make only sense with Math::BigInt::Calc, since
+# check numify, these tests only make sense with Math::BigInt::Calc, since
 # only this uses $BASE
 
 my $BASE = int(1e5);		# should access Math::BigInt::Calc::BASE
@@ -434,7 +450,7 @@ ok ($args[3],6); ok (ref($args[3]),'');
 ok ($args[4],7); ok (ref($args[4]),'');
 
 ###############################################################################
-# test for flaoting-point input (other tests in bnorm() below)
+# test for floating-point input (other tests in bnorm() below)
 
 $z = 1050000000000000;          # may be int on systems with 64bit?
 $x = Math::BigInt->new($z); ok ($x->bsstr(),'105e+13');	# not 1.03e+15
@@ -459,7 +475,7 @@ ok ($x,"170141183460469231731687303715884105727");
 #$x = new Math::BigInt(2); $x **= 6972593; $x--;
 
 # 593573509*2^332162+1 has exactly 1,000,000 digits
-# takes about 24 mins on 300 Mhz, so can not be done yet ;)
+# takes about 24 mins on 300 Mhz, so cannot be done yet ;)
 #$x = Math::BigInt->new(2); $x **= 332162; $x *= "593573509"; $x++;
 #ok ($x->length(),1_000_000);
 
@@ -621,6 +637,17 @@ E23:NaN
 -1010E-2:NaN
 -1.01E+1:NaN
 -1.01E-1:NaN
+&bnan
+1:NaN
+2:NaN
+abc:NaN
+&bone
+2:+:+1
+2:-:-1
+boneNaN:-:-1
+boneNaN:+:+1
+2:abc:+1
+3::+1
 &binf
 1:+:+inf
 2:-:-inf
@@ -853,15 +880,14 @@ abc:+0:NaN
 &bdiv
 abc:abc:NaN
 abc:+1:abc:NaN
-# really?
-#+5:0:+inf
-#-5:0:-inf
 +1:abc:NaN
 +0:+0:NaN
++5:0:+inf
+-5:0:-inf
++1:+0:+inf
 +0:+1:+0
-+1:+0:NaN
 +0:-1:+0
--1:+0:NaN
+-1:+0:-inf
 +1:+1:+1
 -1:-1:+1
 +1:-1:-1

@@ -5,31 +5,31 @@ General:
 
 Math::BigFloat:
  * ! bround(): some bugs may lurk in there (warnings)
- * ! bsqrt() (infinite loops for some cases (sqrt(1000))
-     maybe: find a more proper ending condition
+ * have a look at fsqrt() and it's performance
  * ! bmod() 
  * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
+ * do not reduce numbers in new(), rather do it in anything that outputs it
+   like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
+   number after each op is slow with a binary core math lib like BitVect.
 
 Math::BigFloat::Constant:
  * really needed by someone out there?
 
 Math::BigInt:
- * remove trace()
  * objectify() is too slow and questionable (actually, it are only a few
    percent overhead...still)
  * bround() gives wierd results for -$scale, abs($scale) > $len), and is only
    used by MBF for -$scale = -$len, anyway. POD is wrong for this, too.
- * inf handling
+ * inf handling may not complete
+ * +5 % 0 or -5 % 0 == NaN (should it be something else?)
 
 Given the fact that we are be able to plug-in a much faster core-lib, the
 following are pretty much ultra-low-priority:
 
+Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * ++,-- could be faster in Bigint via hardcoded (manual) increment
  * look at div() for more speed
- * theoretically, we could use $BASE_LEN = 7 instead of 5, to exploit 20% less
-   work for huge numbers. Unfortunately, some code has hardcoded into it that
-   each array elem is 5 digits wide.
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

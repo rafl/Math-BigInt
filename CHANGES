@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.36:
+v1.37:
 
  general:
   + It is subsequent faster than the original in many places 
@@ -24,6 +24,7 @@ v1.36:
  bugs and buglets fixed over Mark's original:
   + 0**0 gave NaN instead of 1
   + -1**y gave -1 instead of +1 for even y
+  + +x/0 is now +inf, -x/0 is -inf (both were NaN)
   + mod/div for negative numbers were incompatible to Perl's way
   + added P. Prymmer's OS/390 '/1e5 vs *1e-5' patch w/o the performance snag
   + incorporated all the patches to the core modules by John Peacock
@@ -40,7 +41,7 @@ v1.36:
     broken in this regard.
  accuracy and precision:
   + there is now support for both accuracy (significant digits) and precision
-    (fixed number of digits after dot), which is turned off by default
+    (fixed number of digits after decimal point), which by default is off
   + objects/numbers now can have a local accuracy/precision
  internal fixes:
   + uses a blessed hash ref instead scalar ref (easier subclassable)

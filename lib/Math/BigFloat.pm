@@ -11,7 +11,7 @@
 
 package Math::BigFloat;
 
-$VERSION = 1.16;
+$VERSION = 1.17;
 require 5.005;
 use Exporter;
 use Math::BigInt qw/objectify/;
@@ -85,7 +85,7 @@ sub new
 
   my $round = shift; $round = 0 if !defined $round; # no rounding as default
   my $self = {}; bless $self, $class;
-  # shortcut for bigints and it's subclasses
+  # shortcut for bigints and its subclasses
   if ((ref($wanted)) && (ref($wanted) ne $class))
     {
     $self->{_m} = $wanted->as_number();		# get us a bigint copy
@@ -168,9 +168,26 @@ sub binf
     {
     my $c = $self; $self = {}; bless $self, $c;
     }
-  $self->{_e} = new Math::BigInt 0;
-  $self->{_m} = new Math::BigInt 0;
+  $self->{_e} = Math::BigInt->bzero();
+  $self->{_m} = Math::BigInt->bzero();
   $self->{sign} = $sign.'inf';
+  return $self;
+  }
+
+sub bone
+  {
+  # create a bigfloat '+-1', if given a BigFloat, set it to '+-1'
+  my $self = shift;
+  my $sign = shift; $sign = '+' if !defined $sign || $sign ne '-';
+
+  $self = $class if !defined $self;
+  if (!ref($self))
+    {
+    my $c = $self; $self = {}; bless $self, $c;
+    }
+  $self->{_e} = Math::BigInt->bzero();
+  $self->{_m} = Math::BigInt->bone();
+  $self->{sign} = $sign;
   return $self;
   }
 
@@ -308,7 +325,7 @@ sub bcmp
   return $l if $l != 0;
   
   # lengths are equal, so compare mantissa, if equal, compare exponents
-  # this assumes normaized numbers (no trailing zeros etc!)
+  # this assumes normalized numbers (no trailing zeros etc!)
   my $rc = $x->{_m} <=> $y->{_m} || $x->{_e} <=> $y->{_e};
   $rc = -$rc if $x->{sign} eq '-';		# -124 < -123
   return $rc;
@@ -463,7 +480,7 @@ sub is_one
 
 sub is_odd
   {
-  # return true if arg (BINT or num_str) is odd or -1 if even
+  # return true if arg (BINT or num_str) is odd or false if even
   my $x = shift; $x = $class->new($x) unless ref $x;
   #my ($self,$x) = objectify(1,@_); 
   
@@ -473,7 +490,7 @@ sub is_odd
 
 sub is_even
   {
-  # return true if arg (BINT or num_str) is even or -1 if odd
+  # return true if arg (BINT or num_str) is even or false if odd
   my $x = shift; $x = $class->new($x) unless ref $x;
   #my ($self,$x) = objectify(1,@_);
 
@@ -602,6 +619,7 @@ sub bsqrt
 
   # start with some reasonable guess
   #$x *= 10 ** ($len - $org->{_e}); $x /= 2;	# !?!?
+  $lx = $lx+$x->{_e};
   $lx = 1 if $lx < 1;
   my $gs = Math::BigFloat->new('1'. ('0' x $lx));	
   
@@ -1226,7 +1244,7 @@ The default rounding mode is 'even'. By using
 C<< Math::BigFloat::round_mode($rnd_mode); >> you can get and set the default
 mode for subsequent rounding. The usage of C<$Math::BigFloat::$rnd_mode> is
 no longer supported.
-                                                                                The second parameter to the round functions then overrides the default
+The second parameter to the round functions then overrides the default
 temporarily. 
 
 The C<< as_number() >> function returns a BigInt from a Math::BigFloat. It uses

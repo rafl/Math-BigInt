@@ -23,14 +23,13 @@ use vars qw/ @ISA @EXPORT $VERSION/;
         _check _zero _one _copy
 	_pow _and _or _xor
 );
-$VERSION = '0.03';
+$VERSION = '0.05';
 
 ##############################################################################
 # global constants, flags and accessory
  
 # constants for easier life
 my $nan = 'NaN';
-my $class = 'Math::BigInt::Small';
 
 ##############################################################################
 # create objects from various representations
@@ -38,9 +37,8 @@ my $class = 'Math::BigInt::Small';
 sub _new
   {
   # (string) return ref to num
-  shift @_ if $_[0] eq $class;
-  my $d = shift;
-  my $x = $$d;
+  my $d = $_[1];
+  my $x = $$d;	# make copy
   return \$x;
   }                                                                             
 
@@ -56,9 +54,7 @@ sub _one
 
 sub _copy
   {
-  shift @_ if $_[0] eq $class;
-  my $x = shift;
-  
+  my $x = $_[1];
   my $z = $$x;
   return \$z;
   }
@@ -69,16 +65,13 @@ sub _copy
 sub _str
   {
   # make string
-  shift @_ if $_[0] eq $class;
-  my $ar = shift;
-  return $ar;
+  return \"${$_[1]}";
   }                                                                             
 
 sub _num
   {
   # make a number
-  shift @_ if $_[0] eq $class;
-  my $x = shift; return $$x;
+  return ${$_[1]};
   }
 
 
@@ -87,32 +80,28 @@ sub _num
 
 sub _add
   {
-  shift @_ if $_[0] eq $class;
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
   $$x += $$y;
   return $x;
   }                                                                             
 
 sub _sub
   {
-  shift @_ if $_[0] eq $class;
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
   $$x -= $$y;
   return $x;
   }                                                                             
 
 sub _mul
   {
-  shift @_ if $_[0] eq $class;
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
   $$x *= $$y;
   return $x;
   }                                                                             
 
 sub _div
   {
-  shift @_ if $_[0] eq $class;
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
 
   my $u = int($$x / $$y); my $r = $$x % $$y; $$x = $u;
   return ($x,\$r) if wantarray;
@@ -121,28 +110,28 @@ sub _div
 
 sub _pow
   {
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
   my $u = $$x ** $$y; $$x = $u;
   return $x;
   }
 
 sub _and
   {
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
   my $u = int($$x) & int($$y); $$x = $u;
   return $x;
   }
 
 sub _xor
   {
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
   my $u = int($$x) ^ int($$y); $$x = $u;
   return $x;
   }
 
 sub _or
   {
-  my ($x,$y) = @_;
+  my ($c,$x,$y) = @_;
   my $u = int($$x) | int($$y); $$x = $u;
   return $x;
   }
@@ -152,24 +141,20 @@ sub _or
 
 sub _acmp
   {
-  shift @_ if $_[0] eq $class;
-  my ($x, $y) = @_;
+  my ($c,$x, $y) = @_;
   return ($$x <=> $$y);
   }
 
 sub _len
   {
-  shift @_ if $_[0] eq $class;
-  my ($x) = @_;
-  return length("$$x");
+  return length("${$_[1]}");
   }
 
 sub _digit
   {
   # return the nth digit, negative values count backward
   # 0 is the rightmost digit
-  shift @_ if $_[0] eq $class;
-  my ($x,$n) = @_;
+  my ($c,$x,$n) = @_;
   
   $n ++;			# 0 => 1, 1 => 2
   return substr($$x,-$n,1);	# 1 => -1, -2 => 2 etc
@@ -181,32 +166,28 @@ sub _digit
 sub _is_zero
   {
   # return true if arg is zero
-  shift @_ if $_[0] eq $class;
-  my ($x) = shift;
+  my ($c,$x) = @_;
   return ($$x == 0) <=> 0;
   }
 
 sub _is_even
   {
   # return true if arg is even
-  shift @_ if $_[0] eq $class;
-  my ($x) = shift;
+  my ($c,$x) = @_;
   return (!($$x & 1)) <=> 0; 
   }
 
 sub _is_odd
   {
   # return true if arg is odd
-  shift @_ if $_[0] eq $class;
-  my ($x) = shift;
+  my ($c,$x) = @_;
   return ($$x & 1) <=> 0;
   }
 
 sub _is_one
   {
   # return true if arg is one
-  shift @_ if $_[0] eq $class;
-  my ($x) = shift;
+  my ($c,$x) = @_;
   return ($$x == 1) <=> 0;
   }
 
@@ -216,9 +197,7 @@ sub _is_one
 sub _check
   {
   # no checks yet, pull it out from the test suite
-  shift @_ if $_[0] eq $class;
-
-  my ($x) = shift;
+  my ($c,$x) = @_;
   return "$x is not a reference" if !ref($x);
   return 0;
   }

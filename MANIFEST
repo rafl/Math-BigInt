@@ -21,6 +21,8 @@ lib/Math/BigInt/Scalar.pm
 lib/Math/BigFloat.pm
 bench/copy.pl			# measure overhead of copy due to overload
 bench/factor.pl
+bench/factorial.pl		# see BENCHMARK
+bench/power.pl			# see BENCHMARK
 bench/round.pl
 bench/bigbench.pl		# really big benchmark suite
 t/mbimbf.t			# test accuracy/precision settings in MBI/MBF

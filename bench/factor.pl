@@ -4,8 +4,8 @@
 # time perl factor.pl [digits]
 
 #use lib '../old';
-use lib '../lib';
-use lib '../../Math-Big-1.04/lib';
+#use lib '../lib';
+#use lib '../../Math-Big-1.04/lib';
 
 #use Math::BigInt calc => 'BitVect';
 use Math::BigInt;
