@@ -307,34 +307,6 @@ for ($i = 0; $i < $loops; $i ++)
   }
 
 ###############################################################################
-#!/usr/bin/perl -w
-
-use lib 'lib';
-
-use Math::BigInt;
-use Benchmark;
-
-my $x = Math::BigInt->new(2);
-my $u1 = Math::BigInt->new(255);
-my $u = Math::BigInt->new(150);
-my $xx = Math::BigInt->new(3);
-my $uu = Math::BigInt->new(127);
-my $z;
-
-timethese (100, {
-   bpow => sub { $z = $x->copy()->bpow($u); },
-   bpow3 => sub { $z = $xx->copy()->bpow($uu); },
-   bpow1 => sub { $z = $x->copy()->bpow($u1); }
-  } );
-
-Operations per second, 300 Mhz PIII:
-
-		bpow	bpow1	bpow3
-	------------------------------
-	 v1.44	  32	   27	   32
-	 v1.45	  37	   30	   36
-
-###############################################################################
 Old v0.01 code:
 
 Total Elapsed Time = 9.001886 Seconds
@@ -409,3 +381,329 @@ Exclusive Times
  0.00   0.000 -0.000      1   0.0000      -  Config::BEGIN
  0.00   0.000 -0.000      1   0.0000      -  Config::TIEHASH
  0.00   0.000 -0.000      1   0.0000      -  Config::import
+
+###############################################################################
+###############################################################################
+#!/usr/bin/perl -w
+
+use lib 'lib';
+
+use Math::BigInt;
+use Benchmark;
+
+my $x = Math::BigInt->new(2);
+my $u1 = Math::BigInt->new(255);
+my $u = Math::BigInt->new(150);
+my $xx = Math::BigInt->new(3);
+my $uu = Math::BigInt->new(127);
+my $z;
+
+timethese (100, {
+   bpow => sub { $z = $x->copy()->bpow($u); },
+   bpow3 => sub { $z = $xx->copy()->bpow($uu); },
+   bpow1 => sub { $z = $x->copy()->bpow($u1); }
+  } );
+
+Operations per second, 300 Mhz PIII:
+
+		bpow	bpow1	bpow3
+	------------------------------
+	 v1.44	  32	   27	   32
+	 v1.45	  37	   30	   36
+
+
+###############################################################################
+###############################################################################
+
+New benchmark showing the improvement in bdec()/binc() and bsub(), both with
+Calc and when using different libs. The poor performance for the floating point
+inc/dec stems from the fact that BigFloat want's to reduce the numbers and thus
+must find out how many trailing zeros there are, and can do so only by
+converting the number to dec, which is a O(N*N) operation when using binary
+libraries like GMP, BitVect or Pari.
+
+The following script (with some modifications to use the different versions)
+was used to generate the data below on a 1 Gz Athlon:
+
+#!/usr/bin/perl -w
+
+$| = 1;
+
+use lib '../old/Math-BigInt-GMP-1.03/lib';
+#use lib '../old/Math-BigInt-Pari-1.04/lib';
+#use lib '../Math-BigInt-BitVect-1.06/lib';
+#use lib '../old/Math-BigInt-BitVect-1.05/lib';
+#use lib '../old/Math-BigInt-1.45/lib';
+#use lib '../old/Math-BigInt-0.01';
+use lib 'lib';
+
+use Math::BigInt lib => 'GMP';
+#use Math::BigInt lib => 'BitVect';
+#use Math::BigInt lib => 'Pari';
+#use Math::BigInt;
+use Math::BigFloat;
+
+print "Math::BigInt v$Math::BigInt::VERSION ";
+if (Math::BigInt->can('_core_lib'))
+  {
+  print "lib => ",Math::BigInt->_core_lib();
+  my $v = '$'.Math::BigInt->_core_lib().'::VERSION'; $v = eval "$v";
+  print " v$v";
+  }
+print "\n";
+
+use Benchmark;
+
+my $x_10000 = Math::BigInt->new('1'.'0' x 10000);
+my $x_1000 = Math::BigInt->new('1'.'0' x 1000);
+my $x_100 = Math::BigInt->new('1'.'0' x 100);
+my $x_10 = Math::BigInt->new('1'.'0' x 10);
+my $x1_10000 = Math::BigInt->new('1'.'0' x 10000);
+my $x1_1000 = Math::BigInt->new('1'.'0' x 1000);
+my $x1_100 = Math::BigInt->new('1'.'0' x 100);
+my $x1_10 = Math::BigInt->new('1'.'0' x 10);
+my $y = Math::BigInt->new('1');
+my $u = Math::BigInt->new('9'.'9' x 1000);
+my $uf = Math::BigInt->new('9'.'9' x 1000);
+my $x2_1000 = Math::BigInt->new('1'.'0' x 1000);
+my $x3_1000 = Math::BigInt->new('1'.'0' x 1000);
+
+my $xf_10000 = Math::BigFloat->new('1'.('0' x 10000).'1');
+my $xf_1000 = Math::BigFloat->new('1'.('0' x 1000).'1');
+my $xf_100 = Math::BigFloat->new('1'.('0' x 100).'1');
+my $xf_10 = Math::BigFloat->new('1'.('0' x 10).'1');
+my $xf2_10000 = Math::BigFloat->new('1'.('0' x 10000).'1');
+my $xf2_1000 = Math::BigFloat->new('1'.('0' x 1000).'1');
+my $xf2_100 = Math::BigFloat->new('1'.('0' x 100).'1');
+my $xf2_10 = Math::BigFloat->new('1'.('0' x 10).'1');
+
+timethese ( -5,
+  {
+  # comment out the inc tests for v0.01 - it had no binc()/finc() methods  
+  binc_10000 => sub { $x1_10000->binc(); },
+  binc_1000 => sub { $x1_1000->binc(); },
+  binc_100 => sub { $x1_100->binc(); },
+  binc_10 => sub { $x1_10->binc(); },
+  #finc_10000 => sub { $xf_10000->finc(); },
+  finc_1000 => sub { $xf_1000->finc(); },
+  finc_100 => sub { $xf_100->finc(); },
+  finc_10 => sub { $xf_10->finc(); },
+  '++_10000' => sub { ++$x_10000; },
+  '++_1000' => sub { ++$x_1000; },
+  '++_100' => sub { ++$x_100; },
+  '++_10' => sub { ++$x_10; },
+  #'f++_10000' => sub { ++$xf2_10000; },
+  'f++_1000' => sub { ++$xf2_1000; },
+  'f++_100' => sub { ++$xf2_100; },
+  'f++_10' => sub { ++$xf2_10; },
+  '++_999' => sub { ++$u; },
+  'f++_999' => sub { ++$uf; },
+  add_1000 => sub { $x2_1000 += $y; },
+  sub_1000 => sub { $x3_1000 -= $y; },
+  } );
+
+###############################################################################
+
+Output:
+
+Math::BigInt v0.01 
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, f++_10, f++_100, f++_1000, f++_10000, f++_999, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  6 secs ( 5.06 usr +  0.01 sys =  5.07 CPU) @ 5521.30/s (n=27993)
+    ++_100:  5 secs ( 5.33 usr +  0.00 sys =  5.33 CPU) @ 3841.28/s (n=20474)
+   ++_1000:  5 secs ( 5.21 usr +  0.01 sys =  5.22 CPU) @ 960.92/s (n=5016)
+  ++_10000:  5 secs ( 5.22 usr +  0.00 sys =  5.22 CPU) @ 92.91/s (n=485)
+    ++_999:  6 secs ( 5.35 usr +  0.00 sys =  5.35 CPU) @ 955.33/s (n=5111)
+  add_1000:  5 secs ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 939.89/s (n=4925)
+    f++_10:  5 secs ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 3121.03/s (n=16323)
+   f++_100:  6 secs ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 2248.11/s (n=11870)
+  f++_1000:  6 secs ( 5.37 usr +  0.00 sys =  5.37 CPU) @ 596.28/s (n=3202)
+ f++_10000:  5 secs ( 5.27 usr +  0.00 sys =  5.27 CPU) @ 59.96/s (n=316)
+   f++_999:  5 secs ( 5.38 usr +  0.00 sys =  5.38 CPU) @ 950.00/s (n=5111)
+  sub_1000:  6 secs ( 5.33 usr +  0.01 sys =  5.34 CPU) @ 1038.76/s (n=5547)
+
+Math::BigInt v1.45 lib => Math::BigInt::Calc v0.13
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_10000, f++_999, finc_10, finc_100, finc_1000, finc_10000, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  5 secs ( 5.09 usr +  0.01 sys =  5.10 CPU) @ 6027.06/s (n=30738)
+    ++_100:  5 secs ( 5.22 usr +  0.00 sys =  5.22 CPU) @ 6000.19/s (n=31321)
+   ++_1000:  5 secs ( 5.19 usr +  0.00 sys =  5.19 CPU) @ 6034.87/s (n=31321)
+  ++_10000:  5 secs ( 5.31 usr +  0.00 sys =  5.31 CPU) @ 6012.05/s (n=31924)
+    ++_999:  6 secs ( 5.33 usr +  0.01 sys =  5.34 CPU) @ 5978.28/s (n=31924)
+  add_1000:  5 secs ( 5.22 usr +  0.00 sys =  5.22 CPU) @ 9830.08/s (n=51313)
+   binc_10:  6 secs ( 5.17 usr +  0.00 sys =  5.17 CPU) @ 6092.65/s (n=31499)
+  binc_100:  5 secs ( 5.18 usr +  0.00 sys =  5.18 CPU) @ 6080.89/s (n=31499)
+ binc_1000:  5 secs ( 5.17 usr +  0.00 sys =  5.17 CPU) @ 6090.91/s (n=31490)
+binc_10000:  6 secs ( 5.25 usr +  0.01 sys =  5.26 CPU) @ 6095.63/s (n=32063)
+    f++_10:  5 secs ( 5.32 usr +  0.01 sys =  5.33 CPU) @ 924.95/s (n=4930)
+   f++_100:  5 secs ( 5.22 usr +  0.00 sys =  5.22 CPU) @ 910.34/s (n=4752)
+  f++_1000:  5 secs ( 5.17 usr +  0.02 sys =  5.19 CPU) @ 821.97/s (n=4266)
+ f++_10000:  5 secs ( 5.28 usr +  0.02 sys =  5.30 CPU) @ 415.28/s (n=2201)
+   f++_999:  5 secs ( 5.27 usr +  0.00 sys =  5.27 CPU) @ 5949.34/s (n=31353)
+   finc_10:  6 secs ( 5.26 usr +  0.00 sys =  5.26 CPU) @ 919.58/s (n=4837)
+  finc_100:  6 secs ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 910.73/s (n=4836)
+ finc_1000:  5 secs ( 5.29 usr +  0.00 sys =  5.29 CPU) @ 821.36/s (n=4345)
+finc_10000:  5 secs ( 5.12 usr +  0.01 sys =  5.13 CPU) @ 414.81/s (n=2128)
+  sub_1000:  4 secs ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 4848.57/s (n=25358)
+
+Math::BigInt v1.45 lib => Math::BigInt::Pari v1.04
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_999, finc_10, finc_100, finc_1000, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  5 secs ( 5.25 usr +  0.00 sys =  5.25 CPU) @ 5529.52/s (n=29030)
+    ++_100:  6 secs ( 5.33 usr +  0.03 sys =  5.36 CPU) @ 5518.28/s (n=29578)
+   ++_1000:  6 secs ( 5.43 usr +  0.05 sys =  5.48 CPU) @ 5297.45/s (n=29030)
+  ++_10000:  5 secs ( 5.26 usr +  0.01 sys =  5.27 CPU) @ 5250.47/s (n=27670)
+    ++_999:  5 secs ( 5.17 usr +  0.00 sys =  5.17 CPU) @ 5512.96/s (n=28502)
+  add_1000:  5 secs ( 5.07 usr +  0.03 sys =  5.10 CPU) @ 9146.67/s (n=46648)
+   binc_10:  7 secs ( 5.36 usr +  0.01 sys =  5.37 CPU) @ 5318.81/s (n=28562)
+  binc_100:  6 secs ( 5.08 usr +  0.10 sys =  5.18 CPU) @ 5502.32/s (n=28502)
+ binc_1000:  5 secs ( 5.18 usr +  0.05 sys =  5.23 CPU) @ 5550.67/s (n=29030)
+binc_10000:  5 secs ( 5.20 usr +  0.02 sys =  5.22 CPU) @ 5298.85/s (n=27660)
+    f++_10:  5 secs ( 5.26 usr +  0.01 sys =  5.27 CPU) @ 824.48/s (n=4345)
+   f++_100:  6 secs ( 5.28 usr +  0.02 sys =  5.30 CPU) @ 549.25/s (n=2911)
+  f++_1000:  5 secs ( 5.06 usr +  0.00 sys =  5.06 CPU) @ 16.21/s (n=82)
+ f++_10000:  ** did not finish **
+   f++_999:  6 secs ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 5529.52/s (n=29030)
+   finc_10:  5 secs ( 5.20 usr +  0.03 sys =  5.23 CPU) @ 843.21/s (n=4410)
+  finc_100:  5 secs ( 5.24 usr +  0.02 sys =  5.26 CPU) @ 553.42/s (n=2911)
+ finc_1000:  5 secs ( 5.39 usr +  0.00 sys =  5.39 CPU) @ 16.14/s (n=87)
+finc_10000:  ** did not finish **
+  sub_1000:  6 secs ( 5.23 usr +  0.00 sys =  5.23 CPU) @ 4994.84/s (n=26123)
+
+Math::BigInt v1.45 lib => Math::BigInt::BitVect v1.05
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_999, finc_10, finc_100, finc_1000, sub_1000, each for at least 5 CPU seconds...
+     ++_10: 14 secs (13.21 usr +  0.35 sys = 13.56 CPU) @ 1390.93/s (n=18861)
+    ++_100: 12 secs (12.35 usr +  0.02 sys = 12.37 CPU) @ 1502.67/s (n=18588)
+   ++_1000: 13 secs (12.97 usr +  0.02 sys = 12.99 CPU) @ 1473.60/s (n=19142)
+  ++_10000: 12 secs (11.77 usr +  0.20 sys = 11.97 CPU) @ 1476.52/s (n=17674)
+    ++_999: 13 secs (12.85 usr +  0.38 sys = 13.23 CPU) @ 1425.62/s (n=18861)
+  add_1000: 22 secs (21.15 usr +  1.17 sys = 22.32 CPU) @ 911.51/s (n=20345)
+   binc_10: 13 secs (13.31 usr +  0.28 sys = 13.59 CPU) @ 1429.87/s (n=19432)
+  binc_100: 14 secs (13.16 usr +  0.27 sys = 13.43 CPU) @ 1425.32/s (n=19142)
+ binc_1000: 13 secs (13.12 usr +  0.01 sys = 13.13 CPU) @ 1479.97/s (n=19432)
+binc_10000: 12 secs (11.66 usr +  0.03 sys = 11.69 CPU) @ 1521.73/s (n=17789)
+    f++_10:  5 secs ( 5.26 usr +  0.00 sys =  5.26 CPU) @ 774.33/s (n=4073)
+   f++_100:  5 secs ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 260.23/s (n=1361)
+  f++_1000:  7 secs ( 7.25 usr +  0.00 sys =  7.25 CPU) @  1.52/s (n=11)
+ f++_10000:  ** did not finish **
+   f++_999: 14 secs (13.63 usr +  0.40 sys = 14.03 CPU) @ 1374.06/s (n=19278)
+   finc_10:  5 secs ( 5.18 usr +  0.01 sys =  5.19 CPU) @ 772.45/s (n=4009)
+  finc_100:  6 secs ( 5.30 usr +  0.02 sys =  5.32 CPU) @ 258.65/s (n=1376)
+ finc_1000:  7 secs ( 7.42 usr +  0.00 sys =  7.42 CPU) @  1.35/s (n=10)
+finc_10000:  ** did not finish **
+  sub_1000:  5 secs ( 4.77 usr +  0.35 sys =  5.12 CPU) @ 323.83/s (n=1658)
+
+Math::BigInt v1.45 lib => Math::BigInt::GMP v1.03
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_999, finc_10, finc_100, finc_1000, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  6 secs ( 5.09 usr +  0.03 sys =  5.12 CPU) @ 4174.22/s (n=21372)
+    ++_100:  5 secs ( 5.26 usr +  0.05 sys =  5.31 CPU) @ 4176.65/s (n=22178)
+   ++_1000:  5 secs ( 5.34 usr +  0.02 sys =  5.36 CPU) @ 4139.55/s (n=22188)
+  ++_10000:  6 secs ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 4087.19/s (n=21703)
+    ++_999:  5 secs ( 5.21 usr +  0.02 sys =  5.23 CPU) @ 4162.14/s (n=21768)
+  add_1000:  5 secs ( 5.16 usr +  0.06 sys =  5.22 CPU) @ 6434.87/s (n=33590)
+   binc_10:  6 secs ( 5.30 usr +  0.02 sys =  5.32 CPU) @ 4249.06/s (n=22605)
+  binc_100:  5 secs ( 5.27 usr +  0.07 sys =  5.34 CPU) @ 4233.15/s (n=22605)
+ binc_1000:  5 secs ( 4.96 usr +  0.04 sys =  5.00 CPU) @ 4232.60/s (n=21163)
+binc_10000:  5 secs ( 5.14 usr +  0.10 sys =  5.24 CPU) @ 4141.79/s (n=21703)
+    f++_10:  5 secs ( 5.17 usr +  0.04 sys =  5.21 CPU) @ 581.96/s (n=3032)
+   f++_100:  5 secs ( 5.27 usr +  0.01 sys =  5.28 CPU) @ 426.33/s (n=2251)
+  f++_1000:  5 secs ( 5.08 usr +  0.00 sys =  5.08 CPU) @ 16.14/s (n=82)
+ f++_10000:  ** did not finish **
+   f++_999:  6 secs ( 5.30 usr +  0.06 sys =  5.36 CPU) @ 4137.69/s (n=22178)
+   finc_10:  5 secs ( 5.28 usr +  0.01 sys =  5.29 CPU) @ 582.04/s (n=3079)
+  finc_100:  5 secs ( 5.15 usr +  0.02 sys =  5.17 CPU) @ 425.73/s (n=2201)
+ finc_1000:  5 secs ( 5.43 usr +  0.00 sys =  5.43 CPU) @ 15.65/s (n=85)
+finc_10000:  ** did not finish **
+  sub_1000:  5 secs ( 5.20 usr +  0.03 sys =  5.23 CPU) @ 3914.72/s (n=20474)
+
+ ***************************** NEW VERSIONS ***********************************
+
+Math::BigInt v1.46 lib => Math::BigInt::Calc v0.14
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_10000, f++_999, finc_10, finc_100, finc_1000, finc_10000, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  6 secs ( 5.30 usr +  0.00 sys =  5.30 CPU) @ 21558.11/s (n=114258)
+    ++_100:  5 secs ( 5.27 usr +  0.00 sys =  5.27 CPU) @ 21680.83/s (n=114258)
+   ++_1000:  4 secs ( 5.26 usr +  0.00 sys =  5.26 CPU) @ 21722.05/s (n=114258)
+  ++_10000:  6 secs ( 5.26 usr +  0.01 sys =  5.27 CPU) @ 21680.83/s (n=114258)
+    ++_999:  5 secs ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 21639.77/s (n=114258)
+  add_1000:  4 secs ( 5.20 usr +  0.00 sys =  5.20 CPU) @ 9690.38/s (n=50390)
+   binc_10:  6 secs ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 23158.76/s (n=122973)
+  binc_100:  5 secs ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 23060.80/s (n=120608)
+ binc_1000:  4 secs ( 5.25 usr +  0.00 sys =  5.25 CPU) @ 22972.95/s (n=120608)
+binc_10000:  6 secs ( 5.26 usr +  0.00 sys =  5.26 CPU) @ 22929.28/s (n=120608)
+    f++_10:  5 secs ( 5.18 usr +  0.01 sys =  5.19 CPU) @ 4706.36/s (n=24426)
+   f++_100:  5 secs ( 5.27 usr +  0.00 sys =  5.27 CPU) @ 4291.27/s (n=22615)
+  f++_1000:  6 secs ( 5.34 usr +  0.01 sys =  5.35 CPU) @ 2304.11/s (n=12327)
+ f++_10000:  5 secs ( 5.21 usr +  0.00 sys =  5.21 CPU) @ 410.36/s (n=2138)
+   f++_999:  6 secs ( 5.21 usr +  0.00 sys =  5.21 CPU) @ 21516.70/s (n=112102)
+   finc_10:  5 secs ( 5.21 usr +  0.00 sys =  5.21 CPU) @ 4834.93/s (n=25190)
+  finc_100:  5 secs ( 5.29 usr +  0.01 sys =  5.30 CPU) @ 4399.81/s (n=23319)
+ finc_1000:  5 secs ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 2334.66/s (n=12327)
+finc_10000:  6 secs ( 5.27 usr +  0.00 sys =  5.27 CPU) @ 410.44/s (n=2163)
+  sub_1000:  5 secs ( 5.18 usr +  0.00 sys =  5.18 CPU) @ 6191.51/s (n=32072)
+
+Math::BigInt v1.46 lib => Math::BigInt::Pari v1.05
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_999, finc_10, finc_100, finc_1000, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  5 secs ( 5.34 usr +  0.00 sys =  5.34 CPU) @ 16016.29/s (n=85527)
+    ++_100:  6 secs ( 5.32 usr +  0.05 sys =  5.37 CPU) @ 15924.95/s (n=85517)
+   ++_1000:  5 secs ( 5.13 usr +  0.07 sys =  5.20 CPU) @ 15753.65/s (n=81919)
+  ++_10000:  6 secs ( 5.17 usr +  0.08 sys =  5.25 CPU) @ 13961.71/s (n=73299)
+    ++_999:  5 secs ( 5.14 usr +  0.06 sys =  5.20 CPU) @ 15753.65/s (n=81919)
+  add_1000:  5 secs ( 5.17 usr +  0.03 sys =  5.20 CPU) @ 9136.92/s (n=47512)
+   binc_10:  4 secs ( 5.22 usr +  0.06 sys =  5.28 CPU) @ 16498.30/s (n=87111)
+  binc_100:  5 secs ( 5.10 usr +  0.06 sys =  5.16 CPU) @ 16575.00/s (n=85527)
+ binc_1000:  6 secs ( 5.34 usr +  0.05 sys =  5.39 CPU) @ 16161.60/s (n=87111)
+binc_10000:  5 secs ( 5.10 usr +  0.05 sys =  5.15 CPU) @ 14232.82/s (n=73299)
+    f++_10:  6 secs ( 5.30 usr +  0.03 sys =  5.33 CPU) @ 2994.75/s (n=15962)
+   f++_100:  5 secs ( 5.28 usr +  0.01 sys =  5.29 CPU) @ 1507.56/s (n=7975)
+  f++_1000:  6 secs ( 5.50 usr +  0.00 sys =  5.50 CPU) @ 30.55/s (n=168)
+ f++_10000:  ** did not finish **
+   f++_999:  5 secs ( 5.09 usr +  0.08 sys =  5.17 CPU) @ 15551.64/s (n=80402)
+   finc_10:  5 secs ( 5.18 usr +  0.01 sys =  5.19 CPU) @ 3032.76/s (n=15740)
+  finc_100:  6 secs ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 1519.05/s (n=7975)
+ finc_1000:  5 secs ( 5.65 usr +  0.00 sys =  5.65 CPU) @ 30.80/s (n=174)
+finc_10000:  ** did not finish **
+  sub_1000:  6 secs ( 5.32 usr +  0.01 sys =  5.33 CPU) @ 6489.31/s (n=34588)
+
+Math::BigInt v1.46 lib => Math::BigInt::BitVect v1.06
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_999, finc_10, finc_100, finc_1000, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  5 secs ( 5.12 usr +  0.01 sys =  5.13 CPU) @ 20004.48/s (n=102623)
+    ++_100:  5 secs ( 5.23 usr +  0.00 sys =  5.23 CPU) @ 19985.28/s (n=104523)
+   ++_1000:  6 secs ( 5.31 usr +  0.00 sys =  5.31 CPU) @ 19849.53/s (n=105401)
+  ++_10000:  6 secs ( 5.10 usr +  0.00 sys =  5.10 CPU) @ 19975.88/s (n=101877)
+    ++_999:  5 secs ( 5.20 usr +  0.00 sys =  5.20 CPU) @ 20102.50/s (n=104533)
+  add_1000:  6 secs ( 5.32 usr +  0.00 sys =  5.32 CPU) @ 7419.17/s (n=39470)
+   binc_10:  6 secs ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 21352.76/s (n=112102)
+  binc_100:  5 secs ( 5.13 usr +  0.01 sys =  5.14 CPU) @ 21405.84/s (n=110026)
+ binc_1000:  6 secs ( 5.15 usr +  0.00 sys =  5.15 CPU) @ 21364.27/s (n=110026)
+binc_10000:  5 secs ( 5.19 usr +  0.00 sys =  5.19 CPU) @ 21199.61/s (n=110026)
+    f++_10:  4 secs ( 5.28 usr +  0.03 sys =  5.31 CPU) @ 2949.15/s (n=15660)
+   f++_100:  5 secs ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 840.34/s (n=4437)
+  f++_1000:  5 secs ( 5.20 usr +  0.01 sys =  5.21 CPU) @  3.07/s (n=16)
+ f++_10000:  ** did not finish **
+   f++_999:  6 secs ( 5.25 usr +  0.00 sys =  5.25 CPU) @ 19911.05/s (n=104533)
+   finc_10:  5 secs ( 5.26 usr +  0.00 sys =  5.26 CPU) @ 2977.19/s (n=15660)
+  finc_100:  5 secs ( 5.30 usr +  0.00 sys =  5.30 CPU) @ 837.17/s (n=4437)
+ finc_1000:  6 secs ( 5.34 usr +  0.01 sys =  5.35 CPU) @  3.18/s (n=17)
+finc_10000:  ** did not finish **
+  sub_1000:  5 secs ( 5.18 usr +  0.00 sys =  5.18 CPU) @ 5502.32/s (n=28502)
+
+Math::BigInt v1.46 lib => Math::BigInt::GMP v1.03
+Benchmark: running ++_10, ++_100, ++_1000, ++_10000, ++_999, add_1000, binc_10, binc_100, binc_1000, binc_10000, f++_10, f++_100, f++_1000, f++_999, finc_10, finc_100, finc_1000, sub_1000, each for at least 5 CPU seconds...
+     ++_10:  4 secs ( 5.11 usr +  0.02 sys =  5.13 CPU) @ 14035.09/s (n=72000)
+    ++_100:  5 secs ( 5.08 usr +  0.03 sys =  5.11 CPU) @ 13840.90/s (n=70727)
+   ++_1000:  6 secs ( 5.27 usr +  0.08 sys =  5.35 CPU) @ 13700.75/s (n=73299)
+  ++_10000:  5 secs ( 5.28 usr +  0.03 sys =  5.31 CPU) @ 13122.22/s (n=69679)
+    ++_999:  4 secs ( 5.27 usr +  0.03 sys =  5.30 CPU) @ 13831.89/s (n=73309)
+  add_1000:  5 secs ( 5.27 usr +  0.04 sys =  5.31 CPU) @ 6386.44/s (n=33912)
+   binc_10:  4 secs ( 5.23 usr +  0.04 sys =  5.27 CPU) @ 14281.40/s (n=75263)
+  binc_100:  5 secs ( 5.18 usr +  0.08 sys =  5.26 CPU) @ 14306.65/s (n=75253)
+ binc_1000:  4 secs ( 5.17 usr +  0.05 sys =  5.22 CPU) @ 14301.92/s (n=74656)
+binc_10000:  5 secs ( 5.11 usr +  0.05 sys =  5.16 CPU) @ 13505.43/s (n=69688)
+    f++_10:  5 secs ( 5.23 usr +  0.02 sys =  5.25 CPU) @ 2151.81/s (n=11297)
+   f++_100:  6 secs ( 5.28 usr +  0.02 sys =  5.30 CPU) @ 1253.96/s (n=6646)
+  f++_1000:  5 secs ( 5.59 usr +  0.01 sys =  5.60 CPU) @ 30.54/s (n=171)
+ f++_10000:  ** did not finish **
+   f++_999:  6 secs ( 5.22 usr +  0.03 sys =  5.25 CPU) @ 13782.67/s (n=72359)
+   finc_10:  5 secs ( 5.18 usr +  0.06 sys =  5.24 CPU) @ 2155.92/s (n=11297)
+  finc_100:  5 secs ( 5.28 usr +  0.01 sys =  5.29 CPU) @ 1258.22/s (n=6656)
+ finc_1000:  5 secs ( 5.21 usr +  0.01 sys =  5.22 CPU) @ 30.84/s (n=161)
+finc_10000:  ** did not finish **
+  sub_1000:  5 secs ( 5.24 usr +  0.03 sys =  5.27 CPU) @ 4781.78/s (n=25200)
+

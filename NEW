@@ -1,32 +1,14 @@
-This lists only the changes for the current release (v1.45) over the last
+This lists only the changes for the current release (v1.46) over the last
 version, since HISTORY is now quite big:
 
-Calc :  changed the test for the biggest possible BASE_LEN to watch for pattern
-	max BASELEN is 8 for now (cheap hack to avoid VMS/OS/390 problems)
-	min BASELEN is now 3 (to avoid for OS/390 problems)
-	added checks in _check() for correct stringification of parts
-	added _mod() for faster $x % $y
-MBI  :  John Peacock's patch to add __PACKAGE__ inside accuracy()/precision()
-	more tests for mul() to check Calc's BASE_LEN choice
-	testsuite skips tests if Calc isn't used, makes it easier for Pari etc
-	converted DOS style line-endings to unix in bigflt.inc and Subclass.pm
-	bmod() wasn't rounding result afterwards
-	bmod() gives now lib a chance to calculate reminder without _div()
-	bmod() had no +-inf or NaN handling and was wrong when $y|$x = 0 or 1
-	added tests for inf handling in div()
-	doc section about reasoning behind NaN and +-inf handling
-	reminder => remainder
-	bpow() about 15% faster (testet with 2 ** 150, 2 ** 256, 3 ** 127)
-	bmod() now a lot faster in almost all cases
-MBF  :  fixed bacmp() for $x != +-inf && $y +-inf, added tests for it
-tests:  incorporated fix from CORE to find the testing files
-	make sure to quote bare floating point values, since stringify might
-	 turn 123.46 into 123.459999999 and thus makes the test appear to fail
-	more tests in calling.t	
-	bigintpm.t now runs it's test in a subclass, too
-	tests that expected BASE of 1e5 were changed to use the real BASE
-	tests for invalid round_mode()
-	various other tests to increase coverage (thanx to Paul Johnson!)
+Calc :  added _inc() and _dec() for faster ++ and --
+MBI  :  call $CALC->_inc() and $CALC->_dec() for faster ++, --
+	don't round twice in bsub() (badd() already rounded), eliminate bneg()
+MBF  :  finc()/fdec()/fsub() got similiar treatment like in MBI
+	new() streamlined
+tests:  added some for _inc()/_dec()
+	adapted core changes to make the testsuite run on CPAN and in core
+	forgot to quote two floats in mbimbf.t - thus test failed in OS/390
 
 Please have arbitrarily big amounts of fun.
 

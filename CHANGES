@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.45:
+v1.46:
 
  general:
   + It is subsequent faster than the original in many places
@@ -57,6 +57,7 @@ v1.45:
  new stuff:
   + bacmp (acmp), because needed for more efficient add()
   + bzero(), bnan(), bone(), binf()
+  + binc(), bdec()
   + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf()
   + digit(), length(), copy()
   + as_number(), as_hex(), as_bin()

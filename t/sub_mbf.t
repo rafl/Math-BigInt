@@ -6,11 +6,27 @@ use strict;
 BEGIN
   {
   $| = 1;
-  unshift @INC, '../lib';	# for running manually
-  my $location = $0; $location =~ s/sub_mbf.t//;
-  unshift @INC, $location; # to locate the testing files
-  chdir 't' if -d 't';
-  plan tests => 1277 + 4;	# + 4 own tests
+  # to locate the testing files
+  my $location = $0; $location =~ s/sub_mbf.t//i;
+  if ($ENV{PERL_CORE})
+    {
+    # testing with the core distribution
+    @INC = qw(../lib);
+    }
+  unshift @INC, '../lib';
+  if (-d 't')
+    {
+    chdir 't';
+    require File::Spec;
+    unshift @INC, File::Spec->catdir(File::Spec->updir, $location);
+    }
+  else
+    {
+    unshift @INC, $location;
+    }
+  print "# INC = @INC\n"; 
+  
+  plan tests => 1299 + 4;	# + 4 own tests
   }
 
 use Math::BigFloat::Subclass;
