@@ -1,0 +1,147 @@
+Here are some benchmark results done with the different versions. v0.01 denotes
+the original Perl 5.6.0 and earlier code of BigInt/BigFloat.
+
+The following calculates n!:
+
+sub factorial
+  {
+  my ($n,$i) = shift;
+  my $res = Math::BigInt->new(1);
+  return $res if $n < 1;
+  for ($i = 2; $i <= $n; $i++)
+    {
+    $res *= $i;
+    }
+  return $res;
+  }
+
+Time for a single calculation of factorial(n), done on a 300 Mhz PIII:
+
+       Version:
+    n:	 v0.01	v1.30	SSLeay::BN
+
+   500	  4.18	1.74	0.35
+  1000   18.25  7.03    0.78
+  2000   80.91 29.70	1.13
+
+Note: The values for SSLeay::BN were interpolated (aka guessed) by taking
+benchmarks from "Algorithmns in Perl", (page 486 in German version), and than
+scaling the numbers to match the speed of v0.01 on this machine.
+
+###############################################################################
+###############################################################################
+Here are some details about a rounding-shoutout. The following script creates
+some big semi-random numbers and thn rounds them of in 3-some steps:
+
+#!/usr/bin/perl -w
+# benchmark to measure rounding speed
+
+# comment one out
+use lib '../old'; my $class = 'Math::BigFloat';
+#use lib 'lib'; my $class = 'Math::BigInt';
+
+use Math::BigInt;
+use Math::BigFloat;
+
+$| = 1;
+# for some determined randomness
+srand(3);
+my $digits = 2000;              # test numbers up to this length
+my $loops = 25;                 # so much different numbers (more, better)
+
+for ($i = 0; $i < $loops; $i ++)
+  {
+  $x = int(rand($digits)+1)+4;                  # length
+  $y = "";
+  while (length($y) < $x)
+    {
+    $y .= int(rand(10000));
+    }
+  $z = length($y);
+  $y = $class->new($y);
+  print "\r to go ",$loops-$i,"        ";
+  # now round some amount to measure it instead of the setup time
+  $x = $z-2;                                    # preserve so many digits
+  while ($x > 3)
+    {
+    #$y->fround($x);                            # now round to somewhere
+    $y = Math::BigFloat->new($y->fround($x));   # for old lib
+    $x -= 3;
+    }
+  }
+
+###############################################################################
+Old v0.01 code:
+
+Total Elapsed Time = 9.001886 Seconds
+  User+System Time = 8.941886 Seconds
+Exclusive Times
+%Time ExclSec CumulS #Calls sec/call Csec/c  Name
+ 15.1   1.350  1.690  13293   0.0001 0.0001  Math::BigInt::external
+ 14.3   1.280  1.254  26399   0.0000 0.0000  Math::BigFloat::norm
+ 13.3   1.190  1.133  57451   0.0000 0.0000  Math::BigInt::bnorm
+ 10.9   0.979  3.732   4507   0.0002 0.0008  Math::BigInt::badd
+ 10.2   0.920  0.893  26586   0.0000 0.0000  Math::BigInt::internal
+ 9.17   0.820  0.802  17588   0.0000 0.0000  Math::BigFloat::stringify
+ 9.06   0.810  2.572  17613   0.0000 0.0001  Math::BigFloat::fnorm
+ 5.59   0.500  0.495   4507   0.0001 0.0001  Math::BigInt::add
+ 4.81   0.430  8.143   8794   0.0000 0.0009  Math::BigFloat::fround
+ 3.69   0.330  0.321   8786   0.0000 0.0000  Math::BigInt::mul
+ 3.02   0.270  1.348   8786   0.0000 0.0002  Math::BigInt::bmul
+ 2.24   0.200  5.658   8786   0.0000 0.0006  Math::BigFloat::round
+ 1.57   0.140  0.131   8786   0.0000 0.0000  Math::BigInt::cmp
+ 1.12   0.100  0.806   8819   0.0000 0.0001  Math::BigFloat::new
+ 0.78   0.070  0.408   8786   0.0000 0.0000  Math::BigInt::bcmp
+ 0.22   0.020  0.040      3   0.0067 0.0133  main::BEGIN
+ 0.11   0.010  0.010      1   0.0100 0.0100  Math::BigInt::BEGIN
+ 0.11   0.010  0.010      2   0.0050 0.0050  lib::BEGIN
+ 0.00   0.000 -0.000      1   0.0000      -  Config::TIEHASH
+ 0.00   0.000 -0.000      1   0.0000      -  Config::import
+ 0.00   0.000 -0.000      6   0.0000      -  Config::FETCH
+ 0.00   0.000 -0.000      1   0.0000      -  lib::import
+ 0.00   0.000 -0.000      2   0.0000      -  overload::import
+ 0.00   0.000 -0.000      2   0.0000      -  overload::OVERLOAD
+ 0.00   0.000 -0.000      2   0.0000      -  Math::BigInt::import
+ 0.00   0.000 -0.000      4   0.0000      -  Math::BigFloat::BEGIN
+ 0.00   0.000 -0.000      3   0.0000      -  Exporter::import
+ 0.00   0.000 -0.000      1   0.0000      -  warnings::BEGIN
+ 0.00   0.000 -0.000      1   0.0000      -  warnings::bits
+ 0.00   0.000 -0.000      1   0.0000      -  warnings::unimport
+
+###############################################################################
+New v1.33 code:
+
+Total Elapsed Time = 7.923339 Seconds
+  User+System Time = 7.863339 Seconds
+Exclusive Times
+%Time ExclSec CumulS #Calls sec/call Csec/c  Name
+ 33.5   2.637  8.367   8794   0.0003 0.0010  Math::BigInt::bround
+ 25.3   1.990  1.983   4507   0.0004 0.0004  Math::BigInt::add
+ 12.8   1.010  1.006    918   0.0011 0.0011  Math::BigInt::bstr
+ 8.77   0.690  0.683   4533   0.0002 0.0002  Math::BigInt::_internal
+ 8.39   0.660  0.587  31807   0.0000 0.0000  Math::BigInt::objectify
+ 5.60   0.440  0.433   4533   0.0001 0.0001  Math::BigInt::_split
+ 4.83   0.380  0.723  17588   0.0000 0.0000  Math::BigInt::digit
+ 3.82   0.300  0.783  27300   0.0000 0.0000  Math::BigInt::length
+ 2.54   0.200  0.159  27300   0.0000 0.0000  Math::BigInt::_digits
+ 2.03   0.160  2.279   4507   0.0000 0.0005  Math::BigInt::badd
+ 1.78   0.140  0.113  17808   0.0000 0.0000  Math::BigInt::is_zero
+ 1.78   0.140  1.232   4533   0.0000 0.0003  Math::BigInt::new
+ 1.53   0.120  0.107   8794   0.0000 0.0000  Math::BigInt::_scale_a
+ 1.14   0.090  0.027  41765   0.0000 0.0000  Math::BigInt::trace
+ 0.89   0.070  8.410   8794   0.0000 0.0010  Math::BigInt::fround
+ 0.38   0.030  0.017   8794   0.0000 0.0000  Math::BigInt::is_nan
+ 0.38   0.030  1.092    918   0.0000 0.0012  Math::BigInt::_scan_for_nonzero
+ 0.38   0.030  0.080      3   0.0100 0.0266  main::BEGIN
+ 0.25   0.020  0.030      5   0.0040 0.0060  Math::BigInt::BEGIN
+ 0.13   0.010  0.003   4507   0.0000 0.0000  constant::__ANON__
+ 0.13   0.010  0.010      5   0.0020 0.0020  strict::bits
+ 0.13   0.010  0.010      1   0.0100 0.0100  vars::BEGIN
+ 0.13   0.010  0.010      2   0.0050 0.0050  lib::BEGIN
+ 0.00   0.000 -0.000      3   0.0000      -  Exporter::heavy_export_to_level
+ 0.00   0.000 -0.000      3   0.0000      -  Exporter::export
+ 0.00   0.000 -0.000      3   0.0000      -  Exporter::heavy_export
+ 0.00   0.000  0.010      6   0.0000 0.0017  Math::BigFloat::BEGIN
+ 0.00   0.000 -0.000      1   0.0000      -  Config::BEGIN
+ 0.00   0.000 -0.000      1   0.0000      -  Config::TIEHASH
+ 0.00   0.000 -0.000      1   0.0000      -  Config::import

@@ -1,0 +1,212 @@
+
+Complete version history of the rewrite project
+===============================================
+
+If you want to see which things are new and different from the original
+Math::* in the Perl core, see CHANGES.
+
+This lists the complete version history for the rewritten versions.
+
+############################################################################## 
+Math::BigFloat:
+
+2000-02-18 1.00: started work
+2000-02-22 1.01: new() and bstr() work now (sort of)
+2000-02-24 1.02: add()/sub() should work now
+2000-03-06 1.03: layed more foundations (mul() etc)
+2000-03-27 1.04: bmul/bdiv/cmp work now, better _norm()
+2000-03-31 1.05: fixed bstr() and bsstr()
+	         added AUTOLOAD for fxxx() to work as well as bxxx()
+		 enhanced and fixed testsuite for mul/cmp/add/new
+2000-04-05 1.06: bstr() returns NaN for NaN's
+		 renamed _norm to bnorm, added it to AUTOLOAD for compatibility
+		 fixed bug Math::BigFloat->new(Math::BigInt->new(3));
+		 bug mul/div when second arg was BigInt
+		 bdiv() works now with precision
+		 precision()
+		 doc about mixing different objects in overloaded math
+2000-04-07 1.07: bug in bstr() for 0.xxx style numbers, as well as for "-xxx"
+		 babs(), bneg(), bint() work now
+		 empty stubs for bsqrt(), bround() and bmod()
+		 exponent(), mantissa(), parts() work now as expected
+2000-04-18 1.08: exponent(), mantissa() and parts() now return BigInt's
+		 bnorm: 0Ey => 0E1 (was wrongly 0E0)
+		 fixed is_zero()
+		 added bround() and bfround() (only truncate mode)
+                 fixed bug in bstr() for 1.203E-2 style numbers (Thanx Tom!)
+2000-04-23 1.09: length() in list context return length of mantissa & exponent
+		 bug in bstr() for '0.x' style strings
+		 added bsqrt()
+		 workaround for Perl v5.6.0 overload-bool bug (via MBI)
+                 fixed rounding
+2000-05-07 1.10: Tom's round fixes (minus one nit)
+ 		 new: .xxx, -.xxx, +.xxx etc are valid inputs, while
+                 '.', 'x x x' and 'Exxx' are now invalid
+                 finally got rid of C&P of overload section and clone()
+2000-05-09 1.11: bug bcmp() (1e-08 was < 0, aka fractions were broken)
+2000-05-11 1.12 Tels
+ * taken over testsuite from John P.
+ * added tests for compare with fraction
+ * fixed fcmp/fround/ffround
+ * added accuracy/precision/fallback/round_mode
+ * bsstr('NaN') returned 'NaNeNaN'
+2000-06-09 1.13 Tels:
+ * adjusted fdiv() so that it now works proper with old testcases
+ * (except a few nits, see testsuite and ACCURACY)
+ * fdiv() in listmode (uses non-working fmod())
+ * fixed/test A/P after each op
+ * $x->accuracy(), $x->precision() actually round $x to the value A/P
+ * fixed fpow(), added tests for it
+ * hexadecimal integer input (0xdeadbeef)
+ * is_one() for -1 was wrongly true, tests for is_one()
+2000-06-13 1.14 Tels:
+ * accuracy/precision rounding after fdiv() was missing
+ * binary integer input (0b01110 etc)
+ * A/P rounding after fdiv() was missing
+ * '-0x0' would wrongly leave '-0'
+ * as_number() was wrong for negative numbers and had no tests
+ * added is_even(), is_odd(), _set(), the inherited ones were broken
+ * fixed is_zero() for NaN
+ * $x->bpow($y) for negative $y was unfinished 
+ * added is_inf(), binf() and some support for +-inf in new(), bsstr() etc
+ * added tests for is_odd(), is_even(), _set() and is_zero(), is_inf(), bsstr()
+2001-06-15 v1.15 Tels
+ * added bfloor(), bceil()
+
+############################################################################## 
+Math::BigInt:
+
+2000-11-13 v1.02 Tels
+ fixed sub and mul (sort of)
+ found out that "$wanted = shift || return bzero()" causes a call to numify,
+ testing for undefined fixes this problem (but might waste more time for
+ a new(0), will save time on average.
+2000-11-14 v1.03 Tels
+ x**0 => 1 (instead of x)
+ fixed bigintpm to include bpow, binc, bdec, new() test
+2000-11-15 v1.04 Tels
+ fixed bigintpm to test '++' and '--' properly
+ done div, fixed mul/bpow (13 tests remain)
+2000-11-16 v1.05 Tels
+ 8 tests remain
+ new copies _all_ fields, not only Math::Bigint ones
+2000-11-19 v1.06 Tels
+ 7 tests remain
+ bgcd accepts lists, added blcm
+2000-11-20 v1.07 Tels
+ objectify fixed to not make copies and work with subclasses
+2000-11-22 v1.08 Tels
+ fixed all but one test (band bior bxor etc)
+2000-11-23 v1.09 Tels
+ fixed bug in bmul (and thus bpow) (self multiply works now)
+2000-11-24 v1.10 Tels
+ finally made it Math::BigInt (w/o trailing 's')
+2001-02-14 v1.11 Tels
+ * fixed bug in band(), bxor(), etc that used badd($x, fixed_number_here);
+ * since subclasses might not be happy with fixed numbers, make sure we pass
+   BigInts all the time if using something like $someclass->badd();
+ * fixed bug in band/bxor/bior which destroyed second argument
+ * bxor/band/bior work now correctly for subclasses
+ * ++ and -- are now a tad (ca 5%) faster
+2001-02-16 v1.12 Tels
+ * accidentily dropped self-multiply test in bigintpm.t
+ * fixed bug in overloading cmp
+ * after correcting the overload for 'cmp', I got a lot of test failings and
+   finally dicsovered that the bstr()'s return of '[+-][0-9]+' instead of
+   Perls ways of '[-]?[0-9]+' breaks string comparisations with numbers :(
+   F.i. ok() from Test.pm uses 'eq' and you can not do ok($a,3*3) where $a
+   is a BigInt. IMNSHO clearly wrong. And only changing the way cmp is
+   overloaded would lead to the curios situation that the following:
+   'print "$a eq $b" if $a eq $b;' would print "+3 eq 3", which looks wrong.
+   Mark B. said go ahead and change bstr(), so I changed it ;) to drop
+   the '+', adapted all the tests, changed the doc, etc.
+   BigInts behave now transparently like build-in scalars in integer/string
+   context ;o)
+2001-02-18 v1.13 Tels
+ * got rid of duplicated copy() code in new()
+2001-02-21 v1.14 Tels
+ * overload +=, -=, *= and /= for about 20-30% more speed if both args have
+   roughly same length
+ * shortcut in add() makes $x += $y; $x -= $y; for large $x and small $y
+   an O(1) case instead of O(N)
+ * fixed (non-critical) bug that caused objectify in numify/bool/stringify to
+   create scratch objects from undef params.
+2001-02-24 v1.15 Tels
+ * $x / $x is now a lot faster (more O(1) than O(N))
+ * 10 ** $x is now a lot faster (more O(N/5) instead of O(N))
+ * overload of **= makes $x **= $y faster
+ * 0 ** 0 was NaN, not 1
+ * -a % b = +c (was -c) to be compatible with perl
+ * added $x->length() and test for it; fixed _digits() (was off by 1)
+ * objectify() was not exported, added tests for objectify()
+2001-03-09 v1.16 Tels
+ * Math::BigInt::badd(4,5) and Math::SomeChildOfBI->badd(4,5) work now
+ * '$x = scalar (**|%|+|-|*|\) $object;' failed (was not tested, either)
+ * 'if ($x)' is now O(1) instead of O(N) and at least twice as fast
+ * fixed nasty bug in _digits that caused <=> after add/sub/mul etc to fail
+   if result was between 100001 and 109999, added test for this
+ * added test cases for op's that should preserve args (+,+=,abs(), neg() etc)
+ * added tests for overloaded 'bool'
+ * added test.pl and some examples (prime.pl, bigprimes.pl)
+ * tests after "use Math::BigInt :constant" were screwed due to not using eval
+ * $x->numify() (for $array[$x] = 0; etc) is much faster now
+ * added caveat documentation for $x = -$x; and $x *= string1 operator string2;
+2001-03-24 v1.20 Tels
+ * added: is_nan()
+ * bug in bmod/bdiv, I forgot some cases with negatives. Thanx to Bruce Fields!
+ * documented ':constant' and eval() crash on Perl 5.00x
+ * documented BigInts behaviour of bmod/bdiv and use integer
+2001-03-30 v1.21 Tels
+ * bool() works now under 5_005
+ * bug in bsub where numbers with at least 6 trailig digits after any op failed
+2001-04-05 v1.22 Tels
+ * documented Peters OS/390 patch/changes (fix was in for quite some time)
+ * fixed bug Math::BigInt->new(Math::BigFloat->new(3));
+ * objectify() with other objects than BigInt as further args, copy() etc
+ * $x->digit($n) to query fast value of Nth digit
+ * as_number()
+2001-04-07 v1.23 Tels
+ * speling errors in pod
+2001-04-23 v1.3 Tels
+ * added (compatible to MBF) mantissa(), exponent() & parts() as well as tests
+ * _trailing_zeros()
+ * fixed as_number() to return copy of BigInt 
+ * added bround(), bfround() and support for round_mode() as well as $rnd_mode
+ * fixed bug in bdiv() wich left reminder "-0", causing further op's to die()
+ * added is_valid to testsuite to see whether invalid objects are created
+ * added bsqrt()
+ * workaround coredump bug in bool() for v5.6.1
+2001-05-08 v1.31 Tels
+ * _ between digits now accepted, ' ' no longer valid inside (but at front/end)
+ * Exxx is NaN, and no longer produces warning
+ * .xxx style numbers are valid input
+ * tests for 1E1, 123E-2, 1E2 etc style input to Bigint.pm
+ * fixed overload (w/ _swap/copy), subclasses can inherit it easily
+ * removed clone()
+ * added bsstr()
+2001-05-11 v1.32 Tels
+ * added accuracy/precision/fallback/round_mode
+2001-06-09 v1.33 Tels
+ * bround() no longer uses 10 ** $pad and is thus much faster when rounding up
+ * fixed and added rounding benchmark (did time bmul instead bround)
+ * blsft(),brsft(): are can work in different bases, check against invalid
+   inputs, more tests, speedup when in base 10
+ * _trailing_zeros is 50% faster
+ * A/P after each op, tests for it in accuracy.t
+ * round() instead of bnorm()
+ * $x->accuracy(), $x->precision() actually round $x to the set value
+ * tests for is_one()
+ * hexadecimal integer input (0xcafebabe etc)
+2001-06-13 v1.34 Tels
+ * binary integer input (0b01110 etc)
+ * fixed: '-0x0' left '-0'
+ * added is_inf(), binf() and some support for +-inf in new(), bsstr() etc
+ * added tests for is_odd(), is_even(), _set() and is_zero(), is_inf(), bsstr()
+2001-06-15 v1.35 Tels
+ * added bfloor(), bceil()
+ * fixed bior(), bxor(), band() for $x->bxxx(NaN,0), added modify() to them
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

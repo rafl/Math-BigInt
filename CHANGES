@@ -1,0 +1,72 @@
+This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
+to the rewritten one. For a complete list of changes see HISTORY:
+
+v1.34:
+
+ general:
+  + It is subsequent faster than the original in many places
+  + regression test suite greatly enlarged to cover more problematic cases
+  + added example scripts (prime.pl, bigprimes.pl, hailstone.pl)
+  + documentation fixed and enhanced
+  + BigInt is sub-classable with very little effort, see M::S or M::BF
+  + subclasses of Math::BigInt know all the same methods, so that you can call
+    $x->some_method() without having to know which type of class $x is
+ caveats:
+  + bstr() and stringify now drop the leading '+' (to make overloaded cmp work
+    as expected when cmp'aring to scalars and other objects (read: bugfix)
+  + spaces are no longer allowed in a number (but may precede or follow it)
+ input:
+  + underscores are now valid between any two digits
+  + integers of the form 1E2, 1.23E2 etc are now valid for BigInt.pm, too
+  + hexadecimal numbers of the form 0xabcdefABCDEF0123456789
+  + binary numbers of the form 0b010101011
+ bugs and buglets fixed over Mark's original:
+  + 0**0 gave NaN instead of 1
+  + -1**y gave -1 instead of +1 for even y
+  + mod/div for negative numbers were incompatible to Perl's way
+  + added P. Prymmer's OS/390 '/1e5 vs *1e-5' patch w/o the performance snag
+  + incorporated all the patches to the core modules by John Peacock
+  + BigFloat::bxxx() works as well as BigFloat::fxxx()
+  + Math::BigInt->new(10) / Math::BigFloat->new(2) returned NaN (ditto for
+    other subclasses of Math::BigInt)
+  + $a = new Math::BigInt; creates now a +0, while "" still gives a NaN
+    This supresses all warnings on undef arguments. Wether this is better...	
+  + import would always use "Math::BigInt" and clash with Exporter
+  + use Math::BigInt qw(bneg); $a = bneg('1234'); etc did not work at all
+  + $x->xxx() now modifies $x in all cases of modifiers and actually returns
+    the same $x (e.g. not a plain scalar or a different reference). All
+    testing routines leave $x alone. bpow(), fround(), ffround() etc were
+    broken in this regard.
+ accuracy and precision:
+  + there is now support for both accuracy (significant digits) and precision
+    (fixed number of digits after dot), which is turned off by default
+  + objects/numbers now can have a local accuracy/precision
+ internal fixes:
+  + uses a blessed hash ref instead scalar ref (easier subclassable)
+  + my instead of local
+  + use strict and -w
+  + s/$[/0/ (after all, $[ = 1; in main does not effect this package)
+  + $# partially removed ($#y is scalar @y -1, $#$y is scalar @$y-1 - ugh!)
+  + added LICENSE section and file
+ new modules (experimental):
+  + Math::BigInt::Constant	- read-only BigInt's
+  + Math::BigFraction		- 1 / 3 * 2 / 7 => 2 / 21
+  + Math::Big			- usefull functions/constants with big numbers
+ new stuff:
+  + bacmp (acmp), because needed for more efficient add()
+  + bint() for writing shorter code (exportable new())
+  + bzero(), bnan(), sign()
+  + is_zero(), is_nan(), is_one(), is_odd(), is_even() for faster testing
+  + digit(), as_number()
+  + mantissa(), exponent(), parts(), length(), copy()
+  + bgcd accepts now lists
+  + blcm (also accepts lists)
+  + fmod() (Thanx J. Peacock) and fdiv() in list context
+  + round(accuracy,precision,mode) round to accuracy/precision using mode
+  + bpow() for BigFloat
+  + bfloor(), bceil()
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

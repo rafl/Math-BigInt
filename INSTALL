@@ -1,0 +1,30 @@
+Rewrite project of Math::Big*
+
+(C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
+
+Contains new version of Math::BigInt, so please do NOT make 'make install',
+except when you do no longer want your old Math::BigInt or know what you are
+doing. This rewritten version is mainly compatible, minus some bugfixes, and
+more feature and speed.
+
+To test, unzip & untar package, then run
+
+	perl Makefile.PL
+	make
+	make test
+	make install		# as root
+
+For a quick reference on what has changed from the old versions, please see
+CHANGES. HISTORY brings you a detailed history log of the rewrite.
+
+In ./examples are some basic example scripts.
+
+More information including HTMLified help and benchmark results are
+available under:
+
+	http://bloodgate.com/perl/
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

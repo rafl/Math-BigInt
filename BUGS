@@ -1,0 +1,72 @@
+
+Known bugs:
+
+* General:
+  + Does not yet properly handle +inf, -inf in math operations
+  + divide by zero throws no exception
+
+* BigFloat:
+  + unfinished (fmod() is missing, fsqrt() is buggy (because div() is buggy))
+  + certain operations (div?) leave $x->{_m} as NaN! Oups! (see fsqrt())
+  + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
+  + new is first running the entire number trough _split, then again the parts
+    to construct BigInts. Could be a bit more optimzed.
+  + fdiv() using F (fallback) mode does not honour local A settings
+  + MBF uses internally MBI for calculating. This can make problems if MBI has
+    set global accuracy settings, and thus rounds unexpectedly the mantissa.
+  + hexadecimal integers work, but what about '0xABC.DEF'? Needed?
+  + is_even('123.345') ??
+* BigInt:
+  + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
+  + Handling of undef arguments is somewhat broken (no proper warnings)
+
+Accuracy:
+  + Engaging $x with set A, and $y with set P should result in an error
+
+###############################################################################
+
+Mixing of classes does not always work like here:
+
+	use Math::BigInt;
+	use Math::BigFloat;
+
+	$x = Math::BigFloat->new(2.5);
+	$y = Math::BigInt->new(2);
+
+	$z = $x + $y;
+
+What should $z become? Certainly not a BigFloat with value 4. But a BigFloat
+with value 4.5? Ora BigInt with value 4? And should
+
+	$z = $y + $x;	# reversed order
+
+influence the result? Overload works this way with scalars, the first object
+gives the class to that the result is set and the second argument converted:
+
+	$z = $x + 2;	# 4.5
+	$z = 2 + $x:	# 4.5
+	$z = $y + 2.5;	# 4 !!
+
+One problem is that in normal Perl floating point is prefered, when in doubt.
+But this assumes that MBI knows about MBF and that MBF is considered more
+"powerfull", so that MBI objects promote themselfe to MBFs upon contact:
+
+	$z = $x + $y;	# 4.5
+	$z = $y + $x;	# 4.5, too
+
+While this could be made to work somehow, the assumption that MBI must know
+anything about MBF (a subclass of it) is somewhat ugly. (Of course having a
+routine in both packages, that return 1 for MBI, and 2 for MBF, thus denoting
+the more powerfull would work, and even with subclasses of MBI, which inherit
+than the 1, or override it (maybe even with 3 for complex numbers)).
+
+The old code (v0.01 etc) breaks in various, mysterious and strange ways when
+confronted with mixed arguments, but for others it works by suprise. For fun
+throw t/fi_mixed.t at the old library.
+
+My new code is only partially better, I am afraid.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

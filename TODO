@@ -1,0 +1,33 @@
+See various .pm files.
+
+General:
+ * Copy on write (helps for $x = -$x; cases etc)
+
+Math::BigFloat:
+ * ! bround(): some bugs may lurk in there (warnings)
+ * ! bsqrt() (infinite loops for some cases (sqrt(1000))
+     maybe: find a more proper ending condition
+ * ! bmod() 
+ * accuracy() & precision() maybe finished (bnorm() in every op, testcases)
+
+Math::BigFloat::Constant:
+ * really?
+
+Math::BigInt:
+ * remove trace()
+ * objectify() is too slow and questionable (actually, it are only a few
+   percent overhead...still)
+ * ++,-- could be faster in Bigint via hardcoded (manual) increment
+ * look at mul() and div() for more speed
+ * bpow() could be faster by not using div() (pre-shift only last array elem?)
+ * bround() gives wierd results for -$scale, abs($scale) > $len), and is only
+   used by MBF for -$scale = -$len, anyway. POD is wrong for this, too.
+ * theoretically, we could use $BASE_LEN = 7 instead of 5, to exploit 20% less
+   work for huge numbers. Unfortunately, some code has hardcoded into it that
+   each array elem is 5 digits wide.
+ * the actualy calculation code should be moved to Math::BigInt::Base.pm RSN!
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

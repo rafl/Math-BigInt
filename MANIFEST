@@ -1,6 +1,25 @@
-BigInt.pm
-Changes
-MANIFEST
-Makefile.PL
+ACCURACY
+CHANGES
+BENCHMARK
+BUGS
+GOALS
+HISTORY
+INSTALL
 README
+LICENSE
+MANIFEST
+NEW
+THANX
+TODO
+Makefile.PL
+examples/hailstone.pl
+examples/prime.pl
+examples/bigprimes.pl
+examples/fib.pl
+examples/1000.txt
+lib/Math/BigInt.pm
+lib/Math/BigFloat.pm
+bench/copy.pl			# measure overhead of copy due to overload
+t/mbimbf.t			# test accuracy/precision settings in MBI/MBF
 t/bigintpm.t
+t/bigfltpm.t

@@ -1,7 +1,0 @@
-Revision history for Perl extension Math::BigInt.
-
-0.01  Wed Apr  4 12:06:05 2001
-	- original version; created by h2xs 1.21 with options
-		-AXn Math::BigInt
-	- copied Math::BigInt out of core installation
-

@@ -1,0 +1,292 @@
+This document describes the accuracy/precision handling in Math::Big* as it
+used to be and is now, completed with an explanation of all terms.
+
+
+Description of terms used here (these may differ from terms used by others):
+
+! description right, but not done yet
+? Question for someone to answer
+
+Precision P:
+  A fixed number of digits before (positive) or after (negative)
+  the dot. F.i. 123.45 has a precision of -2. 0 means an integer like 123
+  (or 120). A precision of 2 means two digits left of the dot are zero, so
+  123 with P = 1 becomes 120. Note that numbers with zeros before the dot may
+  have different precisions, because 1200 can have p = 0, 1 or 2 (depending
+  on what the inital value was). It could also have p < 0, when the digits
+  after the dot are zero.
+  
+! The string output of such a number should be padded with zeros:
+
+	Initial value	P	Result		String
+	1234.01		-3	1000		1000
+	1234		-2	1200		1200
+	1234.5		-1	1230		1230
+	1234.001	1	1234		1234.0
+	1234.01		0	1234		1234
+	1234.01		2	1234.01		1234.01
+	1234.01		5	1234.01		1234.01000
+
+Accuracy A:
+  Number of significant digits. Leading zeros are not counted. A
+  number may have an accuracy greater than the non-zero digits
+  when there are zeros in it or trailing zeros. 123.456 has A of 6,
+  10203 has 5, 123.0506 has 7, 123.450000 has 8, and 0.000123 has 3. 
+
+Fallback F:
+  When both A and P are undefined, this is used as a fallback accuracy.
+
+Rounding mode R: When rounding a number, different 'styles' or 'kinds'
+  of rounding are possible. (Note that random rounding, as in
+  Math::Round, is not implemented.)
+
+  'trunc': truncation invariably removes all digits following the
+  rounding place, replacing them with zeros. Thus, 987.65 rounded
+  to tenths (P=1) becomes 980, and rounded to the fourth sigdig
+  becomes 987.6 (A=4). 123.456 rounded to the second place after the
+  dot (P=-2) becomes 123.46.
+
+  All other implemented styles of rounding attempt to round to the
+  "nearest digit." If the digit D immediately to the right of the
+  rounding place (skipping the decimal point) is greater than 5, the
+  number is incremented at the rounding place (possibly causing a
+  cascade of incrementation): e.g. when rounding to units, 0.9 rounds
+  to 1, and -19.9 rounds to -20. If D < 5, the number is similarly
+  truncated at the rounding place: e.g. when rounding to units, 0.4
+  rounds to 0, and -19.4 rounds to -19.
+
+  However the results of other styles of rounding differ if the
+  digit immediately to the right of the rounding place (skipping the
+  decimal point) is 5 and if there are no digits, or no digits other
+  than 0, after that 5. In such cases:
+
+  'even': rounds the digit at the rounding place to 0, 2, 4, 6, or 8
+  if it is not already. E.g., when rounding to the first sigdig, 0.45
+  becomes 0.4, -0.55 becomes -0.6, but 0.4501 becomes 0.5.
+
+  'odd': rounds the digit at the rounding place to 1, 3, 5, 7, or 9 if
+  it is not already. E.g., when rounding to the first sigdig, 0.45
+  becomes 0.5, -0.55 becomes -0.5, but 0.5501 becomes 0.6.
+
+  '+inf': round to plus infinity, i.e. always round up. E.g., when
+  rounding to the first sigdig, 0.45 becomes 0.5, -0.55 becomes -0.5,
+  but 0.4501 becomes 0.5.
+
+  '-inf': round to minus infinity, i.e. always round down. E.g., when
+  rounding to the first sigdig, 0.45 becomes 0.4, -0.55 becomes -0.6,
+  but 0.4501 becomes 0.5.
+
+  'zero': round to zero, i.e. positive numbers down, negative ones up.
+  E.g., when rounding to the first sigdig, 0.45 becomes 0.4, -0.55
+  becomes -0.5, but 0.4501 becomes 0.5.
+
+During the rest of this document the shortcuts A, P, F and R will be used.
+ 
+The handling of A&P in MBI/MBF (the old core code shipped with Perl
+versions <= 5.7.1) is like this:
+
+? (note: nothing has changed in 5.7.x over 5.6.x in this regard, right?)
+
+Precision: 
+  * ffround($p) is able to round to $p number of digits after the dot
+  * otherwise P is unused
+
+Accuracy (significant digits):
+  * fround($a) rounds to $a significant digits
+  * only fdiv() and fsqrt() take A as (optional) paramater
+    + other operations simple create the same amount (fneg etc), or more (fmul)
+      of digits
+    + rounding/truncating is only done when explicitly calling one of fround
+      or ffround, and never for BigInt (not implemented)
+  * fsqrt() simple hands it's accuracy argument over to fdiv.
+  * the documentation and the comment in the code indicate two different ways
+    on how fdiv() determines the maximum number of digits it should calculate,
+    and the actual code does yet another thing
+    POD:
+      max($Math::BigFloat::div_scale,length(dividend)+length(divisor))
+    Comment:
+      result has at most max(scale, length(dividend), length(divisor)) digits 
+    Actual code:
+      scale = max(scale, length(dividend)-1,length(divisor)-1);
+      scale += length(divisior) - length(dividend);
+    So for lx =3, ly = 9, scale = 10, scale will be actually 16 (10+9-3).
+    Actually, the 'difference' added to the scale is calculated from the
+    number of "significant digits" in dividend and divisor, which is derived
+    by looking at the length of the mantissa. Which is wrong, since it includes
+    the + sign (oups) and actually gets 2 for '+100' and 4 for '+101'. Oups
+    again. Thus 124/3 with div_scale=1 will get you '41.3' based on the strange
+    assumption that 124 has 3 significant digits, while 120/7 will get you
+    '17', not '17.1' since 120 is thought to have 2 significant digits. 
+    The rounding after the division then uses the reminder and $y to determine
+    wether it must round up or down. 
+?   I have no idea which is the right way. Thats why I used scheme a bit more
+?   simple and tweaked the few failing the testcases to match it.
+
+This is how it works now:
+
+Setting/Accessing:
+  * You can set the A global via $Math::BigInt::accuracy or
+    $Math::BigFloat::accuracy or whatever class you are using.
+  * You can also set P globally by using $Math::SomeClass::precision likewise.
+  * Globals are classwide, and not inherited by subclasses.
+  * to undefine A, use $Math::SomeCLass::accuracy = undef
+  * to undefine P, use $Math::SomeClass::precision = undef
+  * To be valid, A must be > 0, P can have any value.
+  * If P is negative, this means round to the P's place right of the dot,
+    positive values mean left from the dot. P of 0 means round to integer.
+  * to find out the current global A, take $Math::SomeClass::accuracy
+  * use $x->accuracy() for the local setting of $x.
+  * to find out the current global P, take $Math::SomeClass::precision
+  * use $x->precision() for the local setting
+
+Creating numbers:
+! * When you create a number, there should be a way to define it's A & P
+  * When a number without specific A or P is created, but the globals are
+    defined, these should be used to round the number imidiately and also
+    stores locally at the number. Thus changing the global defaults later on
+    will not change the A or P of previously created numbers (aka A and P of
+    $x will be what was in effect when $x was created)
+
+Usage:
+  * If A or P are enabled/defined, the are used to round the result of each
+    operation according to the rules below
+  * Negative P are ignored in Math::BigInt, since it never has digits after
+    the dot
+
+Precedence:
+  * It makes only sense that a number has only A or P at a time. Since you can
+    set/get both A and P, there is a rule that will practically enforce only
+    A or P to be in effect at a time, even if both are set. This is called
+    precedence.
+! * If two objects are engaged in an operation, and one of them has A in
+!   effect, and the other P, this should result in a warning or an error,
+!   probably in NaN.
+  * A takes precendence over P (Hint: A comes before P). If A is defined, it
+    is used, otherwise P is used. If none of them is defined, nothing is used,
+    e.g. the result will have as many digits as it can (with an exception
+    for fdiv/fsqrt) and will not be rounded.
+  * There is another setting for fdiv() (and thus for fsqrt()). If none of A
+    or P are defined, fdiv() will use a fallback (F) of $div_scale digits.
+    If either the dividend or the divisors mantissa have more digits than the
+    F, the higher value will be used instead as F.
+    This is to limit the digits (A) of the result (just think if what happens
+    with unlimited A and P in case of 1/3 :-)
+  * fdiv will calculate 1 more digits than required (determined by
+    A, P or F), and, if F is not used, round the result 
+    (this will still fail in case of a result like 0.12345000000001 with A
+    or P of 5, but this can not be helped - or can it?)
+  * Thus you can have the math done by on Math::Big* class in three modi:
+    + never round (this is the default):
+      This is done by setting A and P to undef. No math operation
+      will round the result, with fdiv() and fsqrt() as exception to guard
+      against overflows. You must explicitely call bround(), bfround() or
+      bnorm() (the latter with with parameters).
+      Note: Once you rounded a number, the settings will 'stick' on it and
+      'infect' all other numbers engaged in math operations with it, since
+      local settings have the highest precedence. So, to get SaferRound[tm],
+      use a copy() before rounding like this:
+
+	$x = Math::BigFloat->new(12.34);
+	$y = Math::BigFloat->new(98.76);
+	$z = $x * $y;				# 1218.6984
+	print $x->copy()->fround(3);		# 12.3 (but A is now 3!)
+	$z = $x * $y;				# still 1218.6984, without
+						# copy would have been 1210!
+
+    + round after each op:
+      After each single operation (except for testing like is_zero()) the
+      method bnorm() is called and the result appropriately rounded. By
+      setting proper values for A and P, you can have all-the-same-A or
+      all-the-same-P modi. F.i. Math::Current might set A to undef, and P
+      to -2, globally.	
+
+? Maybe an extra option, that forbids local A & P settings would be in order,
+? so that intermidiate rounding does not 'poison' further math?
+
+Overriding globals:
+  * you will be able to give A, P and R as an argument to all the calculation
+    routines, the second parameter is A, the third one is P, and  the fourth is
+    R (shift place by one for binary operations like add) and used only if the
+    first one is undefined. These two parameters override the globals in
+    the order detailed as follows, aka the first defined value wins:
+    (local: per object, global: globally default, parameter: argument) 
+      + parameter A
+      + parameter P
+      + local A (if defined on both of the operands: take smaller one)
+      + local P (if defined on both of the operands: take smaller one)
+      + gloabl A
+      + global P
+      + global F
+    (unsure - I dont like to set these method paramaters as standard, because
+     unnamed parameters are bad, maybe use a hashref?)
+  * fsqrt() will hand it's arguments to fdiv(), as it used to, only now for two
+    arguments (A and P)
+
+Local settings:
+  * You can set A and P locally by using $x->accuracy() and $x->precision()
+    and thus force different A and P for different objects/numbers.
+
+Rounding:
+  * the rounding routines will use the respective global or local settings
+    fround()/bround() is for accuracy rounding, while ffround()/bfround()
+    is for precision
+  * the two rounding functions take as the second parameter one of the
+    following rounding modes (R):
+    'even', 'odd', '+inf', '-inf', 'zero', 'trunc'
+  * you can set and get the global R by using Math::SomeClass->round_mode()
+    or by setting $Math::SomeClass::rnd_mode
+  * after each operation, $result->round() is called, and the result may
+    eventually be rounded (that is, if A or P were set either local, global
+    or as parameter to the operation)
+  * to manually round a number, call $x->round($A,$P,$rnd_mode);
+    This will round the number by using the appropriate rounding function
+    and then normalize it.
+  * rounding does modify the local settings of the number, so that
+
+	$x = Math::BigFloat->new(123.456);
+	$x->accuracy(5);
+	$x->bround(4);		
+
+    Here 4 takes precedence over 5, so 123.5 is the result and $x->accuracy()
+    will be 4 from now on.
+? Option to turn this localized-sticky off as asked above?
+
+Default values:
+  * R: 'even'
+  * F: 40
+  * A: undef
+  * P: undef
+ 
+Remarks: 
+  * The defaults are set up so that the new code gives the same results as
+    the old code (except in a few cases on fdiv): 
+    + Both A and P are undefined and thus will not be used for rounding
+      after each operation.
+    + round() is thus a no-op, unless given extra parameters A and P
+ 
+Some examples:
+
+  use Math::BigFloat;
+  use Test;
+
+  $x = Math::BigFloat->new(123.4567);
+  $y = Math::BigFloat->new(123.456789);
+  $Math::BigFloat::accuracy = 4;		# no more A than 4
+
+  ok ($x->copy()->fround(),123.4);	# even rounding
+  print $x->copy()->fround(),"\n";	# 123.4
+  Math::BigFloat->round_mode('odd');	# round to odd
+  print $x->copy()->fround(),"\n";	# 123.5
+  $Math::BigFloat::accuracy = 5;		# no more A than 5
+  Math::BigFloat->round_mode('odd');	# round to odd
+  print $x->copy()->fround(),"\n";	# 123.46
+  $y = $x->copy()->fround(4),"\n";	# A = 4: 123.4
+  print "$y, ",$y->accuracy(),"\n";	# 123.4, 4
+
+  $Math::BigFloat::accuracy = undef;	# A not important
+  $Math::BigFloat::precision = 2;	# P important
+  print $x->copy()->bnorm(),"\n";	# 123.46
+  print $x->copy()->fround(),"\n";	# 123.46
+
+Example list not complete.
+
