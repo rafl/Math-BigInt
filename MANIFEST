@@ -1,4 +1,3 @@
-ACCURACY
 CHANGES
 BENCHMARK
 BUGS
@@ -9,17 +8,23 @@ README
 LICENSE
 MANIFEST
 NEW
-THANX
+CREDITS
 TODO
 Makefile.PL
 examples/hailstone.pl
 examples/prime.pl
 examples/bigprimes.pl
-examples/fib.pl
 examples/1000.txt
 lib/Math/BigInt.pm
+lib/Math/BigInt/Calc.pm
+lib/Math/BigInt/Scalar.pm
 lib/Math/BigFloat.pm
 bench/copy.pl			# measure overhead of copy due to overload
+bench/factor.pl
+bench/round.pl
+bench/bigbench.pl		# really big benchmark suite
 t/mbimbf.t			# test accuracy/precision settings in MBI/MBF
-t/bigintpm.t
+t/bigintpm.t			# OO and overload skin over Math::BigInt::*
+t/bigintc.t			# pure perl implementation of uint math core
+t/bigints.t			# scalar implementation of uint math core
 t/bigfltpm.t

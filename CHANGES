@@ -1,13 +1,14 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.34:
+v1.36:
 
  general:
-  + It is subsequent faster than the original in many places
+  + It is subsequent faster than the original in many places 
+  + Can use alternatives to drive the math via use Math::BigInt lib => 'name';
   + regression test suite greatly enlarged to cover more problematic cases
   + added example scripts (prime.pl, bigprimes.pl, hailstone.pl)
-  + documentation fixed and enhanced
+  + documentation fixed and greatly enhanced
   + BigInt is sub-classable with very little effort, see M::S or M::BF
   + subclasses of Math::BigInt know all the same methods, so that you can call
     $x->some_method() without having to know which type of class $x is
@@ -48,16 +49,12 @@ v1.34:
   + s/$[/0/ (after all, $[ = 1; in main does not effect this package)
   + $# partially removed ($#y is scalar @y -1, $#$y is scalar @$y-1 - ugh!)
   + added LICENSE section and file
- new modules (experimental):
-  + Math::BigInt::Constant	- read-only BigInt's
-  + Math::BigFraction		- 1 / 3 * 2 / 7 => 2 / 21
-  + Math::Big			- usefull functions/constants with big numbers
  new stuff:
   + bacmp (acmp), because needed for more efficient add()
   + bint() for writing shorter code (exportable new())
-  + bzero(), bnan(), sign()
-  + is_zero(), is_nan(), is_one(), is_odd(), is_even() for faster testing
-  + digit(), as_number()
+  + bzero(), bnan(), sign(), binf()
+  + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf()
+  + digit(), as_number(), is_positive(), is_negative()
   + mantissa(), exponent(), parts(), length(), copy()
   + bgcd accepts now lists
   + blcm (also accepts lists)

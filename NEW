@@ -1,23 +1,58 @@
-This lists only the changes for the current release (v1.35) over the last
+This lists only the changes for the current release (v1.36) over the last
 version, since HISTORY is now quite big:
 
-Actually changes from 1.33 => 1.35 since 1.34 was never released:
+General fixes and enhancements:
 
-General fixes:
-* MBF: A/P rounding after fdiv() was missing
-* '-0x0' would wrongly leave '-0'
-* as_number() was wrong for negative numbers and had no tests
-* added is_even(), is_odd(), _set() for MBF, the inherited ones were broken
-* fixed MBF::is_zero() for NaN
-* added tests for is_odd(), is_even(), _set() and is_zero(), is_inf(),
-  bsstr(), is_nan() in both MBI & MBF
-* MBF: $x->bpow($y) for negative $y was unfinished
-* partially support for +inf/-inf (binf(), is_inf() and string output, tests
-* band(), bior(), bxor() were missing modify() and wrong for $x->bfoo(NaN,0);
+  Various small fixes and error corrections in code, tests, comments and docs.
+  Especially the added is_positive(), is_negative() and the improvemed handling
+  of +inf and -inf comes to mind.
+  The ACCURACY file was incorporated into the pod, so that the Perl core also
+  gets the documentation.
+  Fixed the long standing bug in fdiv(), that caused the rewritten fsqrt() to
+  fail for most of it's arguments. The problem existed in all rewritten
+  versions of BigFloat.pm and appeared when the length of $y was (much) greater
+  than the length of $x:
+
+	use Math::BigFloat;
+
+	print 2 / Math::BigFloat->new('25.0249960007998400319936012797'),"\n";
+
+  would output '0.079' instead of '0.07992009269196...'.
 
 General additions:
-* MBI, MBF accept now binary input of the form 0b11010101010, -0b01 etc
-* bfloor(), bceil()
+
+  The math core routines were removed from Math::BigInt and put into
+  Math::BigInt::Calc. This gives more flexibility on how to handle the
+  representation and math of big unsigned integers. An example module called
+  Math::BigInt::Scalar is used to demonstrate this. It works only with small
+  numbers and uses normal Perl scalars, but it nicely demonstrates that the
+  design and idea work.
+
+  Currently under development are Math::BigInt::BigNum (using a yet-unnamed c
+  library selected, adapated and developed by John Peacock) and
+  Math::BigInt::BitVect (using Steffen Beiers Bit::Vector module). One of
+  these two will hopefully become someday the standard and replace the
+  dead-slow Math::BigInt::Calc. When this happens, Perl will finally have
+  modular, well-defined and last but not least _fast_ big number support. Or
+  that is what I hope ;)
+
+  You can use alternative math in Math::BigInt by:
+
+	use Math::BigInt lib => 'Name';
+
+  where name is default 'Calc'. 'Math::BigInt::BitVect', 'BitVect' or 'Scalar'
+  are some of the current working examples.
 
 Speedups:
 
+  Due to outsourcing the math to Calc, some things got a trifly slower by some
+  constant factors, because MBI can no longer rely on a underlying decimal
+  representation. This applies primarily to rounding, new and str.
+
+  bmul() is now faster in nearly every case due to internal optimization. It
+  is also _much_ faster when the second argument contains lot's of decimal
+  zeros; when it contains nearly only zeros mul goes from O(N*N) to O(N).
+
+Please have the appropriate amount of fun.
+
+Tels <http://bloodgate.com/perl>

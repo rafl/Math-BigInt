@@ -72,6 +72,13 @@ Math::BigFloat:
  * added tests for is_odd(), is_even(), _set() and is_zero(), is_inf(), bsstr()
 2001-06-15 v1.15 Tels
  * added bfloor(), bceil()
+2001-07-09 v1.16 Tels
+ * is_positive(), is_negative()
+ * various pod fixes (overlong =item, speling erorrs etc)
+ * removed internal _set() and the tests for it
+ * infinity support for fcmp(), fpow()
+ * nailed the bug in fdiv() that caused fsqrt() to fail. fsqr() works now, too.
+ * more tests 
 
 ############################################################################## 
 Math::BigInt:
@@ -189,7 +196,7 @@ Math::BigInt:
 2001-06-09 v1.33 Tels
  * bround() no longer uses 10 ** $pad and is thus much faster when rounding up
  * fixed and added rounding benchmark (did time bmul instead bround)
- * blsft(),brsft(): are can work in different bases, check against invalid
+ * blsft(),brsft(): can work in different bases, check against invalid
    inputs, more tests, speedup when in base 10
  * _trailing_zeros is 50% faster
  * A/P after each op, tests for it in accuracy.t
@@ -205,6 +212,14 @@ Math::BigInt:
 2001-06-15 v1.35 Tels
  * added bfloor(), bceil()
  * fixed bior(), bxor(), band() for $x->bxxx(NaN,0), added modify() to them
+2001-07-04 v1.36 Tels
+ * is_positive(), is_negative()
+ * various pod fixes (overlong =item, speling erorrs etc)
+ * torn out the bones from under the flesh and moved them to Math::BigInt::Calc
+ * added Math::BigInt::Calc, Math::BigInt::Small (and Math::BigInt::BitVect)
+ * fixed tests for bacmp() (could never fail)
+ * removed internal _set() and tests for it
+ * +-inf handling in bcmp(), bpow()
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

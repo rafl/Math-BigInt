@@ -11,14 +11,27 @@ Known bugs:
   + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
-  + fdiv() using F (fallback) mode does not honour local A settings
+  + fdiv() using F (fallback) mode does not honour local (aka $x's) A settings
   + MBF uses internally MBI for calculating. This can make problems if MBI has
     set global accuracy settings, and thus rounds unexpectedly the mantissa.
-  + hexadecimal integers work, but what about '0xABC.DEF'? Needed?
-  + is_even('123.345') ??
+    An attempt to fix it stops the following from breaking, but it might not
+    catch every occurance:
+   
+    use Math::BigInt; 
+    use Math::BigFloat; 
+    $Math::BigInt::accuracy = 4;	
+    $x = Math::BigFloat->new(123.456);
+    ok ($x,123.456);
+
+  + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
+  
 * BigInt:
   + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
   + Handling of undef arguments is somewhat broken (no proper warnings)
+  + require $CALC on non / file-systems? portable way?
+  + use Math::BigInt qw/0.004/;	does not fail (wrong version)
+  + inf handling is not finished yet. Since you normally do not get -+inf, and
+    the old code never knew about +-inf anyway, it is very low priority
 
 Accuracy:
   + Engaging $x with set A, and $y with set P should result in an error
@@ -41,7 +54,7 @@ with value 4.5? Ora BigInt with value 4? And should
 	$z = $y + $x;	# reversed order
 
 influence the result? Overload works this way with scalars, the first object
-gives the class to that the result is set and the second argument converted:
+gives the class to that the result is set and the second argument is converted:
 
 	$z = $x + 2;	# 4.5
 	$z = 2 + $x:	# 4.5
@@ -62,7 +75,7 @@ than the 1, or override it (maybe even with 3 for complex numbers)).
 
 The old code (v0.01 etc) breaks in various, mysterious and strange ways when
 confronted with mixed arguments, but for others it works by suprise. For fun
-throw t/fi_mixed.t at the old library.
+throw t/mbimbf.t at the old library.
 
 My new code is only partially better, I am afraid.
 

@@ -15,6 +15,9 @@ To test, unzip & untar package, then run
 
 See also ./examples for some example scripts.
 
+You can look on CPAN (http://search.cpan.org/) for modules that replace the
+core math routines of Math::BigInt (look for Math::BigInt::BitVect, f.i.).
+
 More information including HTMLified help and preliminary benchmark results
 are available under:
 

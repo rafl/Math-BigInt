@@ -2,10 +2,10 @@ Rewrite project of Math::Big*
 
 (C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
 
-Contains new version of Math::BigInt, so please do NOT make 'make install',
-except when you do no longer want your old Math::BigInt or know what you are
-doing. This rewritten version is mainly compatible, minus some bugfixes, and
-more feature and speed.
+Contains new version of Math::BigInt and Math::bigFloat, so please do NOT
+make 'make install', except when you do no longer want your old Math::BigInt
+or know what you are doing. This rewritten version is mainly compatible, minus
+some bugfixes, and more feature and more speed.
 
 To test, unzip & untar package, then run
 
@@ -13,6 +13,10 @@ To test, unzip & untar package, then run
 	make
 	make test
 	make install		# as root
+
+These modules will not be installed into the Perl core, but into site-perl.
+This means simple usig them will give you still the old versions in your
+Perl distribution.
 
 For a quick reference on what has changed from the old versions, please see
 CHANGES. HISTORY brings you a detailed history log of the rewrite.
