@@ -23,6 +23,7 @@ Math::BigInt:
  * bround() gives wierd results for -$scale, abs($scale) > $len), and is only
    used by MBF for -$scale = -$len, anyway. POD is wrong for this, too.
  * +5 % 0 or -5 % 0 == NaN (should it be something else?)
+ * as_hex(), as_bin()
 
 Given the fact that we are be able to plug-in a much faster core-lib, the
 following are pretty much ultra-low-priority:

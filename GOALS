@@ -41,6 +41,10 @@ First, it uses base2, instead of base10 for the internal representation:
   likely be given in base10 (although input numbers tend to be small).
   The same limits also applies to rounding, since it works in decimal
   space.
+* Especially with MBFs way to normalize the numbers after each op the time
+  fpr each op becomes O(N*N) since normalization needs to know the number of
+  trailing zeros, which you only know in decimal space. Oups. (for odd numbers
+  this is determined in O(1), but for even numbers it is still O(N*N))
 
 It remains to be seen wether the "wasted" time in new() and bstr() is
 compensated for in the faster calculation routines or not. 
@@ -49,7 +53,7 @@ Note: The current implementation using arrays has the same trade-off against
 the old core (v0.02 and lower) routines:
 
 slower new() and bstr() compared to storing the number as string, but faster
-internal calculation compared agains the original v0.01 BigInt. When doing
+internal calculation compared against the original v0.01 BigInt. When doing
 benchmarks, even for small numbers the "wasted" time in new() and bstr() is
 usually compensated for by the faster internal math, thus speeding up programs
 on the average. F.i. factorial() is now about 2.6 times faster than with the
@@ -59,7 +63,8 @@ SSLeay::BN).
 One problem here is rounding. It works in decimal space. So whenever you round,
 the number must be converted to decimal, which is very costly. Things like
 A and P turned on by default will make it _very_ slow, and even slow for big
-numbers. Think O(N*N) compared to O(N) and you know what I mean.
+numbers. Think O(N*N) compared to O(N) and you know what I mean. In these cases
+it can be better to use Calc instead of Pari, BitVect or GMP.
 
 Another problem is MBF: It tries to find the smallest exponent, and for this
 needs to look at the decimal digits to find trailing zeros. Currently it does
@@ -71,26 +76,23 @@ then is for bsstr() and exponenT() and parts(). Hopefully this will fly.
 + Sign:
 
 The complete sign-mangling is done by MBI. The underlying core math lib only
-handles big unsigned integers, which simplifies many things greatly.
+handles big unsigned integers, which simplifies many things greatly. But the
+sign mangling is in Perl, thus slow and adding a constant time per op.
 
 + Auto-extend/size issues:
 
 BV does not extend the operands automatically on overflow. So the core-lib
 acting as a wrapper must do this. Luckily, BV returns overflow and carry
 flags. Unfortunately, BV also expects it's arguments to have the same size,
-which means a lot of padding and reducing again.
+which means a lot of padding and reducing again. This makes BV unnecc. slow,
+as compared f.i. to Pari.
 
-All the wrappers overhead would make it pretty slow for small numbers, probably
-even slower than it is now. So the real performance boost will come only for
+All the wrappers overhead makes it pretty slow for small numbers, even slower
+than it is now with Calc. So the real performance boost will come only for
 really long numbers like 2**654321. It remains to be seen were the tradeoff
 will occur, f.i. when the numbers must get insanly big to pay off, it is better
 to use the old way, but if it is faster for relatively small numbers like
 1234567890123456789, that is the way to go.
-
-It also remains to be seen whether a binary-representation based module like
-Bit::Vector can really replace Math::BigInt:Calc.
-
-Of course I have not benchmaked anything yet. Stand by...
 
 ##############################################################################
 

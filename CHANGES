@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.41:
+v1.42:
 
  general:
   + It is subsequent faster than the original in many places
@@ -23,6 +23,8 @@ v1.41:
   + integers of the form 1E2, 1.23E2, 2.00 etc now valid for BigInt.pm, too
   + hexadecimal numbers of the form 0xabcdefABCDEF0123456789
   + binary numbers of the form 0b010101011
+ output:
+  + as_hex() and as_bin() for easier conversation between bases
  bugs and buglets fixed over Mark's original:
   + 0**0 gave NaN instead of 1
   + -1**y gave -1 instead of +1 for even y
@@ -39,8 +41,8 @@ v1.41:
   + use Math::BigInt qw(bneg); $a = bneg('1234'); etc did not work at all
   + $x->xxx() now modifies $x in all cases of modifiers and actually returns
     the same $x (e.g. not a plain scalar or a different reference). All
-    testing routines leave $x alone. bpow(), fround(), ffround() etc were
-    broken in this regard.
+    testing routines leave $x alone. bpow(), bmod(), fround(), ffround() etc
+    were broken in this regard.
  accuracy and precision:
   + there is now support for both accuracy (significant digits) and precision
     (fixed number of digits after decimal point), which by default is off
@@ -56,11 +58,11 @@ v1.41:
   + bacmp (acmp), because needed for more efficient add()
   + bzero(), bnan(), bone(), binf()
   + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf()
-  + digit(), as_number(), length(), copy()
-  + sign(), is_positive(), is_negative()
-  + mantissa(), exponent(), parts(), sign(),
-  + bgcd() accepts now lists
-  + blcm() (also accepts lists)
+  + digit(), length(), copy()
+  + as_number(), as_hex(), as_bin()
+  + is_positive(), is_negative()
+  + mantissa(), exponent(), parts(), sign()
+  + bgcd() accepts now lists, blcm() (also accepts lists)
   + fmod() (Thanx J. Peacock) and fdiv() in list context
   + round(accuracy,precision,mode) round to accuracy/precision using mode
   + bpow() for BigFloat

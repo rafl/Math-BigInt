@@ -5,21 +5,10 @@ use strict;
 # use warnings;	# dont use warnings for older Perls
 
 require Exporter;
-
-use vars qw/ @ISA @EXPORT $VERSION/;
+use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-@EXPORT = qw(
-	_add _mul _div _mod _sub
-	_new
-	_str _num _acmp _len
-	_digit
-	_is_zero _is_one
-	_is_even _is_odd
-	_check _zero _one _copy _zeros
-        _rsft _lsft
-);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -28,12 +17,11 @@ $VERSION = '0.09';
 
 # todo:
 # - fully remove funky $# stuff (maybe)
-# - use integer; vs 1e7 as base 
 
 # USE_MUL: due to problems on certain os (os390, posix-bc) "* 1e-5" is used
-# instead of "/ 1e5" at some places, (marked with USE_MUL). But instead of
-# using the reverse only on problematic machines, I used it everytime to avoid
-# the costly comparisons. This _should_ work everywhere. Thanx Peter Prymmer
+# instead of "/ 1e5" at some places, (marked with USE_MUL).
+# The BEGIN block is used to determine which of the two variants gives the
+# correct result.
 
 ##############################################################################
 # global constants, flags and accessory
@@ -47,13 +35,14 @@ my $RBASE = abs('1e-'.$BASE_LEN);	# see USE_MUL
 
 BEGIN
   {
-  # Daniel Pfeiffer: determine largest group of digits that is precisely
+  # from Daniel Pfeiffer: determine largest group of digits that is precisely
   # multipliable with itself plus carry
   my ($e, $num) = 4;
-  do {
-     $num = ('9' x ++$e) + 0;
+  do 
+    {
+    $num = ('9' x ++$e) + 0;
     $num *= $num + 1;
-  } until ($num == $num - 1 or $num - 1 == $num - 2);
+    } until ($num == $num - 1 or $num - 1 == $num - 2);
   $BASE_LEN = $e-1;
   $BASE = int("1e".$BASE_LEN);
   $RBASE = abs('1e-'.$BASE_LEN);	# see USE_MUL
@@ -104,6 +93,9 @@ sub _copy
   {
   return [ @{$_[1]} ];
   }
+
+# catch and throw away
+sub import { }
 
 ##############################################################################
 # convert back to string and number
@@ -589,7 +581,7 @@ sub __strip_zeros
 
 sub _check
   {
-  # no checks yet, pull it out from the test suite
+  # used by the test suite
   my $x = $_[1];
 
   return "$x is not a reference" if !ref($x);
@@ -622,9 +614,9 @@ Math::BigInt::Calc - Pure Perl module to support Math::BigInt
 
 =head1 SYNOPSIS
 
-Provides support for big integer calculations. Not intended
-to be used by other modules. Other modules which export the
-same functions can also be used to support Math::Bigint
+Provides support for big integer calculations. Not intended to be used by other
+modules (except Math::BigInt::Cached). Other modules which sport the same
+functions can also be used to support Math::Bigint, like Math::BigInt::Pari.
 
 =head1 DESCRIPTION
 
@@ -633,11 +625,11 @@ was rewritten to use library modules for core math routines. Any
 module which follows the same API as this can be used instead by
 using the following call:
 
-	use Math::BigInt lib => BigNum;
+	use Math::BigInt lib => 'libname';
 
 =head1 EXPORT
 
-The following functions MUST be exported in order to support
+The following functions MUST be defined in order to support
 the use by Math::BigInt:
 
 	_new(string)	return ref to new object from ref to decimal string
@@ -677,12 +669,19 @@ the use by Math::BigInt:
 	_check(obj)	check whether internal representation is still intact
 			return 0 for ok, otherwise error message as string
 
-The following functions are optional, and can be exported if the underlying lib
-has a fast way to do them. If not defined, Math::BigInt will use a pure, but
-slow, Perl function as fallback to emulate these:
+The following functions are optional, and can be defined if the underlying lib
+has a fast way to do them. If undefined, Math::BigInt will use a pure, but
+slow, Perl way as fallback to emulate these:
 
 	_from_hex(str)	return ref to new object from ref to hexadecimal string
 	_from_bin(str)	return ref to new object from ref to binary string
+	
+	_as_hex(str)	return ref to scalar string containing the value as
+			unsigned hex string, with the '0x' prepended.
+			Leading zeros must be stripped.
+	_as_bin(str)	Like as_hex, only as binary string containing only
+			zeros and ones. Leading zeros must be stripped and a
+			'0b' must be prepended.
 	
 	_rsft(obj,N,B)	shift object in base B by N 'digits' right
 	_lsft(obj,N,B)	shift object in base B by N 'digits' left
@@ -710,7 +709,7 @@ zero or similar cases.
 
 The first parameter can be modified, that includes the possibility that you
 return a reference to a completely different object instead. Although keeping
-the reference the same is prefered.
+the reference is prefered over creating and returning a different one.
 
 Return values are always references to objects or strings. Exceptions are
 C<_lsft()> and C<_rsft()>, which return undef if they can not shift the
@@ -722,11 +721,11 @@ to BigInt, which will use some generic code to calculate the result.
 If you want to port your own favourite c-lib for big numbers to the
 Math::BigInt interface, you can take any of the already existing modules as
 a rough guideline. You should really wrap up the latest BigInt and BigFloat
-testsuites with your module, and replace the following line:
+testsuites with your module, and replace in them any of the following:
 
 	use Math::BigInt;
 
-by
+by this:
 
 	use Math::BigInt lib => 'yourlib';
 
@@ -745,7 +744,7 @@ Seperated from BigInt and shaped API with the help of John Peacock.
 
 =head1 SEE ALSO
 
-L<Math::BigInt>, L<Math::BigFloat>, L<Math::BigInt::BitVect> and
-L<Math::BigInt::Pari>.
+L<Math::BigInt>, L<Math::BigFloat>, L<Math::BigInt::BitVect>,
+L<Math::BigInt::GMP>, L<Math::BigInt::Cached> and L<Math::BigInt::Pari>.
 
 =cut

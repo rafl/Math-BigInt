@@ -10,20 +10,10 @@ use strict;
 
 require Exporter;
 
-use vars qw/ @ISA @EXPORT $VERSION/;
+use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-@EXPORT = qw(
-        _add _mul _div _mod _sub
-        _new _from_hex _from_bin
-        _str _num _acmp _len
-        _digit
-        _is_zero _is_one
-        _is_even _is_odd
-        _check _zero _one _copy
-	_pow _and _or _xor
-);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -58,6 +48,9 @@ sub _copy
   my $z = $$x;
   return \$z;
   }
+
+# catch and throw away
+sub import { }
 
 ##############################################################################
 # convert back to string and number

@@ -11,7 +11,7 @@
 
 package Math::BigFloat;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 require 5.005;
 use Exporter;
 use Math::BigInt qw/objectify/;
@@ -33,10 +33,9 @@ use vars qw/$AUTOLOAD $accuracy $precision $div_scale $rnd_mode/;
 my $class = "Math::BigFloat";
 
 use overload
-'<=>'	=>	sub {
-			$_[2] ?
-                      $class->bcmp($_[1],$_[0]) : 
-                      $class->bcmp($_[0],$_[1])},
+'<=>'	=>	sub { $_[2] ?
+                      ref($_[0])->bcmp($_[1],$_[0]) : 
+                      ref($_[0])->bcmp($_[0],$_[1])},
 'int'	=>	sub { $_[0]->as_number() },		# 'trunc' to bigint
 ;
 
@@ -63,7 +62,7 @@ $div_scale = 40;
   # checks for AUTOLOAD
   my %methods = map { $_ => 1 }  
    qw / fadd fsub fmul fdiv fround ffround fsqrt fmod fstr fsstr fpow fnorm
-        fabs fneg fint fcmp fzero fnan finc fdec
+        fabs fneg fint fcmp fzero fnan finf finc fdec
       /;
 
   sub method_valid { return exists $methods{$_[0]||''}; } 
@@ -98,11 +97,12 @@ sub new
     }
   # got string
   # handle '+inf', '-inf' first
-  if ($wanted =~ /^[+-]inf$/)
+  if ($wanted =~ /^[+-]?inf$/)
     {
     $self->{_e} = Math::BigInt->new(0);
     $self->{_m} = Math::BigInt->new(0);
     $self->{sign} = $wanted;
+    $self->{sign} = '+inf' if $self->{sign} eq 'inf';
     return $self->bnorm();
     }
   #print "new string '$wanted'\n";
@@ -345,18 +345,31 @@ sub bcmp
   return 1 if $yz && $x->{sign} eq '+';			# +x <=> 0
 
   # adjust so that exponents are equal
-  my $lx = $x->{_m}->length() + $x->{_e};
-  my $ly = $y->{_m}->length() + $y->{_e};
+  my $lxm = $x->{_m}->length();
+  my $lym = $y->{_m}->length();
+  my $lx = $lxm + $x->{_e};
+  my $ly = $lym + $y->{_e};
   # print "x $x y $y lx $lx ly $ly\n";
   my $l = $lx - $ly; $l = -$l if $x->{sign} eq '-';
   # print "$l $x->{sign}\n";
-  return $l if $l != 0;
+  return $l <=> 0 if $l != 0;
   
-  # lengths are equal, so compare mantissa, if equal, compare exponents
-  # this assumes normalized numbers (no trailing zeros etc!)
-  my $rc = $x->{_m} <=> $y->{_m} || $x->{_e} <=> $y->{_e};
+  # lengths (corrected by exponent) are equal
+  # so make mantissa euqal length by padding with zero (shift left)
+  my $diff = $lxm - $lym;
+  my $xm = $x->{_m};		# not yet copy it
+  my $ym = $y->{_m};
+  if ($diff > 0)
+    {
+    $ym = $y->{_m}->copy()->blsft($diff,10);
+    }
+  elsif ($diff < 0)
+    {
+    $xm = $x->{_m}->copy()->blsft(-$diff,10);
+    }
+  my $rc = $xm->bcmp($ym);
   $rc = -$rc if $x->{sign} eq '-';		# -124 < -123
-  return $rc;
+  return $rc <=> 0;
   }
 
 sub bacmp 
@@ -980,7 +993,11 @@ sub exponent
   my $self = shift;
   $self = $class->new($self) unless ref $self;
 
-  return bnan() if $self->is_nan();
+  if ($self->{sign} !~ /^[+-]$/)
+    {
+    my $s = $self->{sign}; $s =~ s/^[+-]//;
+    my $c = ref($self); return $c->new($s); 		# -inf, +inf => +inf
+    }
   return $self->{_e}->copy();
   }
 
@@ -990,7 +1007,11 @@ sub mantissa
   my $self = shift;
   $self = $class->new($self) unless ref $self;
  
-  return bnan() if $self->is_nan();
+  if ($self->{sign} !~ /^[+-]$/)
+    {
+    my $s = $self->{sign}; $s =~ s/^[+]//;
+    my $c = ref($self); return $c->new($s); 		# -inf, +inf => +inf
+    }
   my $m = $self->{_m}->copy();	# faster than going via bstr()
   $m->bneg() if $self->{sign} eq '-';
 
@@ -1003,7 +1024,12 @@ sub parts
   my $self = shift;
   $self = $class->new($self) unless ref $self;
 
-  return (bnan(),bnan()) if $self->is_nan();
+  if ($self->{sign} !~ /^[+-]$/)
+    {
+    my $s = $self->{sign}; $s =~ s/^[+]//; my $se = $s; $se =~ s/^[-]//;
+    my $c = ref($self);
+    return ($c->new($s),$c->new($se)); 	# +inf => inf and -inf,+inf => inf
+    }
   my $m = $self->{_m}->copy();	# faster than going via bstr()
   $m->bneg() if $self->{sign} eq '-';
   return ($m,$self->{_e}->copy());
@@ -1095,6 +1121,7 @@ sub length
   {
   my $x = shift; $x = $class->new($x) unless ref $x; 
 
+  return 1 if $x->{_m}->is_zero();
   my $len = $x->{_m}->length();
   $len += $x->{_e} if $x->{_e}->sign() eq '+';
   if (wantarray())

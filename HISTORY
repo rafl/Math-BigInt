@@ -23,6 +23,8 @@ Math::BigInt::Calc:
  * fixed bug in mul() shortcut
 2001-07-20 v0.09 Tels
  * don't use warnings for older Perls
+2001-08-24 v0.10 Tels
+ * no longer export anything, ignore import calls
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -33,6 +35,8 @@ Math::BigInt::Scalar:
  * first argument is always classname, so removed checks and shift
 2001-07-20 v0.06 Tels
  * don't use warnings for older Perls
+2001-08-24 v0.10 Tels
+ * no longer export anything, ignore import calls
 
 ############################################################################## 
 Math::BigFloat:
@@ -119,6 +123,12 @@ Math::BigFloat:
 2001-08-03 v1.20 Tels
  * streamlined bcmp
  * drop leading '+' for inf
+2001-09-03 v1.21 Tels
+ * serious bug in bcmp() caused 1.5 to be greater than 2. Yikes!
+ * bcmp() did not only return -1,0,1 and undef but other values, too
+ * new('inf') produced NaN (was expecting '+inf')
+ * exponent(), mantissa() & parts() failed or returned scalars for inf,-inf,NaN
+ * include finf in AUTOLOAD list
 
 ############################################################################## 
 Math::BigInt:
@@ -288,6 +298,14 @@ Math::BigInt:
    (makes it work with BitVect, Pari, GMP etc)
 2001-08-08 v1.41 Tels
  * fixed inf test (coredumps)
+2001-09-03 v1.42 Tels
+ * bug in overload section causing performance losses in subclasses
+ * call $CALC->import() with list of libs
+ * odd numbers never have trailing zeros, so don't convert them to dec to look
+ * as_hex() and as_bin()
+ * $x->bmod() did not modify $x, only returned result. Oups.
+ * new('inf') produced NaN (was expecting '+inf')
+ * exponent(), mantissa() & parts() failed or returned scalars for inf,-inf,NaN
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

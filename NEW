@@ -1,10 +1,24 @@
-This lists only the changes for the current release (v1.41) over the last
+This lists only the changes for the current release (v1.42) over the last
 version, since HISTORY is now quite big:
 
 Fixes and enhancements:
-  fixed the inf test (coredumps)
-  fixed CAVEAT doc about $x = $y;
- 
+  Fixed serious bug in MBF::bcmp which caused 1.5 to be bigger than 2 *oups*
+  fixed $x->length() for $x == 0 in Math::BigFloat
+  parts()/mantissa()/exponent() for +-inf/ NaN (failed or returned scalars)
+  new('inf') failed (expected '+inf')
+  MBF: finf() did not work (only binf() did)
+  MBF::bcmp would not only return 0,1,-1 and undef but other values, too
+  Bug in MBI overload that caused poor performance for bcmp() of subclasses
+  odd numbers can't have trailing 0's, so no conv. necc. for Pari etc
+  $CALC->import() w/ list of libs, needed by coming Math::BigInt::Cached
+  added as_hex() and as_bin()
+  MBF: added tests for length(), parts(), exponent() and mantissa()
+  MBI: test for length() in list context
+
+Documentation:
+  CAVEAT doc about length in list context (print)
+  fixed doc in Math::BigInt::Calc
+
 Please have arbitrarily big amounts of fun.
 
 Tels <http://bloodgate.com/perl>
