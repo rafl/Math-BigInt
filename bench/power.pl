@@ -2,9 +2,10 @@
 
 #use lib '../../Math-BigInt-1.36/lib'; use Math::BigInt;	# 1.36
 #use lib '../../Math-BigInt-1.36/lib'; use Math::BigInt lib => 'BitVect';
-#use lib '../lib'; use Math::BigInt;				# 1.37
-#use lib '../lib'; use Math::BigInt lib => 'BitVect';		# 1.37 BitVect
-use lib '../lib'; use Math::BigInt lib => 'Pari';		# 1.37 Pari
+#use lib '../lib'; use Math::BigInt;				# cur
+#use lib '../lib'; use Math::BigInt lib => 'BitVect';		# cur BitVect 1.01
+use lib '../lib'; use lib '../../Math-BigInt-BitVect-1.02'; use Math::BigInt lib => 'BitVect';		# cur BitVect 1.02
+#use lib '../lib'; use Math::BigInt lib => 'Pari';		# cur Pari
 #use lib '../../Math-BigInt-1.33/lib'; use Math::BigInt;		# 1.33
 #use lib '../../Math-BigInt-0.01'; use Math::BigInt;		# 0.0.1 v5.7.1
 #use lib '../../Math-BigInt-0.49/lib'; use Math::BigInt;		# 0.49 Daniel
@@ -19,6 +20,8 @@ $d = Math::BigInt::_core_lib() if Math::BigInt->can('_core_lib');
 $m =
  eval { Math::BigInt::Calc::_base_len(); } ||
  eval { Math::BigInt::BASEDIGITS(); } || 'unknown (likely 1e5)';
+$d .= " " . $d->VERSION if $d ne '';
+
 print "$Math::BigInt::VERSION ($d) base 1e$m\n"; 
 
 for ($i=0; $i<10; $i++)

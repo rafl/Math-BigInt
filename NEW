@@ -1,94 +1,26 @@
-This lists only the changes for the current release (v1.38) over the last
+This lists only the changes for the current release (v1.39) over the last
 version, since HISTORY is now quite big:
 
 Fixes and enhancements:
-  The shortcut code in mul() had a nasty bug. Fixed and tests added.
-
-This lists only the changes for the current release (v1.37) over the last
-version, since HISTORY is now quite big:
-
-Fixes and enhancements:
-
-  Applied Philip Newton's speling and pod patch(es)
-  Benjamin Trott's patch for badd() (no more shortcuts)
-  Resolved some naming conflicts between MBI and Calc
-  +123 / 0 => +inf, -1234 / 0 => -inf (0/0 and x % 0 remain NaN)
-  Made classname argument mandatory in lib/Calc calls => simplifies code a lot
-  Calc can now shift in BASE 10 (and fallback for anything else) 
-  _one() renamed to bone()
-  Tests for bnan() and bone()
-  Loading of core libs can now do multiples and falls back to Calc. The
-  following will use the first existing lib, or Calc, if none of them exists:
-
-	use Math::BigInt lib => 'foo, bar , BitVect, baz';
-  Calc does now automatically determine the biggest base it can use. See below. 
+  Some calls to $CALC were not assigning the return value back to $x->{value}
+    (This is important when the lib does not modify the args, but returns a
+     new value instead; sometimes this is ineviteable)
+  Improved infinity handling (complete with tests):
+    +-123 / +-inf => 0
+    123 / 0 => +inf, -123 / 0 => -inf in MBF
+    +inf - +inf = 0, -inf + -inf = 0, -inf - -inf = -inf, +inf + +inf = +inf
+    +inf++ or +inf-- => +inf, -inf -- or -inf ++ => -inf
+    +inf <=> -inf etc 
+    $x->binf()->bstr() => 'inf', not '+inf' (for cmp, eg etc)
+  MBF: there were no tests for fdec() and finc()
+  MBF: numbers with set precision/accuracy are zero padded
+	1234, a=3 => 1230, 1234, a=6 => 1234.00, 123, p=3 => 123.000
+  MBI: test for 1234.00 as valid input
+  _split() had accidentily 'return return ...', also streamlined it a bit
+  Negative inputs in band(), bxor(), bior() and bsrft()/blsft() were broken
+  Hexadecimal/binary inputs with underscrores were broken
   
-Speedups:
-
-  The usual base 1e7 is 25% (for add etc) respective 40% (for mul etc) faster
-  Fixed bsqrt()'s guess so that it now takes less steps and thus is much faster
-  The faster _mul() code was accidentily commented out, and also had a bug
-  Revised version of Benjamin Trott's _split optimization:
-
-    use Math::BigInt lib => 'BitVect';
-    for (1..1700) { my $x = Math::BigInt->new(2); $x **= 1024; }
-
-  Before:
-    Total Elapsed Time = 1.029665 Seconds
-      User+System Time = 0.979665 Seconds
-    Exclusive Times
-    %Time ExclSec CumulS #Calls sec/call Csec/c  Name
-     24.5   0.240  0.237   3400   0.0001 0.0001  Math::BigInt::_split
-     20.4   0.200  0.592   3400   0.0001 0.0002  Math::BigInt::new
-     9.19   0.090  0.085   1700   0.0001 0.0000  Math::BigInt::round
-     7.15   0.070  0.652   1700   0.0000 0.0004  Math::BigInt::bpow
-     6.12   0.060  0.053   6802   0.0000 0.0000  Bit::Vector::new_Dec
-     6.12   0.060  0.308   1700   0.0000 0.0002  Math::BigInt::objectify
-     6.12   0.060  0.063   3400   0.0000 0.0000  Math::BigInt::BitVect::_is_one
-     6.12   0.060  0.106   3400   0.0000 0.0000  Math::BigInt::BitVect::_new
-     6.12   0.060  0.058   1700   0.0000 0.0000  Math::BigInt::BitVect::_pow
-     4.08   0.040  0.046   3400   0.0000 0.0000  Math::BigInt::is_zero
-     4.08   0.040  0.070   3400   0.0000 0.0000  Math::BigInt::BitVect::_zero
-     3.06   0.030  0.020  10200   0.0000 0.0000  Bit::Vector::Size
-     3.06   0.030  0.086   3400   0.0000 0.0000  Math::BigInt::is_one
-     3.06   0.030  0.040   3400   0.0000 0.0000  Math::BigInt::BitVect::__reduce
-     3.06   0.030  0.013   3400   0.0000 0.0000  Math::BigInt::BitVect::_is_zero
-
-  After:
-    Total Elapsed Time = 0.729669 Seconds
-      User+System Time = 0.729669 Seconds
-    Exclusive Times
-    %Time ExclSec CumulS #Calls sec/call Csec/c  Name
-     27.4   0.200  0.362   3400   0.0001 0.0001  Math::BigInt::new
-     10.9   0.080  0.075   1700   0.0000 0.0000  Math::BigInt::round
-     10.9   0.080  0.612   1700   0.0000 0.0004  Math::BigInt::bpow
-     9.59   0.070  0.268   1700   0.0000 0.0002  Math::BigInt::objectify
-     8.22   0.060  0.096   3400   0.0000 0.0000  Math::BigInt::BitVect::_new
-     8.22   0.060  0.058   1700   0.0000 0.0000  Math::BigInt::BitVect::_pow
-     6.85   0.050  0.047   3400   0.0000 0.0000  Math::BigInt::_split
-     6.85   0.050  0.076   3400   0.0000 0.0000  Math::BigInt::is_zero
-     6.85   0.050  0.043   3400   0.0000 0.0000  Math::BigInt::BitVect::_is_one
-     5.48   0.040  0.030   3400   0.0000 0.0000  Math::BigInt::BitVect::_zero
-     5.48   0.040  0.040   3400   0.0000 0.0000  Math::BigInt::BitVect::__reduce
-     5.48   0.040  0.076   3400   0.0000 0.0000  Math::BigInt::is_one
-     5.48   0.040  0.033   3400   0.0000 0.0000  Math::BigInt::BitVect::_is_zero
-     4.11   0.030  0.020  10200   0.0000 0.0000  Bit::Vector::Size
-     2.74   0.020  0.629   1700   0.0000 0.0004  Math::BigInt::__ANON__
-
-  More benchmarks have been done and are included BENCHMARK.
-
-I must also apologize to Daniel Pfeiffer, who apparently back in March 2001 did
-a rewrite of Math::BigInt while unware of the new version and thus duplicated
-lot's efforts.
-Sorry that nobody told you of this ongoing project, and sorry that nobody
-told me of yours. YouY work and ideas are very much appreciated, and some of
-them are truly novel (like the factorization optimization, which will go into
-Math::Big, and the dynamic adjustment of the $BASE, which is already included).
-
-I hope in the future important developments are more known and that information
-flows better between usenet and p5p.
-
-Please have the appropriate amount of fun.
+Please have arbitrarily big amounts of fun.
 
 Tels <http://bloodgate.com/perl>
 

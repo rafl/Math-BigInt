@@ -2,7 +2,7 @@ package Math::BigInt::Calc;
 
 use 5.005;
 use strict;
-use warnings;
+# use warnings;	# dont use warnings for older Perls
 
 require Exporter;
 
@@ -19,7 +19,7 @@ use vars qw/ @ISA @EXPORT $VERSION/;
 	_check _zero _one _copy _zeros
         _rsft _lsft
 );
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 # Package to store unsigned big integers in decimal and do math with them
 

@@ -8,7 +8,7 @@ BEGIN
   $| = 1;
   # chdir 't' if -d 't';
   unshift @INC, '../lib'; # for running manually
-  plan tests => 43;
+  plan tests => 51;
   }
 
 # testing of Math::BigInt::BitVect, primarily for interface/api and not for the
@@ -80,6 +80,20 @@ $x = _new($C,\"123"); $y = _new($C,\"1111");
 
 # _num
 $x = _new($C,\"12345"); $x = _num($C,$x); ok (ref($x)||'',''); ok ($x,12345);
+
+# _len
+$x = _new($C,\"12345"); $x = _len($C,$x); ok (ref($x)||'',''); ok ($x,5);
+
+# _and, _or, _xor
+$x = _new($C,\"3"); $y = _new($C,\"4"); ok (${_str($C, _or($C,$x,$y))},7);
+$x = _new($C,\"1"); $y = _new($C,\"4"); ok (${_str($C, _xor($C,$x,$y))},5);
+$x = _new($C,\"7"); $y = _new($C,\"3"); ok (${_str($C, _and($C,$x,$y))},3);
+
+# _pow
+$x = _new($C,\"2"); $y = _new($C,\"4"); ok (${_str($C, _pow($C,$x,$y))},16);
+$x = _new($C,\"2"); $y = _new($C,\"5"); ok (${_str($C, _pow($C,$x,$y))},32);
+$x = _new($C,\"3"); $y = _new($C,\"3"); ok (${_str($C, _pow($C,$x,$y))},27);
+
 
 # should not happen:
 # $x = _new($C,\"-2"); $y = _new($C,\"4"); ok (_acmp($C,$x,$y),-1);

@@ -6,7 +6,7 @@ package Math::BigInt::Scalar;
 
 use 5.005;
 use strict;
-use warnings;
+# use warnings; # dont use warnings for older Perls
 
 require Exporter;
 
@@ -23,7 +23,7 @@ use vars qw/ @ISA @EXPORT $VERSION/;
         _check _zero _one _copy
 	_pow _and _or _xor
 );
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 ##############################################################################
 # global constants, flags and accessory

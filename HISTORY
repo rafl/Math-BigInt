@@ -21,6 +21,8 @@ Math::BigInt::Calc:
  * shift in base ten by _lsft() and _rsft()
 2001-07-15 v0.08 Tels
  * fixed bug in mul() shortcut
+2001-07-20 v0.09 Tels
+ * don't use warnings for older Perls
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -29,6 +31,8 @@ Math::BigInt::Scalar:
  * first release
 2001-07-15 v0.05 Tels
  * first argument is always classname, so removed checks and shift
+2001-07-20 v0.06 Tels
+ * don't use warnings for older Perls
 
 ############################################################################## 
 Math::BigFloat:
@@ -106,6 +110,12 @@ Math::BigFloat:
  * applied Philip Newtons speling and doc patch(s) 
  * added bone()
  * tests for bnan() and bone()
+2001-08-02 v1.19 Tels
+ * 123/+-inf => 0, test for that and -1,0 / NaN => NaN
+ * +123 / 0 => +inf, -123 / 0 => -inf (was missing in MBF)
+ * fixed +-inf handling in bacmp/bcmp/bsub/badd/bdiv and tests for that
+ * padd bstr() output of numbers with set A or P
+ * remove bfloat() (Math::BigInt->bfloat() did not work, anyway, see bint())
 
 ############################################################################## 
 Math::BigInt:
@@ -247,7 +257,7 @@ Math::BigInt:
  * fixed tests for bacmp() (could never fail)
  * removed internal _set() and tests for it
  * +-inf handling in bcmp(), bpow()
-2001-07-15 v1.17 Tels
+2001-07-15 v1.37 Tels
  * applied Philip Newtons speling and doc patch(s)
  * Benjamin Trott: _split() is faster for numbers that need no splitting
  * Benjamin Trott: don't take shortcut in badd(), or Pari won't work 
@@ -259,8 +269,14 @@ Math::BigInt:
  * tests for bnan() and bone()
  * Math::BigInt::Calc now determines biggest $BASE to use. Default should now
    be 1e7 on most systems, giving 20% to 40% speedups.
-2001-07-15 v1.18 Tels
+2001-07-15 v1.38 Tels
  * test for mul() shortcut
+2001-08-02 v1.39 Tels
+ * fixed history (duh!)
+ * assign return values from $CALC back to $x->{value}
+ * fixed +-inf handling in a lot of places and tests for that
+ * band(), bxor() and bior() now work with negative inputs
+ * remove bint() (Math::BigFloat->bint() just DNDWIM and no sense, either)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

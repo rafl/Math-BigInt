@@ -18,6 +18,18 @@ These modules will not be installed into the Perl core, but into site-perl.
 This means simple usig them will give you still the old versions in your
 Perl distribution.
 
+You can try to use
+
+	make install UNINST=1
+
+to force makemaker to remove the versions from the core, so that the newly
+installed ones into site-perl are the only ones and will thus be used.
+Otherwise you need to
+
+	use lib '/usr/local/lib/perl5/site_perl/Math/';
+
+or something equally ugly to enable the new versions in your scripts.
+
 For a quick reference on what has changed from the old versions, please see
 CHANGES. HISTORY brings you a detailed history log of the rewrite.
 

@@ -5,12 +5,13 @@ General:
 
 Math::BigFloat:
  * ! bround(): some bugs may lurk in there (warnings)
- * have a look at fsqrt() and it's performance
+ * have a closer look at fsqrt() and it's performance
  * ! bmod() 
  * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
  * do not reduce numbers in new(), rather do it in anything that outputs it
    like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
    number after each op is slow with a binary core math lib like BitVect.
+ * ?? add $x->bint(), that rounds with 'trunc' to an integer ??
 
 Math::BigFloat::Constant:
  * really needed by someone out there?
@@ -20,7 +21,6 @@ Math::BigInt:
    percent overhead...still)
  * bround() gives wierd results for -$scale, abs($scale) > $len), and is only
    used by MBF for -$scale = -$len, anyway. POD is wrong for this, too.
- * inf handling may not complete
  * +5 % 0 or -5 % 0 == NaN (should it be something else?)
 
 Given the fact that we are be able to plug-in a much faster core-lib, the

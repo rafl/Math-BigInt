@@ -3,9 +3,9 @@
 #use lib '../../Math-BigInt-1.36/lib'; use Math::BigInt;	# 1.36
 #use lib '../../Math-BigInt-1.36/lib'; use Math::BigInt lib => 'BitVect';
 #use lib '.'; use Math::BigInt lib => 'BitVect';		# 1.36 BitVect
-use lib '../lib'; use Math::BigInt;				# 1.37
-#use lib '../lib'; use Math::BigInt lib => 'BitVect';		# 1.37 BitVect
-#use lib '../lib'; use Math::BigInt lib => 'Pari';		# 1.37 Pari
+use lib '../lib'; use Math::BigInt;				# current
+#use lib '../lib'; use Math::BigInt lib => 'BitVect';		# cur BitVect
+#use lib '../lib'; use Math::BigInt lib => 'Pari';		# cur Pari
 #use lib '../../Math-BigInt-1.33/lib'; use Math::BigInt;		# 1.33
 #use lib '../../Math-BigInt-0.01'; use Math::BigInt;		# 0.0.1 v5.7.1
 #use lib '../../Math-BigInt-0.49/lib'; use Math::BigInt;		# 0.49 Daniel

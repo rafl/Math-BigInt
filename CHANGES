@@ -1,10 +1,11 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.38:
+v1.398:
 
  general:
-  + It is subsequent faster than the original in many places 
+  + It is subsequent faster than the original in many places
+  + Can take advantage of 64 bit architectures
   + Can use alternatives to drive the math via use Math::BigInt lib => 'name';
   + regression test suite greatly enlarged to cover more problematic cases
   + added example scripts (prime.pl, bigprimes.pl, hailstone.pl)
@@ -18,13 +19,13 @@ v1.38:
   + spaces are no longer allowed in a number (but may precede or follow it)
  input:
   + underscores are now valid between any two digits
-  + integers of the form 1E2, 1.23E2 etc are now valid for BigInt.pm, too
+  + integers of the form 1E2, 1.23E2, 2.00 etc now valid for BigInt.pm, too
   + hexadecimal numbers of the form 0xabcdefABCDEF0123456789
   + binary numbers of the form 0b010101011
  bugs and buglets fixed over Mark's original:
   + 0**0 gave NaN instead of 1
   + -1**y gave -1 instead of +1 for even y
-  + +x/0 is now +inf, -x/0 is -inf (both were NaN)
+  + +x/0 is now +inf, -x/0 is -inf (both were NaN), as well as other inf cases
   + mod/div for negative numbers were incompatible to Perl's way
   + added P. Prymmer's OS/390 '/1e5 vs *1e-5' patch w/o the performance snag
   + incorporated all the patches to the core modules by John Peacock
@@ -53,13 +54,13 @@ v1.38:
  new stuff:
   + bacmp (acmp), because needed for more efficient add()
   + bint() for writing shorter code (exportable new())
-  + bzero(), bnan(), bone, binf()
+  + bzero(), bnan(), bone(), binf()
   + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf()
   + digit(), as_number(), length(), copy()
   + sign(), is_positive(), is_negative()
   + mantissa(), exponent(), parts(), sign(),
-  + bgcd accepts now lists
-  + blcm (also accepts lists)
+  + bgcd() accepts now lists
+  + blcm() (also accepts lists)
   + fmod() (Thanx J. Peacock) and fdiv() in list context
   + round(accuracy,precision,mode) round to accuracy/precision using mode
   + bpow() for BigFloat
