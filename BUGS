@@ -5,13 +5,13 @@ Known bugs:
   + divide by zero throws no exception
 
 * BigFloat:
-  + unfinished (fmod() is missing)
+  + blog() is not finished yet
   + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
   + fdiv() using F (fallback) mode does not work properly in all cases of
     local (aka $x's or $y's) A or P settings. Not definite test case yet, but
-    it might calculate not enough digits to satisify the rounding needs.
+    it might calculate not enough digits to satisfy the rounding needs.
   + MBF uses internally MBI for calculating. This can make problems if MBI has
     set global accuracy settings, and thus rounds unexpectedly the mantissa.
     My attempt to fix it stops the following from breaking, but it might not
@@ -24,17 +24,10 @@ Known bugs:
     ok ($x,123.456);
 
   + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
-  + This hangs:
-        $x = Math::BigFloat->new(12);
-        Math::BigFloat->precision(0);
-        print $x->copy->bsqrt(),"\n";           # 4
-  + This hangs, too:
-        Math::BigFloat->precision(2);		# even (-2) hangs
-        print $x->bsqrt(),"\n";                 # 3.46
   
 * BigInt:
   + .2e2 is not yet recognized as valid input
-  + exponent on input is limited to an Perl integer (bigger numbers won't fit
+  + exponent on input is limited to a Perl int (bigger numbers won't fit
     into your memory, anyway - use BigFloat)
   + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
   + Handling of undef arguments is somewhat broken (no proper warnings)
@@ -42,11 +35,6 @@ Known bugs:
     This is likely an Exporter bug, and causes Math::BigInt to eval require on
     earlier Perls when loading the core math lib. Thus the loading can fail on
     filesystems that can not cope with 'Math/BigInt/Calc.pm' style filenames.
-
-Accuracy:
- Any operation encountering the following should result in an error:
-  + $x with set A, and $y with set P
-  + $x with a different rounding mode than $y
 
 ###############################################################################
 
@@ -86,10 +74,27 @@ the more powerfull would work, and even with subclasses of MBI, which inherit
 than the 1, or override it (maybe even with 3 for complex numbers)).
 
 The old code (v0.01 etc) breaks in various, mysterious and strange ways when
-confronted with mixed arguments, but for others it works by suprise. For fun
-throw t/mbimbf.t at the old library.
+confronted with mixed arguments, but for others it works by suprise.
 
 My new code is only partially better, I am afraid.
+
+Update: One proposed solution is to specify the class for upgrades like:
+
+	use Math::BigInt promote => 'Math::BigFloat';
+
+Certain operations (bsqrt(), bdiv(), bmod(), blog() etc) would then revert
+to the given class, while others would use a ranking system to revert to the
+given class like:
+
+	$x = $y + $z;		# $y->rank() = 10 (BigInt)
+				# $z->rank() = 20 (BigFloat)
+
+Thus $z->copy()->badd($y) is called, since $z has an higher rank and the proper
+result will be returned (BigFloat in this case). This will also work for
+
+	$x = $z + $y;
+
+The implementation of that is scheduled for v1.50.
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

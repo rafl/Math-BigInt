@@ -1,19 +1,23 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.46:
+v1.49:
 
  general:
   + It is subsequent faster than the original in many places
-  + Can take advantage of scalars with more than 32 bits
-  + Can use alternatives to drive the math via use Math::BigInt lib => 'name';
-  + regression test suite greatly enlarged to cover more problematic cases
+    + Use more than 16 bit at a time, greater BASELEN for 64 bit systems
+    + overload for things like +=
+    + special operations like binc()
+    + many optimizations and shortcuts in normal operations
+    + Can use Math::BigInt lib => 'name'; for Pari, GMP, Bit::Vector or others
+  + regression test suite greatly enhanced to cover more problematic cases
   + added example scripts (prime.pl, bigprimes.pl, hailstone.pl)
   + documentation fixed and greatly enhanced
   + BigInt is sub-classable with very little effort, see M::S or M::BF
   + subclasses of Math::BigInt know all the same methods, so that you can call
     $x->some_method() without having to know which type of class $x is
   + added infinity handling
+  + much better NaN handling
  caveats:
   + bstr() and stringify now drop the leading '+' (to make overloaded cmp work
     as expected when cmp'aring to scalars and other objects (read: bugfix)
@@ -22,7 +26,7 @@ v1.46:
   + underscores are now valid between any two digits (in hex/binary input, too)
   + integers of the form 1E2, 1.23E2, 2.00 etc now valid for BigInt.pm, too
   + hexadecimal numbers of the form 0xabcdefABCDEF0123456789
-  + binary numbers of the form 0b010101011
+  + binary numbers of the form 0b01010101101000001000100101
  output:
   + as_hex() and as_bin() for easier conversation between bases
  bugs and buglets fixed over Mark's original:
@@ -55,6 +59,7 @@ v1.46:
   + $# partially removed ($#y is scalar @y -1, $#$y is scalar @$y-1 - ugh!)
   + added LICENSE section and file
  new stuff:
+  + brsft()/blsft() also can do other bases than 2
   + bacmp (acmp), because needed for more efficient add()
   + bzero(), bnan(), bone(), binf()
   + binc(), bdec()
@@ -65,6 +70,7 @@ v1.46:
   + mantissa(), exponent(), parts(), sign()
   + bgcd() accepts now lists, blcm() (also accepts lists)
   + fmod() (Thanx J. Peacock) and fdiv() in list context
+  + flog()/blog() for overloading of log()
   + round(accuracy,precision,mode) round to accuracy/precision using mode
   + bpow() for BigFloat
   + bfloor(), bceil()

@@ -50,6 +50,18 @@ Math::BigInt::Calc:
  * streamlined _acmp() 
  * cap of 5 for BASE for UTS and UNICOS/Cray
  * better test to find out what BASE should be (use +0.0 to force floats)
+2001-12-20 v0.18 Tels
+ * added _as_hex() and _as_bin() with 16 bit chunks
+ * from_bin() now uses oct() and 16 bits per iteration
+ * removed needless return statements
+2001-12-23 v0.19 Tels
+ * first working version of using two different bases: one for mul/div, the
+   other for all other ops, including converting via _to_large()/_to_small()
+2002-01-07 v0.20 Tels
+ * better detection of higher-int-only base (but disabled due to failures)
+ * streamlined converting
+ * turned dual-basis off by default (now 7-7 on 32 bit and 9-9 on most 64 it)
+ * _str() uses int() on first part to avoid '0000' instead of '0'
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -62,6 +74,10 @@ Math::BigInt::Scalar:
  * don't use warnings for older Perls
 2001-08-24 v0.10 Tels
  * no longer export anything, ignore import calls
+2002-01-07 v0.11 Tels
+ * fixed version
+ * added DESCRIPTION section to stop pod2man complaining
+ * added _dec, _inc
 
 ############################################################################## 
 Math::BigFloat:
@@ -181,6 +197,15 @@ Math::BigFloat:
  * make fsqrt() subclass proof by using $self instead of Math::BigFloat
  * bzero(), bone(): take additional A and P and store 'em
  * bnan(), binf(): clear A and P 
+2001-01-06 v1.27 Tels
+ * overload for log() and flog()/blog()
+ * bzero()/bone() handling of A & P was broken
+ * bround()/bfround() handling of zeros forgot to set A & P
+ * fdiv: fixed a bug in round to A with given round_mode (always used global)
+ * fsqrt(): would hang/fail if either $x's or global A or P were set
+ * fsqrt() didn't modify $x sometimes, but returned a new reference
+ * fsqrt(): calc 4 more digits for rounding, not 1 (endless looping otherwise)
+ * fmod() now actually works
 
 ############################################################################## 
 Math::BigInt:
@@ -387,6 +412,16 @@ Math::BigInt:
  * removed the EXPORT_OK except for objectify, _swap and bgcd/blcm
  * bzero(), bone(): take additional A and P and store 'em
  * bnan(), binf(): clear A and P 
+2002-01-07 v1.49 Tels
+ * as_hex() and as_bin() use 16 instead of 8 bits per iteration
+ * overload for log() and blog()
+ * tricks to make 'require Math::BigInt' and 'use Math::BigInt();' work again
+ * use $CALC instead of require for newer Perls (test for $] > 5.006 vs 5.6)
+ * bzero()/bone() handling of A & P was broken
+ * bround()/bfround() forgot to set A or P for zeros
+ * embedded _find_round_parameters into round(), streamlined both versions
+ * round() now uses string-add to make it almost twice as fast
+ * bnot() did round twice
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

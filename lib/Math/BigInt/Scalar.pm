@@ -13,7 +13,7 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '0.07';
+$VERSION = '0.11';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -129,6 +129,20 @@ sub _or
   return $x;
   }
 
+sub _inc
+  {
+  my ($c,$x) = @_;
+  my $u = int($$x)+1; $$x = $u;
+  return $x;
+  }
+
+sub _dec
+  {
+  my ($c,$x) = @_;
+  my $u = int($$x)-1; $$x = $u;
+  return $x;
+  }
+
 ##############################################################################
 # testing
 
@@ -207,6 +221,10 @@ Math::BigInt::Scalar - Pure Perl module to test Math::BigInt with scalars
 Provides support for big integer calculations via means of 'small' int/floats.
 Only for testing purposes, since it will fail at large values. But it is simple
 enough not to introduce bugs on it's own and to serve as a testbed.
+
+=head1 DESCRIPTION
+
+Please see Math::BigInt::Calc.
 
 =head1 LICENSE
  

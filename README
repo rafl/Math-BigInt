@@ -1,6 +1,6 @@
 Rewrite project of Math::BigInt, Math::BigFloat.
 
-(C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
+(C) Copyright ..--- ----- ----- .---- - ..--- by - . .-.. ... .-.-.-
 
 This package contains new versions of Math::BigInt and Math::BigFloat,
 so please do NOT make 'make install', except when you do no longer want your

@@ -35,6 +35,7 @@ Math::BigInt:
 
    The shortcuts in code that return $x->bzero() or similiar things need to
    do $x->bzero($a,$p); and this needs tests.
+   Update: Should now work for most things. Check for completeness.
 
 Given the fact that we are be able to plug-in a much faster core-lib, the
 following are pretty much ultra-low-priority:
@@ -43,10 +44,9 @@ Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * look at div() for more speed
  * alternative mul() method using shifts
- * band() etc. could use more bits (making it 32 instead of 16: double speed)
  * find a way to let underlying lib calculate band(), bior(), bxor() for
    negative inputs
- * use more than 16 bits for band(), bior(), bxor()
+ * make converting between bases faster
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

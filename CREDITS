@@ -10,6 +10,8 @@ I wish to thank the following people:
 * John Peacock for pushing me to finish Math::BigInt::Calc.
 * Benjamin Trott for the _split optimization and finding the bug in badd()
 * Daniel Pfeiffer for v0.49
+* Compaq for their TestDrive accounts and the admins managing them - this makes
+  testing on a large variety of platforms possible. Thanx!
 
 Special thanx must go to John Peacock and Tom Roche, both have helped me a lot
 in developing the latest version, not only by cheerfully kicking my lazy butt

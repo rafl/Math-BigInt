@@ -1,41 +1,89 @@
-This lists only the changes for the current release (v1.48) over the last
+This lists only the changes for the current release (v1.49) over the last
 version, since HISTORY is now quite big:
 
-misc :  updated TODO and BUGS
-	removed bench/ from dist (see http:/bloodgate.com/perl/bigbench.html)
-	fixed examples/bigprime.pl
-Calc :  added _sqrt() for more speed
-	_sqrt() shortcut for small (< $BASE) numbers for better performance
-	shortcut in _mul for small numbers (< $BASE_LEN2)
-	added _and, _or, and _xor and let them use more than 16 bits
-	find out how many bits _and, _or and _xor can safely use
-	div() might leave empty array, so __strip_zeros fixes these
-	streamlined _acmp()
-MBI  :  fixed pod in many places
-	bmod: use round(), not bround()
-	bsqrt: use _sqrt() from lib, if possible
-	bsqrt: would hang for certain (most?) inputs
-	bdiv: slow check for 1 || -1 replaced by much faster version
-	bdiv: call _div() only when necc. in list context, otherwise scalar
-	streamlined copy(), _find_round_parameters()
-	removed the EXPORT_OK except for objectify, _swap and bgcd/blcm
-	bzero(), bone(): take additional A and P and store 'em
-	bnan(), binf(): clear A and P
-MBF  :  fneg() failed (now hand up to MBI)
-	frsft() and flsft() were no aliases to brsft() and blsft()
-	fone() was no alias for bone()
-	blsft() and brsft() were missing altogether
-	streamlined: fpow() and fmul()
-	removed the EXPORT_OK
-	fqsrt() uses now BigInt::bsqrt() as guess: greatly improved performance
-	make fsqrt() subclass proof by using $self instead of Math::BigFloat
-	bzero(), bone(): take additional A and P and store 'em
-	bnan(), binf(): clear A and P
-tests:  added some for MBI::bsqrt(), MBF::lfst() and MBF::rsft()
-	added extensive tests for band(), bior() and bxor()
-	added t/Math/BigInt/BareCalc.pm and run bigint's test trough it
+misc  : INSTALLDIRS => 'perl' in Makefile.PL (finally clobber v0.01 in core)
+	'require Math::BigInt; $x = Math::BigInt->new(1); $x++' works again
+	ditto for 'use Math::BigInt();' - thanx to cpan testers
+	test-subclasses delegate their global A, P and R to SUPER->new()
+	BareCalc: 5.005_3 doesn't like v0.18, make it '0.18'
+Scalar: added section DESCRIPTION to shut up complaining make
+	added _dec() and _inc()
+Calc  : added _as_hex()/as_bin (with 16 bits per iteration) for more speed
+	from_bin(): Use oct() and 16 bits perl iteration
+	removed leftover _check() in _div_use_mul()
+	_div() shortcut for $x < $BASE & $y < $BASE
+        _lsft()/_rsft() can handle other bases than 10 now
+        _sqrt(): a tad faster now by not using _lsft() to construct guess
+	removed needless return statements
+	"$x" was '0000' instead of '0' in some cases
+  0.19: can use a different BASE_LEN for mul/div and the rest
+MBI   : blog() and overload for log()
+	as_hex()/as_bin convert 16 instead of 8 bits at a time
+	new takes A,P and round_mode: $x = Math::BigInt->new($x,$A,$P,$R);
+	bmod, bpow: didn't take $y's A & P into account
+	set both A & P results in NaN for any operation
+	$x->bfround() with negative P forgot to clear A of $x
+	bzero()/bone() weren't handling given rounding arguments properly
+	rounding of 0's forgot to set A and/or P	
+	merge _find_rounding_parameters into round(), making this much faster
+	round(): set A and set P is now an error
+	bround() is now faster again (nearly to it's old speed) under both
+	 Calc and other binary libs, especially for rounding up big numbers
+	bnot() rounded twice (bdec() already does take care of that)
+MBF   : flog()/blog() and overload for log()
+	new() takes A,P and round_mode: $x = Math::BigFloat->new($x,$A,$P,$R);
+	bzero()/bone(): did not handle given rounding arguments properly
+	rounding of 0's forgot to set A and/or P
+	bround(): forgot to store A in some cases
+	bround(): removed needless calculation of $delta
+	bdiv(): when rounding to given A and given R, negleted given R
+	bsqrt(): would hang/fail if $x had A/P or global A/P was enabled
+	bsqrt(): wouldn't modify $x, but return a new reference instead
+	bmod() now actually works in most cases
+tests : require.t: test that require Math::BigInt; works
+	use.t: test that use Math::BigInt(); works
+	run mbimbf (rounding/A/P) tests through subclasses
 
-Please have arbitrarily big amounts of fun.
+This release has been tested on the following systems:
+
+  OS				     System			Perl	  OK?	
+ ----------------------------------------------------------------------------
+  SuSE 7.2a Linux on Blazer Itanium  Blazer Itanium 4@800MHz	v5.6.0
+  TurboLinux 6.0 on Intel            ProLiant 5500 2@450MHz	v5_005_03
+  SuSE 7.1 Linux on Alpha(JAVA)      DS20e 2@667MHz (ev67)	v5.6.0
+  SuSE 7.1 Linux on Alpha            DS20 2@500MHz (ev6)	v5.6.0
+  SuSE 7.1 Linux on Alpha            DS10-L 1@466MHz (ev6)	v5.6.0
+  SuSE 7.2 Linux on Intel            ProLiant ML530 2@800MHz	v5.6.1
+
+  Debian 2.2 Linux on Alpha          DS20 2@500MHz (ev6)	v5.005_03
+  Debian 2.2 Linux on Alpha          XP1000a 1@667MHz (ev6) 	v5.005_03
+  Debian 2.2 Linux on Intel          ProLiant 5500 4@500MHz 	v5.005_03
+  Caldera OpenLinux eDesktop 2.4     ProLiant 5500 4@500MHz	v5.6.0
+
+  FreeBSD 4.4 on Intel               ProLiant 5500 2@450MHz 	v5.005_03
+  FreeBSD 4.4 on Alpha               XP1000a 1@667MHz (ev6)	v5.005_03
+  NetBSD 1.5.1 on Alpha              DS10 1@466MHz (EV6)	v5.6.0
+
+  Compaq Tru64 Unix 4.0g(JAVA)       AS1200 2@533MHz (ev56)	v5.6.1
+  Compaq Tru64 Unix 5.1a(JAVA)       DS10-L 1@466MHz (ev6)	v5.6.0
+  Compaq Tru64 Unix 5.1a(JAVA)       DS20E 2@667MHz (ev6)	v5.6.0
+  Compaq Tru64 Unix 5.1a(JAVA)       ES40 4@667MHz (ev6)	v5.6.0
+
+  iPAQ                               iPAQ H3650			v5.6.1    No
+
+  SuSE 7.0 Linux on AMD		     Athlon@1052MHz	        v5.7.2@13832
+
+I didn't try to wrap my brain around testing on VMS, lest I would again be
+trapped there. And there I thought DOS had a complicated system at the
+prompt...:)
+
+While BigInt.pm seems to "run" on the iPAQ, Calc.pm segfaults. I'll have to
+investigate.
+
+Thanks go to Compaq for providing most of the machines (save the last) in their
+TestDrive program!
+
+Please have Math::BigInt->new('inf') big amounts of fun.
 
 Tels <http://bloodgate.com/perl>
 
