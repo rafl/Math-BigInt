@@ -10,7 +10,7 @@ BEGIN
   {
   $| = 1;
   # to locate the testing files
-  my $location = $0; $location =~ s/bigfltpm.t//i;
+  my $location = $0; $location =~ s/sub_mif.t//i;
   if ($ENV{PERL_CORE})
     {
     @INC = qw(../lib); 		# testing with the core distribution
@@ -31,7 +31,7 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 428;
+  plan tests => 438;
   }
 
 use Math::BigInt::Subclass;

@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.49:
+v1.52:
 
  general:
   + It is subsequent faster than the original in many places
@@ -21,7 +21,10 @@ v1.49:
  caveats:
   + bstr() and stringify now drop the leading '+' (to make overloaded cmp work
     as expected when cmp'aring to scalars and other objects (read: bugfix)
+  + due to the dropping of '+' the string sort order has changed. It is now
+    compatible to the way perl sorts it's strings.
   + spaces are no longer allowed in a number (but may precede or follow it)
+  !! You can always make a subclass and change all these things quite easily !!
  input:
   + underscores are now valid between any two digits (in hex/binary input, too)
   + integers of the form 1E2, 1.23E2, 2.00 etc now valid for BigInt.pm, too
@@ -62,17 +65,18 @@ v1.49:
   + brsft()/blsft() also can do other bases than 2
   + bacmp (acmp), because needed for more efficient add()
   + bzero(), bnan(), bone(), binf()
-  + binc(), bdec()
-  + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf()
+  + binc(), bdec(), bfac()
+  + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf(), is_int()
   + digit(), length(), copy()
   + as_number(), as_hex(), as_bin()
   + is_positive(), is_negative()
   + mantissa(), exponent(), parts(), sign()
   + bgcd() accepts now lists, blcm() (also accepts lists)
-  + fmod() (Thanx J. Peacock) and fdiv() in list context
   + flog()/blog() for overloading of log()
+  + bfac() for factorial
   + round(accuracy,precision,mode) round to accuracy/precision using mode
-  + bpow() for BigFloat
+  + MBF: fpow(), fmod(), fdiv() in list context (Thanx J. Peacock)
+  + MBI: bsqrt()
   + bfloor(), bceil()
 
 Please send me test-reports, your experiences with this and your ideas - I love

@@ -3,9 +3,10 @@ Known bugs:
 
 * General:
   + divide by zero throws no exception
+  + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
+    you need it, please bug the autor(s) about it.
 
 * BigFloat:
-  + blog() is not finished yet
   + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
@@ -26,6 +27,7 @@ Known bugs:
   + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
   
 * BigInt:
+  + blog() is not finished yet
   + .2e2 is not yet recognized as valid input
   + exponent on input is limited to a Perl int (bigger numbers won't fit
     into your memory, anyway - use BigFloat)
@@ -39,6 +41,8 @@ Known bugs:
 ###############################################################################
 
 Mixing of classes does not always work like here:
+
+(upgrade helps, but is not fully implemented)
 
 	use Math::BigInt;
 	use Math::BigFloat;

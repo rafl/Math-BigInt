@@ -2,10 +2,12 @@ See also various .pm files.
 
 General:
  * Copy on write (helps for $x = -$x; cases etc) (seems to make it slower :/
+ * try to cash UNIVERSAL::can results, since $CALC shouldn't change (or even
+   unset them when $CALC changes)
 
 Math::BigFloat:
+ * finish 'upgrade'
  * ! bround()/bfround(): some bugs may lurk in there
- * ! bmod() 
  * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
  * do not reduce numbers in new(), rather do it in anything that outputs it
    like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
@@ -17,6 +19,7 @@ Math::BigFloat::Constant:
  * really needed by someone out there?
 
 Math::BigInt:
+ * finish 'upgrade'
  * remove rounding overhead when no rounding is done, e.g. no $object has A nor
    P and neither of bround(), bround(), accuracy() or precision() was called
  * bround() is only used by MBF for -$scale = -$len, anyway. POD is wrong for
@@ -43,6 +46,7 @@ following are pretty much ultra-low-priority:
 Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * look at div() for more speed
+ * code a div() algorithmn for $y < $BASE (e.g. should be something linear)
  * alternative mul() method using shifts
  * find a way to let underlying lib calculate band(), bior(), bxor() for
    negative inputs

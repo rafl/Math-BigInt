@@ -1,89 +1,24 @@
-This lists only the changes for the current release (v1.49) over the last
+This lists only the changes for the current release (v1.53) over the last
 version, since HISTORY is now quite big:
 
-misc  : INSTALLDIRS => 'perl' in Makefile.PL (finally clobber v0.01 in core)
-	'require Math::BigInt; $x = Math::BigInt->new(1); $x++' works again
-	ditto for 'use Math::BigInt();' - thanx to cpan testers
-	test-subclasses delegate their global A, P and R to SUPER->new()
-	BareCalc: 5.005_3 doesn't like v0.18, make it '0.18'
-Scalar: added section DESCRIPTION to shut up complaining make
-	added _dec() and _inc()
-Calc  : added _as_hex()/as_bin (with 16 bits per iteration) for more speed
-	from_bin(): Use oct() and 16 bits perl iteration
-	removed leftover _check() in _div_use_mul()
-	_div() shortcut for $x < $BASE & $y < $BASE
-        _lsft()/_rsft() can handle other bases than 10 now
-        _sqrt(): a tad faster now by not using _lsft() to construct guess
-	removed needless return statements
-	"$x" was '0000' instead of '0' in some cases
-  0.19: can use a different BASE_LEN for mul/div and the rest
-MBI   : blog() and overload for log()
-	as_hex()/as_bin convert 16 instead of 8 bits at a time
-	new takes A,P and round_mode: $x = Math::BigInt->new($x,$A,$P,$R);
-	bmod, bpow: didn't take $y's A & P into account
-	set both A & P results in NaN for any operation
-	$x->bfround() with negative P forgot to clear A of $x
-	bzero()/bone() weren't handling given rounding arguments properly
-	rounding of 0's forgot to set A and/or P	
-	merge _find_rounding_parameters into round(), making this much faster
-	round(): set A and set P is now an error
-	bround() is now faster again (nearly to it's old speed) under both
-	 Calc and other binary libs, especially for rounding up big numbers
-	bnot() rounded twice (bdec() already does take care of that)
-MBF   : flog()/blog() and overload for log()
-	new() takes A,P and round_mode: $x = Math::BigFloat->new($x,$A,$P,$R);
-	bzero()/bone(): did not handle given rounding arguments properly
-	rounding of 0's forgot to set A and/or P
-	bround(): forgot to store A in some cases
-	bround(): removed needless calculation of $delta
-	bdiv(): when rounding to given A and given R, negleted given R
-	bsqrt(): would hang/fail if $x had A/P or global A/P was enabled
-	bsqrt(): wouldn't modify $x, but return a new reference instead
-	bmod() now actually works in most cases
-tests : require.t: test that require Math::BigInt; works
-	use.t: test that use Math::BigInt(); works
-	run mbimbf (rounding/A/P) tests through subclasses
+Calc  : _div() has shortcut if $y < $MBASE
+MBI   : added downgrade()
+	typo: precisision vs. precision made Math::BigInt->config() whince
+MBF   : numify() on _e in bcmp/bacmp makes these about factor 5.25 faster
+	replaced some *= (10 ** $x) places in badd by blsft($x,10) for speed
+	(speedup between factor 1 and 3 (up to inf), better for large numbers)
+	optimized ffloor() and fceil()
+	opt. fpow() (15 vs 16 times is_zero(): between 2 and 15% faster)
+	opt. as_number() (replaced "< 0" with "{sign} eq '-'": factor 1..2)
+	the fix for bsub (forgot round if $x->bsub(0)) was also present in MBF
+	$x->badd(0) forgot to round result
+	added downgrade and upgrade to valid methods for inheritance
+	new() now downgrades if wanted and possible (e.g. for integers)
+tests : added some for bsub((0) and badd(0) bugs
+	tests for downgrade
+	tests for the _mod() shortcuts
 
-This release has been tested on the following systems:
-
-  OS				     System			Perl	  OK?	
- ----------------------------------------------------------------------------
-  SuSE 7.2a Linux on Blazer Itanium  Blazer Itanium 4@800MHz	v5.6.0
-  TurboLinux 6.0 on Intel            ProLiant 5500 2@450MHz	v5_005_03
-  SuSE 7.1 Linux on Alpha(JAVA)      DS20e 2@667MHz (ev67)	v5.6.0
-  SuSE 7.1 Linux on Alpha            DS20 2@500MHz (ev6)	v5.6.0
-  SuSE 7.1 Linux on Alpha            DS10-L 1@466MHz (ev6)	v5.6.0
-  SuSE 7.2 Linux on Intel            ProLiant ML530 2@800MHz	v5.6.1
-
-  Debian 2.2 Linux on Alpha          DS20 2@500MHz (ev6)	v5.005_03
-  Debian 2.2 Linux on Alpha          XP1000a 1@667MHz (ev6) 	v5.005_03
-  Debian 2.2 Linux on Intel          ProLiant 5500 4@500MHz 	v5.005_03
-  Caldera OpenLinux eDesktop 2.4     ProLiant 5500 4@500MHz	v5.6.0
-
-  FreeBSD 4.4 on Intel               ProLiant 5500 2@450MHz 	v5.005_03
-  FreeBSD 4.4 on Alpha               XP1000a 1@667MHz (ev6)	v5.005_03
-  NetBSD 1.5.1 on Alpha              DS10 1@466MHz (EV6)	v5.6.0
-
-  Compaq Tru64 Unix 4.0g(JAVA)       AS1200 2@533MHz (ev56)	v5.6.1
-  Compaq Tru64 Unix 5.1a(JAVA)       DS10-L 1@466MHz (ev6)	v5.6.0
-  Compaq Tru64 Unix 5.1a(JAVA)       DS20E 2@667MHz (ev6)	v5.6.0
-  Compaq Tru64 Unix 5.1a(JAVA)       ES40 4@667MHz (ev6)	v5.6.0
-
-  iPAQ                               iPAQ H3650			v5.6.1    No
-
-  SuSE 7.0 Linux on AMD		     Athlon@1052MHz	        v5.7.2@13832
-
-I didn't try to wrap my brain around testing on VMS, lest I would again be
-trapped there. And there I thought DOS had a complicated system at the
-prompt...:)
-
-While BigInt.pm seems to "run" on the iPAQ, Calc.pm segfaults. I'll have to
-investigate.
-
-Thanks go to Compaq for providing most of the machines (save the last) in their
-TestDrive program!
-
-Please have Math::BigInt->new('inf') big amounts of fun.
+Please have Math::BigInt->new('inf')->bmul('inf') big amounts of fun.
 
 Tels <http://bloodgate.com/perl>
 

@@ -32,8 +32,15 @@ t/calling.t			# ensure that Class->method('string') works
 t/sub_mbi.t			# empty subclass test for M::BI
 t/sub_mbf.t			# empty subclass test for M::BF
 t/bare_mbi.t			# test Math::BigInt's simulation of Calc
+t/bare_mbf.t			# test Math::BigInt's sim of Calc via BigFloat
 t/require.t			# test: require Math::BigInt;
 t/use.t				# test: use Math::BigInt();
+t/upgrade.t			# see if upgrading works
+t/downgrade.t			# see if downgrading works
+t/constant.t			# test Math::BigInt/BigFloat ':constant'
+t/config.t			# test Math::BigInt->config()
+t/inf_nan.t			# inf and NaN handling
+t/upgrade.inc			# actual tests for upgrading
 t/Math/BigInt/BareCalc.pm	# for testing BigInt's simulation of Calc
 t/Math/BigInt/Subclass.pm	# empty subclass
 t/Math/BigFloat/Subclass.pm	# empty subclass
