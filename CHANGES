@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.52:
+v1.55:
 
  general:
   + It is subsequent faster than the original in many places
@@ -35,6 +35,7 @@ v1.52:
  bugs and buglets fixed over Mark's original:
   + 0**0 gave NaN instead of 1
   + -1**y gave -1 instead of +1 for even y
+  + fsqrt() gave slightly wrong results (like for fsqrt(9))
   + +x/0 is now +inf, -x/0 is -inf (both were NaN), as well as other inf cases
   + mod/div for negative numbers were incompatible to Perl's way
   + added P. Prymmer's OS/390 '/1e5 vs *1e-5' patch w/o the performance snag
@@ -62,6 +63,8 @@ v1.52:
   + $# partially removed ($#y is scalar @y -1, $#$y is scalar @$y-1 - ugh!)
   + added LICENSE section and file
  new stuff:
+  + MBF: :constant works now
+  + MBI: :constant picks up binary and hexadecimal constants
   + brsft()/blsft() also can do other bases than 2
   + bacmp (acmp), because needed for more efficient add()
   + bzero(), bnan(), bone(), binf()
@@ -73,9 +76,9 @@ v1.52:
   + mantissa(), exponent(), parts(), sign()
   + bgcd() accepts now lists, blcm() (also accepts lists)
   + flog()/blog() for overloading of log()
-  + bfac() for factorial
   + round(accuracy,precision,mode) round to accuracy/precision using mode
   + MBF: fpow(), fmod(), fdiv() in list context (Thanx J. Peacock)
+  + fpow() can now handle non-integer arguments, like in fpow(2.1 ** 0.2)
   + MBI: bsqrt()
   + bfloor(), bceil()
 

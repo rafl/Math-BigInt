@@ -62,8 +62,10 @@ Math::BigInt::Calc:
  * streamlined converting
  * turned dual-basis off by default (now 7-7 on 32 bit and 9-9 on most 64 it)
  * _str() uses int() on first part to avoid '0000' instead of '0'
-2002-01-07 v0.22 Tels
-
+2002-02-10 v0.22 Tels
+ * _sqrt1() => _sqrt() (oups)
+ * much better guess for _sqrt() resulting in faster sqrt
+ * added _fac()
 2002-02-24 v0.23 Tels
  * from_bin() repack input and use from_hex(): twice as fast
 2002-02-27 v0.24 Tels
@@ -71,6 +73,9 @@ Math::BigInt::Calc:
  * _div() has shortcut if $y is very small
 2002-03-03 v0.25 Tels
  * started _square() (not done yet)
+2002-03-17 v0.26 Tels
+ * a fix in _rsft() that left empty array instead of (0)
+ * a fix in _sub(): early out made -1 + 100000000001 == 0 (if length($y) > 8)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -215,6 +220,9 @@ Math::BigFloat:
  * fsqrt() didn't modify $x sometimes, but returned a new reference
  * fsqrt(): calc 4 more digits for rounding, not 1 (endless looping otherwise)
  * fmod() now actually works
+2002-02-10 v1.27 Tels (forgot to increase version)
+ * ffac()
+ * various: disable Math::BigInt::upgrade to avoid deep recursion
 2002-02-16 v1.28 Tels
  * fixed use Math::BigFloat ':constant';
  * fixed flog() function to calc right result, honour rounding-globals
@@ -454,7 +462,14 @@ Math::BigInt:
  * round() now uses string-add to make it almost twice as fast
  * bnot() did round twice
 2002-02-10 v1.50 Tels
- *
+ * bfac() and hook for _fac() in libs
+ * documented sub-classing and auto-upgrade
+ * < 4 test in bsqrt() after the CALC call for more performance
+ * added overload for sqrt()
+ * added possibility to upgrade via use Math::BigInt upgrade => 'Foo::Bar'
+ * Math::Big(Int|Float)->accuracy() clears precision, and vice versa
+ * small optimization in bdiv() regarding abs($x) < abs($y)
+ * brsft() for negative numbers in base 2 was completely wrong
 2002-02-16 v1.51 Tels
  * fixed bfround(-x) (f.i. 0.004->bfround(-2) resulted in 0.01, not 0.00)
  * bfround(x) rounded at wrong place (off by one)
@@ -476,6 +491,9 @@ Math::BigInt:
  * bpow() upgrades if second argument is non-integer
  * objectify disable downgrade (for MBF)
  * new() twice as fast due to shortcut simple numbers, save _split() & _round()
+2002-03-17 v1.55 Tels
+ * :constant picks up binary/hexadecimal constants
+ * Math::BigInt->digit(123) works now
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
