@@ -12,6 +12,7 @@ Math::BigFloat:
    like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
    number after each op is slow with a binary core math lib like BitVect.
  * ?? add $x->bint(), that rounds with 'trunc' to an integer ??
+ * look at performance, especially new() (sig of ->{_m} and babs there)
 
 Math::BigFloat::Constant:
  * really needed by someone out there?

@@ -286,6 +286,8 @@ Math::BigInt:
  * drop leading '+' for inf
  * bxor(), band(), bior() with negative arguments don't get passed to lib
    (makes it work with BitVect, Pari, GMP etc)
+2001-08-08 v1.41 Tels
+ * fixed inf test (coredumps)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

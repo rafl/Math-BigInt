@@ -519,10 +519,11 @@ ok ($x,-3);
 ok (ref($x),'Math::Foo');
 
 ###############################################################################
-# test whether +inf eq inf
-
-$y = 1e1000000;	# create inf, since bareword inf does not work
-$x = Math::BigInt->new('+inf'); ok ($x,$y);
+# Test whether +inf eq inf
+# This tried to test whether BigInt inf equals Perl inf. Unfortunately, Perl
+# hasn't (before 5.7.3 at least) a consistent way to say inf, and some things
+# like 1e100000 crash on some platforms. So simple test for 'inf'
+$x = Math::BigInt->new('+inf'); ok ($x,'inf');
 
 ###############################################################################
 # all tests done

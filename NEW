@@ -1,12 +1,9 @@
-This lists only the changes for the current release (v1.40) over the last
+This lists only the changes for the current release (v1.41) over the last
 version, since HISTORY is now quite big:
 
 Fixes and enhancements:
-  drop leading '+' for inf in bstr(), bsstr() to make $x->binf() eq inf work
-  streamlined bcmp() for comparisations with zero
-  bxor(-$x,-$y) was broken and not tested for
-  bxor(), band(), bior() with negative arguments no longer passed to
-  underlying lib (means it works with BitVect, Pari, GMP etc)
+  fixed the inf test (coredumps)
+  fixed CAVEAT doc about $x = $y;
  
 Please have arbitrarily big amounts of fun.
 

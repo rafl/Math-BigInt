@@ -26,6 +26,8 @@ Known bugs:
   + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
   
 * BigInt:
+  + exponent on input is limited to an Perl integer (bigger numbers won't fit
+    into your memory, anyway)
   + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
   + Handling of undef arguments is somewhat broken (no proper warnings)
   + eval('use...') and use Math::BigInt qw/:constant/ fail on Perl prior 5.6.0
