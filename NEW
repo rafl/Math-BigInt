@@ -1,15 +1,10 @@
-This lists only the changes for the current release (v1.76) over the last
+This lists only the changes for the current release (v1.77) over the last
 version, since HISTORY is now quite big:
 
-Calc : return $BASE from _base_len(), too
-MBI  : fix rounding doc and add notes about precision() and accuracy
-       new('inf')/new('-inf') will now croak() when trap_inf is true
-       load FastCalc as default, then fallback to Calc
-MBF  : fix back fdiv() in list context
-       fix fmod() with -1
-	fix rounding doc, add precision() vs. accuracy
-       new('inf')/new('-inf') will now croak() when trap_inf is true
-tests: add tests for new() with inf, and for fmod()
+Calc : remove shortcut in div(), since it doesn't work
+MBI  : bump version
+MBF  : fix new() to work correctly with Math::BigInt::Pari
+tests: tests for div ((2**100)-1)/2**100
 
 ##############################################################################
 

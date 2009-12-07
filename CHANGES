@@ -159,6 +159,8 @@ Math::BigInt::Calc:
  * fix the div() shortcut for short numbers to actually work
 2005-03-29 v0.46 Tels
  * avoid crash in FastCalc by making $BASE and $BASE_LEN use vars qw//;
+2005-05-17 v0.47 Tels
+ * remove shortcut in div(), it wasn't working properly
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -459,6 +461,8 @@ Math::BigFloat:
 2005-03-29 v1.50 Tels
  * fix rounding doc, add notes about prevision vs. accuracy
  * set FastCalc as default (we still use whatever MBI uses)
+2005-04-10 v1.51 Tels
+ * fix new() to work with Math::BigInt::Pari
 
 ############################################################################## 
 Math::BigInt:
@@ -855,6 +859,8 @@ Math::BigInt:
  * fix rounding doc, add notes about prevision vs. accuracy
  * trap inf and -inf in new()
  * load FastCalc as default
+2005-05-17 v1.77 Tels
+ * bump version
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

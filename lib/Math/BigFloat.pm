@@ -12,7 +12,7 @@ package Math::BigFloat;
 #   _a	: accuracy
 #   _p	: precision
 
-$VERSION = '1.50';
+$VERSION = '1.51';
 require 5.005;
 
 require Exporter;
@@ -197,7 +197,8 @@ sub new
         my $z = $MBI->_new($zeros);
         # turn '120e2' into '12e3'
         $MBI->_rsft ( $self->{_m}, $z, 10);
-	_e_add ( $self->{_e}, $z, $self->{_es}, '+');
+        ($self->{_e}, $self->{_es}) =
+	  _e_add ( $self->{_e}, $z, $self->{_es}, '+');
         }
       }
     $self->{sign} = $$mis;
