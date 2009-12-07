@@ -1,24 +1,32 @@
-This lists only the changes for the current release (v1.61) over the last
+This lists only the changes for the current release (v1.62) over the last
 version, since HISTORY is now quite big:
 
-Calc  : _acmp() is a tad faster (no longer calling _len())
-        cleaned up a bit and added some comments
-MBI   : fixed the trailing "\n" bug (already in v1.60 in Perl v5.8.0)
-	some pod fixed (also already in v5.8.0)
-        bround() used (accidentily) internally Math::Big(Float|int) as scale
-        pod for is_foo() subs states more explicit that true/false will be
-         returned, but not the exact value (0,'',undef or 1/2/3 etc)
-MBF   : $x->new("0.02"); $x->accuracy($a); $x->bdiv($y,$d) failed to round
-	 when $d > $a
-	bsstr() was broken for negative numbers
-	numify() used bsstr() and was also broken for negative numbers
-	numify('+inf') returned '+inf' and not 'inf'
-	as_hex(), as_bin() now work at least for integers, +-inf and NaN
-tests : t/*.inc do now use strict;
-	MBF: more tests for bsstr/numify/stringify, tests for as_hex/as_bin
-	moved some objectify() tests to mbimbf.inc (to run them w/ bare/sub)
-        added a test tweak to for is_foo() to let them pass under FastCalc
-        added a lot of tests for Calc (_len(), _acmp() etc)
+Calc  : fixed a bug in _rsft that forgot to set the result to 0 if you
+	 shifted only a few more digits right than $x had
+        _modinv() now works thanx to the all-positive algorithmn in MBI. It
+         speeds bmodinv() up by more than a factor of 4
+MBI   : bmodinv() now keeps internals positive, speeding it up by about 5-8%
+	bcmp()/bacmp() upgrade if neccessary
+MBF   : bcmp()/bacmp() upgrade if neccessary
+tests : tests for the _rsft bug-fix
+	more tests for bmodinv()
+	tests for bcmp()/bacmp()'s upgrading
+	more tests for _num()/_inc()/_dec()/_copy() etc in bigintc.t
+
+v1.61 Calc v0.31:
+Benchmark: running modinv_1, modinv_2 for at least 3 CPU seconds...
+  modinv_1:  4s (3.23 usr +  0.00 sys =  3.23 CPU) @ 248/s (n=801)
+  modinv_2:  4s (3.17 usr +  0.00 sys =  3.17 CPU) @  25/s (n=80)
+
+v1.62 Calc v0.30:
+Benchmark: running modinv_1, modinv_2 for at least 3 CPU seconds...
+  modinv_1:  4s (3.12 usr +  0.00 sys =  3.12 CPU) @ 262/s (n=818)      1.056
+  modinv_2:  4s (3.18 usr +  0.00 sys =  3.18 CPU) @  27/s (n=85)       1.08
+
+v1.62 Calc v0.32:
+Benchmark: running modinv_1, modinv_2 for at least 3 CPU seconds...
+  modinv_1:  4s (3.00 usr +  0.00 sys =  3.00 CPU) @ 1163/s (n=3488)    4.68
+  modinv_2:  4s (3.00 usr +  0.00 sys =  3.00 CPU) @  106/s (n=317)     4.24
 
 ###############################################################################
 

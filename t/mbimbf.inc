@@ -361,7 +361,16 @@ $z = $u->copy()->bmul($y,undef,2,'odd'); ok ($z,30860);
 $z = $u->copy()->bmul($y,undef,3,'odd'); ok ($z,30900);
 $z = $u->copy()->bmul($y,undef,-1,'odd'); ok ($z,30862.5);
 
-# breakage:
+my $warn = ''; $SIG{__WARN__} = sub { $warn = shift; };
+# these should warn, since '3.17' is a NaN in BigInt and thus >= returns undef
+$warn = ''; eval "\$z = 3.17 <= \$y"; ok ($z, 1);
+print "# Got: '$warn'\n" unless
+ok ($warn =~ /^Use of uninitialized value in numeric le \(<=\) at/);	
+$warn = ''; eval "\$z = \$y >= 3.17"; ok ($z, 1);
+print "# Got: '$warn'\n" unless
+ok ($warn =~ /^Use of uninitialized value in numeric ge \(>=\) at/);	
+
+# XXX TODO breakage:
 # $z = $y->copy()->bmul($u,2,0,'odd'); ok ($z,31000);
 # $z = $y * $u; ok ($z,5); ok (ref($z),$mbi);
 # $z = $y + $x; ok ($z,12); ok (ref($z),$mbi);

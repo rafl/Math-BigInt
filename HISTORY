@@ -87,6 +87,10 @@ Math::BigInt::Calc:
 2002-08-13 v0.31 Tels
  * _acmp() no longer calls _len() => tad faster
  * some cleanup of old code, added some more comments
+2002-08-21 v0.32 Tels
+ * fixed bug in _rsft() that did not set result to 0 in some cases
+ * _modinv() now works, thanx to the all-positive algorithmn
+ * much more tests in bigintc.t (taken over from FastCalc)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -277,6 +281,8 @@ Math::BigFloat:
    when $d > $a
  * numify() returned '+inf' instead of 'inf'
  * (more) tests for bsstr(), numify(), as_hex(), as_bin
+2002-08-20 v1.37 Tels
+ * bcmp()/bacmp() upgrade now if requested
 
 ############################################################################## 
 Math::BigInt:
@@ -557,6 +563,10 @@ Math::BigInt:
  * fix for trailing newlines in input
  * some doc fixes (especially return values of is_foo() methods)
  * make testsuite so that it will pass under FastCalc easily
+2002-08-21 v1.62 Tels
+ * bcmp()/bacmp() upgrade now if requested
+ * bmodinv() uses an all-positive algorithmn, speeding it up by about 5-8%
+   and allowing to implement the same algorithmn in Calc for factor 4 speedup
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

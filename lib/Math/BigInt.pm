@@ -18,7 +18,7 @@ package Math::BigInt;
 my $class = "Math::BigInt";
 require 5.005;
 
-$VERSION = '1.61';
+$VERSION = '1.62';
 use Exporter;
 @ISA =       qw( Exporter );
 @EXPORT_OK = qw( objectify _swap bgcd blcm); 
@@ -869,6 +869,9 @@ sub bcmp
     ($self,$x,$y) = objectify(2,@_);
     }
 
+  return $upgrade->bcmp($x,$y) if defined $upgrade &&
+    ((!$x->isa($self)) || (!$y->isa($self)));
+
   if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/))
     {
     # handle +-inf and NaN
@@ -910,6 +913,9 @@ sub bacmp
     {
     ($self,$x,$y) = objectify(2,@_);
     }
+
+  return $upgrade->bacmp($x,$y) if defined $upgrade &&
+    ((!$x->isa($self)) || (!$y->isa($self)));
 
   if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/))
     {
@@ -1479,25 +1485,25 @@ sub bmod
 
 sub bmodinv
   {
-  # modular inverse.  given a number which is (hopefully) relatively
+  # Modular inverse.  given a number which is (hopefully) relatively
   # prime to the modulus, calculate its inverse using Euclid's
-  # alogrithm.  if the number is not relatively prime to the modulus
+  # alogrithm.  If the number is not relatively prime to the modulus
   # (i.e. their gcd is not one) then NaN is returned.
 
   # set up parameters
   my ($self,$x,$y,@r) = (ref($_[0]),@_);
-  # objectify is costly, so avoid it 
+  # objectify is costly, so avoid it
   if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
     {
     ($self,$x,$y,@r) = objectify(2,@_);
-    } 
+    }
 
   return $x if $x->modify('bmodinv');
 
   return $x->bnan()
-	if ($y->{sign} ne '+'				# -, NaN, +inf, -inf
-         || $x->is_zero()				# or num == 0
-	 || $x->{sign} !~ /^[+-]$/			# or num NaN, inf, -inf
+        if ($y->{sign} ne '+'                           # -, NaN, +inf, -inf
+         || $x->is_zero()                               # or num == 0
+         || $x->{sign} !~ /^[+-]$/                      # or num NaN, inf, -inf
         );
 
   # put least residue into $x if $x was negative, and thus make it positive
@@ -1505,11 +1511,14 @@ sub bmodinv
 
   if ($CALC->can('_modinv'))
     {
-    $x->{value} = $CALC->_modinv($x->{value},$y->{value});
-    $x->bnan() if !defined $x->{value} ;            # in case there was none
+    my $sign;
+    ($x->{value},$sign) = $CALC->_modinv($x->{value},$y->{value});
+    $x->bnan() if !defined $x->{value};                 # in case no GCD found
+    return $x if !defined $sign;                        # already real result
+    $x->{sign} = $sign;                                 # flip/flop see below
+    $x->bmod($y);                                       # calc real result
     return $x;
     }
-
   my ($u, $u1) = ($self->bzero(), $self->bone());
   my ($a, $b) = ($y->copy(), $x->copy());
 
@@ -1519,21 +1528,37 @@ sub bmodinv
   # a case with 28 loops still gains about 3% with this layout.
   my $q;
   ($a, $q, $b) = ($b, $a->bdiv($b));                    # step #1
-  # Euclid's Algorithm
-  while (!$b->is_zero())
+  # Euclid's Algorithm (calculate GCD of ($a,$b) in $a and also calculate
+  # two values in $u and $u1, we use only $u1 afterwards)
+  my $sign = 1;                                         # flip-flop
+  while (!$b->is_zero())                                # found GCD if $b == 0
     {
-    ($u, $u1) = ($u1, $u->bsub($u1->copy()->bmul($q))); # step #2
+    # the original algorithm had:
+    # ($u, $u1) = ($u1, $u->bsub($u1->copy()->bmul($q))); # step #2
+    # The following creates exact the same sequence of numbers in $u1,
+    # except for the sign ($u1 is now always positive). Since formerly
+    # the sign of $u1 was alternating between '-' and '+', the $sign
+    # flip-flop will take care of that, so that at the end of the loop
+    # we have the real sign of $u1. Keeping numbers positive gains us
+    # speed since badd() is faster than bsub() and makes it possible
+    # to have the algorithmn in Calc for even more speed.
+
+    ($u, $u1) = ($u1, $u->badd($u1->copy()->bmul($q))); # step #2
+    $sign = - $sign;                                    # flip sign
+
     ($a, $q, $b) = ($b, $a->bdiv($b));                  # step #1 again
     }
 
-  # if the gcd is not 1, then return NaN!  It would be pointless to
-  # have called bgcd to check this first, because we would then be performing
-  # the same Euclidean Algorithm *twice*
+  # If the gcd is not 1, then return NaN! It would be pointless to
+  # have called bgcd to check this first, because we would then be
+  # performing the same Euclidean Algorithm *twice*.
   return $x->bnan() unless $a->is_one();
 
-  $u1->bmod($y);
-  $x->{value} = $u1->{value};
-  $x->{sign} = $u1->{sign};
+  $u1->bneg() if $sign != 1;                            # need to flip?
+
+  $u1->bmod($y);                                        # calc result
+  $x->{value} = $u1->{value};                           # and copy over to $x
+  $x->{sign} = $u1->{sign};                             # to modify in place
   $x;
   }
 

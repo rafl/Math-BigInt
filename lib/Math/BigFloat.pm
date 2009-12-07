@@ -12,7 +12,7 @@ package Math::BigFloat;
 #   _p: precision
 #   _f: flags, used to signal MBI not to touch our private parts
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 require 5.005;
 use Exporter;
 use File::Spec;
@@ -345,6 +345,9 @@ sub bcmp
     ($self,$x,$y) = objectify(2,@_);
     }
 
+  return $upgrade->bcmp($x,$y) if defined $upgrade &&
+    ((!$x->isa($self)) || (!$y->isa($self)));
+
   if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/))
     {
     # handle +-inf and NaN
@@ -407,6 +410,9 @@ sub bacmp
     {
     ($self,$x,$y) = objectify(2,@_);
     }
+
+  return $upgrade->bacmp($x,$y) if defined $upgrade &&
+    ((!$x->isa($self)) || (!$y->isa($self)));
 
   # handle +-inf and NaN's
   if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/)
