@@ -4,6 +4,8 @@ Known bugs:
 * TODO BUGS:
   + implement test for the upgrading bug in bsub()
 
+* NaN handling in comparisations slightly broken. See also [perl #33106].
+
 * General:
   + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
     you need it, please bug the autor(s) about it.

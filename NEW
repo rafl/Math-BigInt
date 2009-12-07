@@ -1,83 +1,52 @@
-This lists only the changes for the current release (v1.73) over the last
+This lists only the changes for the current release (v1.74) over the last
 version, since HISTORY is now quite big:
 
-Calc : fixed bug in _from_hex() that garbled numbers with longer parts than
-	BASE_LEN (Thanx Mark Lakata!)
-MBI  : overload <<= and >>= for more speed
-       fixed a lot of inf and NaN cases for bpow()
-       save one unnec. call to bnorm() in round()
-MBF  : streamlined new() to not have to call _zeros() and _is_zero(), that
-	helps a bit for small numbers, and a lot for large numbers stored when
-	not stored in decimal (like under GMP :)
-       shortcut in new() for "simple" numbers like "123" - much faster now
-       fixed a lot of inf and NaN cases for fpow()
-       simplify loading of MBI in import(): if require is good for 5.6.x, it
-	will suffice for 5.8.x
-misc : added PREREQ to Scalar::Util
-tests: tests for <<= and >>=
-       MBF more tests for inputs resulting in zero
+Security Alert! This release fixes a possibility to trick Math::Big* into
+doing nasty things with eval. Upgrading to v1.74 is strongly recommended!
+
+Calc : small cleanups, remove some dead wood
+       shortcut for _div() with numbers of equal nr of parts (scales
+	much better than before)
+       inline is_zero() into _gcd() to make it slightly faster
+MBI  : streamline _scale_(a|p) as to not require accuracy/precicison()
+	and round_mode() unless nec.
+       remove the now unnec. support for MB_NEVER_ROUND and {_f}, this
+	makes all ops that call round() a tad faster (one exists is
+	removed) and shrinks the codesize a bit
+       streamline bneg(), inline is_zero(): makes it 1.6 times faster
+       replace ref($_[0]) w/ undef when it isn't actually needed. This
+	makes some ops (bsstr(), bneg etc) about 2% faster for small numbers
+       restrict low-level math library names to sane chars to avoid
+	exploitation of eval()
+       fill_can_cache() accidentily did checks for 'or' & 'xor'
+       inline fill_can_cache()
+       add _register_callback() to notify subclasses of lib changes
+       bgcd() is now about 10% faster
+       is_positive(0) == 0, since 0 is neither positive nor negative
+       load Exporter only if neccessary (e.g. "use Math::BigInt;" doesn't)
+MBF  : add bneg() and inline is_zero() in it, making it 1.6 times faster
+       replace ref($_[0]) w/ undef when it isn't actually needed. This
+	makes some ops (bsstr(), bneg etc) about 2% faster for small numbers
+       use _register_callback()
+       bgcd()/blcm() never worked, so fix them for integers and add tests
+misc : small doc cleanups
+tests: lib_load.t: test for _register_callback()
+       change inf_nan.t to use Test::More
 
 ##############################################################################
-
-Removing _zeros() from BigFloat's new really helps GMP for long string inputs:
-
-v1.72:
-# time perl -MMath::BigFloat=lib,GMP -wle 
-# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
-12e+1000000
-
-real    0m3.744s
-user    0m3.601s
-sys     0m0.093s
 
 v1.73:
-# time perl -Ilib -MMath::BigFloat=lib,GMP -wle 
-# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
-12e+1000000
+9 x 21 / 6 x 21:      5s ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 13123/s (n=69688)
+9 x 99 / 6 x 99:      5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @  7095/s (n=37323)
+9 x 999 / 6 x 999:    5s ( 5.33 usr +  0.01 sys =  5.34 CPU) @  1358/s (n=7252)
+9 x 9999 / 6 x 9999:  6s ( 5.33 usr +  0.01 sys =  5.34 CPU) @   129/s (n=693)
 
-real    0m1.410s
-user    0m1.309s
-sys     0m0.073s
+v1.74:
+9 x 21 / 6 x 21:      5s ( 5.26 usr +  0.01 sys =  5.27 CPU) @ 22910/s (n=120740)
+9 x 99 / 6 x 99:      5s ( 5.18 usr +  0.01 sys =  5.19 CPU) @ 21599/s (n=112102)
+9 x 999 / 6 x 999:    5s ( 5.22 usr +  0.00 sys =  5.22 CPU) @ 11552/s (n=60304)
+9 x 9999 / 6 x 9999:  6s ( 5.34 usr +  0.01 sys =  5.35 CPU) @  2178/s (n=11654)
 
-Since GMP stores the number internally as hex, a O(N^2) operation
-(decimal => hex) is necessary. And since _zeros() looks at the number in
-decimal, too, two of these were necessary. Since these O(N^2) operations
-are dominating the time spent, saving _zeros() should therefore save about
-50% of the time for big numbers, what the benchmark confirms.
-
-Note: We could save even more by splitting the zeros up and only convert the
-non-zero part. 
-
-Note that with Calc, only O(N) operations are involved, and we only save a few
-percent. However, Calc is about 10 times faster since it stores the number in
-decimal anyway:
-
-# time perl -MMath::BigFloat -wle 
-# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
-12e+1000000
-
-real    0m0.455s
-user    0m0.324s
-sys     0m0.063s
-
-# time perl -Ilib -MMath::BigFloat -wle 
-# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
-12e+1000000
-
-real    0m0.428s
-user    0m0.300s
-sys     0m0.062s
-
-##############################################################################
-
-Please have Math::BigInt->bzero()->bpow('0.1')->bpow(-42) big amounts of fun.
-
-Tels <http://bloodgate.com/perl>
-
-
-real    0m0.428s
-user    0m0.300s
-sys     0m0.062s
 ##############################################################################
 
 Please have Math::BigInt->bzero()->bpow('0.1')->bpow(-42) big amounts of fun.

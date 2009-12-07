@@ -62,6 +62,7 @@ t/trap.t			# test whether trap_nan and trap_inf works
 t/inf_nan.t			# inf and NaN handling
 t/isa.t				# isa() and new() w/ mixed classes tests
 t/upgrade.inc			# actual tests for upgrading
+t/lib_load.t			# test registered callbacks
 t/mbi_rand.t			# do some testing w/ random inputs/outputs
 t/with_sub.t			# test Math::BigFloat with => 'package'
 t/sub_ali.t			# test alias subroutines w/ alias.inc
