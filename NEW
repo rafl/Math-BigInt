@@ -1,11 +1,10 @@
 This lists only the changes for the current release over the last version,
 since HISTORY is now quite big:
 
-* fix from_hex(), from_bin() and from_oct() (Thanx Frank de Lange!)
-* works with small changes on Perl v5.6.0 and v5.6.1 (Thanx zefram!)
-* Fix 64bit integers on Perl 5.8.0 (thanx zefram)
-* Fix rounding with non-integer A or P parameters (these are truncated to
-  integers now, see round.t)
+* fix #34459: bsqrt() breaks on floats with enough digits (Thanx Niko Tyni!)
+* fix #35238: batan2() does not handle inf/-inf properly
+* fix #35162: MBI segfault (as_number(Math::BigRat())), Thanx Zsbán Ambrus!)
+* fix #34822: Which library is used? (Thanx Mark Overmeer!)
 
 ##############################################################################
 

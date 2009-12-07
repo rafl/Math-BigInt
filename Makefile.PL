@@ -14,24 +14,23 @@ all_from	'lib/Math/BigInt.pm';
 
 requires	'perl'		=> 5.006;
 
-# see if old versions are installed, and if so, force
-# and upgrade:
+# See if old versions are installed, and if so, tell the user that
+# upgrading them would make little fluffy kittens much happier:
 
 my @checks;
-
-check_minimum_version ('Math::BigInt::FastCalc' => 0.14);
-check_minimum_version ('Math::BigInt::GMP'	=> 1.21);
-check_minimum_version ('Math::BigInt::Pari'	=> 1.12);
-check_minimum_version ('Math::BigRat'		=> 0.20);
-check_minimum_version ('bignum' 		=> 0.21);
+check_minimum_version ('Math::BigInt::FastCalc' => 0.19);
+check_minimum_version ('Math::BigInt::GMP'	=> 1.24);
+check_minimum_version ('Math::BigInt::Pari'	=> 1.13);
+check_minimum_version ('Math::BigRat'		=> 0.22);
+check_minimum_version ('bignum' 		=> 0.22);
 
 if (@checks > 0)
   {
   print ("\n" . '*' x 70 . "\n Attention: After installing this package, you should also update:\n\n");
-  for my $need (@checks)
+  for my $n (@checks)
     {
-    my $name = $need->[0]; while (length($name) < 24) { $name .= ' '; }
-    print "  $name to at least v$need->[1]\t (you have v$need->[2])\n";
+    my $name = $n->[0]; while (length($name) < 24) { $name .= ' '; }
+    print "  $name to at least v$n->[1]\t (you have v$n->[2])\n";
     }
   print "\n";
   sleep(5);

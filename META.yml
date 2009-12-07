@@ -1,11 +1,11 @@
 ---
-abstract: Arbitrary size integer/float math package
+abstract: 'Arbitrary size integer/float math package'
 author:
   - 'Tels <nospam-abuse@bloodgate.com>'
 build_requires:
   Test::More: 0.62
 distribution_type: module
-generated_by: Module::Install version 0.68
+generated_by: 'Module::Install version 0.71'
 installdirs: perl
 license: perl
 meta-spec:
@@ -18,11 +18,11 @@ no_index:
     - inc
     - t
 recommends:
-  Math::BigInt::FastCalc: 0.14
-  Math::BigInt::GMP: 1.21
-  Math::BigInt::Pari: 1.12
-  Math::BigRat: 0.2
-  bignum: 0.21
+  Math::BigInt::FastCalc: 0.19
+  Math::BigInt::GMP: 1.24
+  Math::BigInt::Pari: 1.13
+  Math::BigRat: 0.22
+  bignum: 0.22
 requires:
-  perl: 5.6.0
-version: 1.88
+  perl: 5.006
+version: 1.89

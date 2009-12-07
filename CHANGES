@@ -513,6 +513,10 @@ Math::BigFloat:
  * add bpi(), bcos(), bsin(), batan(), batan2() methods
  * add bmuladd()
  * streamline the is_xxx() and copy() methods
+2008-04-20 v1.60 Tels
+ * fix #34459: bsqrt() breaks on floats with enough digits (Thanx Niko Tyni!)
+ * fix #35238: batan2() handles inf/+inf wrong
+ * fix #35162: MBI segfault (as_number(Math::BigRat()) was wrong)
  
 ############################################################################## 
 Math::BigInt:
@@ -958,6 +962,8 @@ Math::BigInt:
  * minimum required is Perl v5.6 (tested by zefram)
  * _find_round_parameters(), _scale_a() and _scale_p(): trunc A/P to integers
  * fix from_oct(), from_bin() and from_hex()
+2008-04-20 v1.89 Tels
+ * fix #35238: batan2() handles inf/+inf wrong
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
