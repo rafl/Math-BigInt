@@ -1,51 +1,40 @@
-This lists only the changes for the current release (v1.74) over the last
+This lists only the changes for the current release (v1.75) over the last
 version, since HISTORY is now quite big:
 
-Security Alert! This release fixes a possibility to trick Math::Big* into
-doing nasty things with eval. Upgrading to v1.74 is strongly recommended!
-
-Calc : small cleanups, remove some dead wood
-       shortcut for _div() with numbers of equal nr of parts (scales
-	much better than before)
-       inline is_zero() into _gcd() to make it slightly faster
-MBI  : streamline _scale_(a|p) as to not require accuracy/precicison()
-	and round_mode() unless nec.
-       remove the now unnec. support for MB_NEVER_ROUND and {_f}, this
-	makes all ops that call round() a tad faster (one exists is
-	removed) and shrinks the codesize a bit
-       streamline bneg(), inline is_zero(): makes it 1.6 times faster
-       replace ref($_[0]) w/ undef when it isn't actually needed. This
-	makes some ops (bsstr(), bneg etc) about 2% faster for small numbers
-       restrict low-level math library names to sane chars to avoid
-	exploitation of eval()
-       fill_can_cache() accidentily did checks for 'or' & 'xor'
-       inline fill_can_cache()
-       add _register_callback() to notify subclasses of lib changes
-       bgcd() is now about 10% faster
-       is_positive(0) == 0, since 0 is neither positive nor negative
-       load Exporter only if neccessary (e.g. "use Math::BigInt;" doesn't)
-MBF  : add bneg() and inline is_zero() in it, making it 1.6 times faster
-       replace ref($_[0]) w/ undef when it isn't actually needed. This
-	makes some ops (bsstr(), bneg etc) about 2% faster for small numbers
-       use _register_callback()
-       bgcd()/blcm() never worked, so fix them for integers and add tests
-misc : small doc cleanups
-tests: lib_load.t: test for _register_callback()
-       change inf_nan.t to use Test::More
+Calc : fix the shortcut for div() to always work properly 
+MBI  : use a trick to remove the dependency on Scalar::Util in bsub()
+       fix atan2(), it did not preserve the order of arguments
+	(Thanx to Ambros & Zaxo for report and patch!)
+       fix documentation about rounding
+MBF  : likewise remove dependecy on Scalar::Util in bdiv()
+       bdiv() cache result of "!$y->is_one()" for wantarray case to make
+	($res,$rem) = $x->bdiv($y); about 10% faster
+misc : 
+tests: for atan2() 
 
 ##############################################################################
 
-v1.73:
-9 x 21 / 6 x 21:      5s ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 13123/s (n=69688)
-9 x 99 / 6 x 99:      5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @  7095/s (n=37323)
-9 x 999 / 6 x 999:    5s ( 5.33 usr +  0.01 sys =  5.34 CPU) @  1358/s (n=7252)
-9 x 9999 / 6 x 9999:  6s ( 5.33 usr +  0.01 sys =  5.34 CPU) @   129/s (n=693)
+Math::BigInt v1.74
+$ $f->bdiv($f2):  5s ( 5.24 usr +  0.02 sys =  5.26 CPU) @  4354/s (n=22903)
+@ $f->bdiv($f2):  5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @  2529/s (n=13303)
+$f->bsub($f2):    5s ( 5.32 usr +  0.00 sys =  5.32 CPU) @ 11775/s (n=62643)
+$x->bsub($xi):    6s ( 5.28 usr +  0.01 sys =  5.29 CPU) @ 24141/s (n=127706)
 
-v1.74:
-9 x 21 / 6 x 21:      5s ( 5.26 usr +  0.01 sys =  5.27 CPU) @ 22910/s (n=120740)
-9 x 99 / 6 x 99:      5s ( 5.18 usr +  0.01 sys =  5.19 CPU) @ 21599/s (n=112102)
-9 x 999 / 6 x 999:    5s ( 5.22 usr +  0.00 sys =  5.22 CPU) @ 11552/s (n=60304)
-9 x 9999 / 6 x 9999:  6s ( 5.34 usr +  0.01 sys =  5.35 CPU) @  2178/s (n=11654)
+Math::BigInt v1.75
+$ $f->bdiv($f2):  5s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  4498/s (n=23751)
+@ $f->bdiv($f2):  6s ( 5.32 usr +  0.02 sys =  5.34 CPU) @  2826/s (n=15091)
+$f->bsub($f2):    5s ( 5.26 usr +  0.01 sys =  5.27 CPU) @ 11886/s (n=62643)
+$x->bsub($xi):    5s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 24371/s (n=127706)
+
+Special cases (we dont care about speed for them):
+
+Math::BigInt v1.74
+$f->bsub($f):     6s ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 30457/s (n=160815)
+$x->bsub($x):     5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 42162/s (n=221354)
+
+Math::BigInt v1.75
+$f->bsub($f):     6s ( 5.30 usr + -0.00 sys =  5.30 CPU) @ 30342/s (n=160815)
+$x->bsub($x):     5s ( 5.19 usr +  0.01 sys =  5.20 CPU) @ 41751/s (n=217107)
 
 ##############################################################################
 

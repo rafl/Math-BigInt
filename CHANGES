@@ -155,6 +155,8 @@ Math::BigInt::Calc:
 2005-01-01 v0.44 Tels
  * small cleanups
  * shortcut for numbers of same length in _div, where X > Y
+2005-03-20 v0.45 Tels
+ * fix the div() shortcut for short numbers to actually work
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -441,13 +443,17 @@ Math::BigFloat:
  * eliminate the need for _zeros() in new() (speed-up for GMP et. al.)
  * eliminate _is_zero() in new() (small speed up)
  * added shortcut for simple numbers in new() (speed up)
-2005-01-01 v0.48 Tels
+2005-01-01 v1.48 Tels
  * use new interface to _scale_a() and _scale_p() in BigInt
  * add bneg() and inline is_zero() in it, making it 1.6 times faster
  * replace ref($_[0]) w/ undef when it isn't actually needed. This
    makes some ops (bsstr(), bneg etc) about 2% faster for small numbers
  * use MBI::_register_callback() to get notified of lib changes
  * bgcd()/blcm() never worked, so fix them for integers and add tests
+2005-03-20 v1.49 Tels
+ * remove dependecy on Scalar::Util in bdiv()
+ * bdiv() cache result of "!$y->is_one()" for wantarray case to make
+   ($res,$rem) = $x->bdiv($y); about 10% faster
 
 ############################################################################## 
 Math::BigInt:
@@ -836,6 +842,10 @@ Math::BigInt:
  * is_positive(0) == 0, since 0 is neither positive nor negative
  * streamline bmod() a bit
  * fix blog() constructing arguments (broke Math::BigInt::Constant)
+2005-03-20 v1.75 Tels
+ * use a trick to remove the dependency on Scalar::Util in bsub()
+ * fix atan2(), it did not preserve the order of arguments
+   (Thanx to Ambros & Zaxo for report and patch!)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
