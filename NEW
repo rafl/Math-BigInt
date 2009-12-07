@@ -1,26 +1,70 @@
-This lists only the changes for the current release (v1.63) over the last
+This lists only the changes for the current release (v1.64) over the last
 version, since HISTORY is now quite big:
 
-MBI   : bsqrt() simulation would not modify $x but return a new object instead
-MBF   : bsqrt() would hang on certain inputs (limit was calculated wrong). So
-         we switch it to a completely different algorithmn using MBI bsqrt() 
-         to calculate the necc. digits based on the observation that
-         sqrt(x*y) == sqrt(x) * sqrt(y) and we can set y == 100. This makes it
-         also much faster (about factor 10).
-        bsqrt(0) would warn and round wrongly to 4 digits. Ditto for bpow,
-         blog and bdiv. It is now equivalent to bsqrt(undef).
-        removed needless "use File::Spec;"
-tests : some more tests for bsqrt() and fsqrt()
-        tests for $x->bsqrt(0)/$x->bpow(0) beeing equivalent to $x->bXXX(undef)
-	constant.t "no warnings 'portable'" instead of "local $^W = 0;"
+Calc : fix bug in new mul shortcut that used "* $RBASE" instead of "/ $MBASE"
+       document "$caught & 1 != 0" vs. "($caught & 1) != 0"
+       don't use "$i = $i % $MBASE", use "$i -= $car * $MBASE" (ARM failures)
+       removed the experimental LEN_CONVERT code since it wasn't used anyway
+       _div() now has shortcut for when $x == $y
+       _div() shortcut for $y > $x
+       _root() method (works only for small arguments for now)
+MBI  : removed needless "my $c = ...;" statements in binf() and bnan()
+       forgot () around "$x->{_f} & MB_NEVER_ROUND"
+       bsqrt(inf) == inf, not NaN
+       $x->bdiv($x) did not round the resulting 1 properly
+       removed the shortcut testcode in bdiv() (Calc handles this now)
+       added (non-working for now) broot() method
+       changed length() to CORE::length() in two places (thanx Liz!)
+       config() can take arguments and set them, croak on wrong ones
+       config(trap_nan => 1) to manipulate former $NaNOK variable
+       config(trap_inf => 1), too
+       trap_nan/trap_inf really croak on any attempt to create an NaN/inf
+       _find_rounding_parameters(): set $a to undef if it is 0
+MBF  : blog():
+       + MUCH faster when $x > 10 or $x < 0.1 (constant time vs.
+         time * 10 when doubling/halving $x)
+       + also much faster if $x has many digits (like 1/3 or 123**123)
+       + for $x < 1 and $x > 0 did not work at all (bacmp vs bcmp)
+       + returns now NaN if $base <= 0 or $base == 1
+       + does handle other bases than "undef" (aka e) properly now
+       require Math::BigFloat did not work (opposed to BigInt, where it does)
+       _pow() suffered the same bug of bacmp vs bcmp (so 0.2 ** 0.2 failed)
+       removed unused _pow2() routine
+       _find_round_parameters() returns ($x,$a,$p,$r) and not ($a,$p,$r), so
+        use it correctly, and also test for $x = NaN afterwards
+        (happens when $a and $p were set and thus $x became NaN)
+       bsqrt() failed since v1.63 for values like 0.2, 0.002, 0.00134 etc
+       added broot() method
+       $x->is_one('-') was broken (never returned true for $x == -1) 
+       config() can take arguments and set them, croak on wrong ones
+       config(trap_nan => 1) to manipulate former $NaNOK variable
+       config(trap_inf => 1), too
+       trap_nan/trap_inf really croak on any attempt to create an NaN/inf
+Misc : moved Scalar.pm to t/Math/BigInt/Scalar.pm to avoid installing it
+       BareCalc prints the used Calc version for better diags in tests
+       better doc for the $a = $b assignment problem
+       MBF: fixed synopsis section, added a SEE ALSO section
+       MBI: fixed SEE ALSO section
+       BigInt/Subclass.pm tracks given "lib => " arguments for testsuite
+       spelling Bigint => BigInt
+       updated TODO
+       MBF/MBI: documented root, other doc fixes and enhances
+tests: some more tests for blog()
+       test bsqrt(inf) and arguments like 0.2, 0.49, 1.23 etc
+       more tests for bdiv()
+       tests for MBF/MBI is_one('-')
+       req_mbf[.]\.t for testing "require BigFloat;"
+       use_mbfw.t for testing "use BigFloat lib => ..., with => ...;"
+       biglog.t for blog()/bpow() since they are too slow to be run 3 times
+       config.t also tests Math::BigFloat (oups) and setting of arguments
 
-Despite the new added tests the testsuite runs now about 15% faster due to the
-much improved bsqrt() algorithmn:
+Times for the testsuite of v1.63 vs. v1.64:
 
-AMD Athlon TBird 1Ghz: 
-
-v1.62 Files 27, tests 21053 45 secs (30.25 cusr +  0.60 csys = 30.85 CPU)
-v1.63 Files 27, Tests 21077 40 secs (26.05 cusr +  0.61 csys = 26.66 CPU)
+AMD Athlon 1Ghz:
+Files=27, Tests=21077,  39 s ( 24 cusr +   0 csys =  24 CPU) v1.63
+Files=35, Tests=21566,  42 s ( 27 cusr +   0 csys =  27 CPU) v1.64 eta
+Files=35, Tests=21908,  50 s ( 34 cusr +   1 csys =  35 CPU) v1.64 theta
+Files=36, Tests=22249,  55 s ( 39 cusr +   0 csys =  39 CPU) v1.64 kappa
 
 ###############################################################################
 

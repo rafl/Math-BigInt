@@ -4,6 +4,7 @@ General:
  * Copy on write (helps for $x = -$x; cases etc) (seems to make it slower :/
  * try to cash UNIVERSAL::can results, since $CALC shouldn't change (or even
    unset them when $CALC changes)
+ * run config() and die_on_nan() tests under Subclass.pm
 
 Math::BigFloat:
  * finish upgrading and downgrading
@@ -15,8 +16,10 @@ Math::BigFloat:
  * add $x->bint(), that returns only the integer part truncated
  * also add bfract() that returns just the fractional part
  * tests for frsft() and flsft() with $n != 2
- * blog() is dead slow, and doesn't work for bases != e (aka only ln() works)
- * bsqrt(): maybe optimize the diff-compare away?
+ * blog() is still quite slow for numbers with lots of decimals (8 seconds vs.
+   72 (or million years in v1.6 :) for log(123**123) is quite good, actually,
+   but still not good enough for me...)
+ * finish broot() by using different algorithmn
 
 Math::BigFloat::Constant:
  * really needed by someone out there?
@@ -26,7 +29,9 @@ Math::BigInt:
  * remove rounding overhead when no rounding is done, e.g. no $object has A nor
    P and neither of bround(), bround(), accuracy() or precision() was called
  * bround() is only used by MBF for -$scale = -$len, anyway. POD is wrong for
-   this, too.
+   this, too
+ * blog() needs implementing
+ * broot() needs implementing
  * +5 % 0 or -5 % 0 == NaN (should it be something else?)
  * certain shortcuts returning bzero(), bone() etc may not set the requested
    rounding parameters, so that $x->foo($y,$a,$p,$r) may return $x without a
@@ -49,12 +54,10 @@ following are pretty much ultra-low-priority:
 Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * look at div() for more speed
- * code a div() algorithmn for $y < $BASE (e.g. should be something linear)
  * alternative mul() method using shifts
  * find a way to let underlying lib calculate band(), bior(), bxor() for
    negative inputs
  * make converting between bases faster
- * add _modinv() for more speed
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

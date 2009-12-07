@@ -1,0 +1,91 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.15.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 f6ef98e8f3f6a4f670d569f279ef5a3c05c16d0c BENCHMARK
+SHA1 8d18cc8f80b681a4ad4efa0e37e4a0d0cb850487 BUGS
+SHA1 f5f23a0e89142ef1bde0122e4d408af47885d64e CHANGES
+SHA1 3cf3ac938436f3be74485d222c9af034bda0d3d7 CREDITS
+SHA1 bc2db74538d3acd53f71b5512a144fe18c253ecd GOALS
+SHA1 d63d1618203b35bb9339c74d07984b5e33c84ecd HISTORY
+SHA1 c42565ad26cdf91502bacf19a4f7080e63c51fe2 INSTALL
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 e7c8405afb5cb30fdbf0c078a375f66f35e1be7a MANIFEST
+SHA1 6f91d1f9464f77b28f29e85501edbe8c52607e7c Makefile.PL
+SHA1 d819e98de8bb04a57e8debb4133368f0bf93272e NEW
+SHA1 481f5827752d2100914db1eaeb60bf0bbd13529e README
+SHA1 4ef28ef84f5fe5e609a9165e89c3b50f8ead1afa TODO
+SHA1 c2bbe82659480de8710b9e64a62d47b64dddd2d2 examples/1000.txt
+SHA1 b88700764a8b78c904ed38e50db0286b76228132 examples/bigprimes.pl
+SHA1 b57b118469a1a16e54d61206c5bd9077dbb2231a examples/hailstone.pl
+SHA1 8ca42793d8769ec8d0928f11c30f38d96dd54efb examples/prime.pl
+SHA1 65efef8c7e83e1ffdde91d15122bcc7e82d8e034 lib/Math/BigFloat.pm
+SHA1 bba4ff8907692945a4ace0ac34884e8621f34623 lib/Math/BigInt.pm
+SHA1 5b43edb3be332869cb76d7cb770fd1b9ae59c144 lib/Math/BigInt/Calc.pm
+SHA1 b95b155899fdd87e89c9f328d934a9685048ae54 t/Math/BigFloat/Subclass.pm
+SHA1 985096b28aa5bb61d55b78395db5e3147a6e09da t/Math/BigInt/BareCalc.pm
+SHA1 acc29724a937598608555f61c059b06e1791e0fc t/Math/BigInt/Scalar.pm
+SHA1 3976f800de5362a313722619d0427c3ab7e749c8 t/Math/BigInt/Subclass.pm
+SHA1 50ef7cb1d501f0f660bceafea801ebff0152db80 t/bare_mbf.t
+SHA1 a53fda71dcd6d7bb330a1bc1758be660bedbb324 t/bare_mbi.t
+SHA1 12da5e811355abca64b9c14416fe356110d6fb4e t/bare_mif.t
+SHA1 abb95b16630d36b28d32149f10d48064495a41e4 t/bigfltpm.inc
+SHA1 fb5b183bb0807489ada1e496e0a4fa75c9ab7fd6 t/bigfltpm.t
+SHA1 bd230a968b451c1046c0aa717a2b28ed56269c44 t/bigintc.t
+SHA1 8e3587329c1e64c2b1d4708893234a562bd66c5a t/bigintpm.inc
+SHA1 4ae65be00b5e42e9a5f7066c79325a82799a6e70 t/bigintpm.t
+SHA1 a92f1c995c1c65495ee86d6b9a609241a2cdd581 t/bigints.t
+SHA1 9479a1cd5c605fe6ea74398bc5f1a197319d43e2 t/biglog.t
+SHA1 0abbba67014fa0490d73ba71dfa53e66255dca73 t/calling.t
+SHA1 f4c9f57b6565efb24e3b9e509eedeaa05e663727 t/config.t
+SHA1 89afac8e40767dfaefb63ac168dfc6d4a8fa62c3 t/constant.t
+SHA1 06a61b0960baf481dea5f3933976a2144fcddede t/downgrade.t
+SHA1 6ff1c0440baac5d1d5acceac3993fd8edc746568 t/inf_nan.t
+SHA1 a934776dbb5f9d283280ee3daf8266fca40ba883 t/isa.t
+SHA1 6e5ff51d2bf02012732256f90bae8720cd042c8b t/mbi_rand.t
+SHA1 d85d871eb20f530b259ac43fdbe2ceb30ac37abd t/mbimbf.inc
+SHA1 6328532738485bdafb1b15fcf50659a7cc29a870 t/mbimbf.t
+SHA1 498b9620f19c1af3fd0f5ac40ca450ea16b03c4a t/req_mbf0.t
+SHA1 2bf1114ec69ce1e93780e5c5d404c92993a5f897 t/req_mbf1.t
+SHA1 a9217f3f0a916306d4f5266df13543bef32b78fa t/req_mbfa.t
+SHA1 43cb24fd2d6deb26f0caf9bf059b4ba7a7913cec t/req_mbfi.t
+SHA1 2ba7ca978b42eab85be6d937f119d10c92cb7c36 t/req_mbfn.t
+SHA1 5213caedd519e90de47e1110b76c611234c58856 t/req_mbfw.t
+SHA1 df2253458d6ad0d6dd41dc5e4c580be281a97bfd t/require.t
+SHA1 f83eea56dee174969f6624c1610b7c4bd141fc2a t/sub_mbf.t
+SHA1 bb79ac833084d03e44ca3ac15593f1c548b7040e t/sub_mbi.t
+SHA1 6babed8db201933c83089118593fa85440ef9e66 t/sub_mif.t
+SHA1 e4601e56140543350cb6c39ac6817620659739c7 t/trap.t
+SHA1 fb7e4e3e1448bd262ada41a98fe8b7dd58d1e5f8 t/upgrade.inc
+SHA1 9d7097e03ae248135695a06ffb3a702bbdb88043 t/upgrade.t
+SHA1 c34129bfb8e09fda7d281318fbfb4a950662bd29 t/upgradef.t
+SHA1 07c523d2ad4b789f5d1fad249d5e1e035ad3e3b7 t/use.t
+SHA1 324cecc6cc1e0ba6671bab0ee50c5be9bd5f07c4 t/use_lib1.t
+SHA1 f26a6159fcfacc3f8790497fdbac617cb5251016 t/use_lib2.t
+SHA1 690d52cb871750588441dc8c01338aa4a99d14b9 t/use_lib3.t
+SHA1 f82f3ff530c0f4863475b6888863597ec656f960 t/use_lib4.t
+SHA1 451a0c2b3c374c0da68f47d8790117a6032968c8 t/use_mbfw.t
+SHA1 93efb7d6b2d9bce07ab029f678e9cff5be7d934b t/with_sub.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.6 (GNU/Linux)
+Comment: When cryptography is outlawed, bayl bhgynjf jvyy unir cevinpl.
+
+iQEVAwUBPcVmGXcLPEOTuEwVAQG9Dgf+J/zKHPbJcTz/y5+PUTDQxP2/1rcsXiOw
+PHO6YAF148THeqHzal8j7+syPEAjSAVzQhF5Izb44FgnR9YyTzjeepwv8CGSoIp0
+GpzVvtEs6rA9y5FMCDPOn/s9YfxMAAD3LMKXR12KC4rZ7kP94qd824eO+8N2jpJy
+Y9chy0pw6IYLv6pdKQFFHVxegKJHTwTyuljLESvv1ZKQTET+0Cyxm2a0HXqZum/z
+Ev7iF6SpN8Z/dKHpkU+elLByGzzN0J9naRCXCYV/yq8eCsRQkvqN6bc8o6jPkhbq
+OAdEJKQYC7s/3Ffe9jnwPm1e4B1MlQ6iCavN9oHEweVr3W1xMdJeBQ==
+=+UU1
+-----END PGP SIGNATURE-----

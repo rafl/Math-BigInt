@@ -1,12 +1,13 @@
-CHANGES
+CHANGES				# changes from the original v0.01
 BENCHMARK
 BUGS
 GOALS
-HISTORY
+HISTORY				# detailed version history
 INSTALL
 README
 LICENSE
 MANIFEST
+SIGNATURE
 NEW
 CREDITS
 TODO
@@ -17,7 +18,6 @@ examples/bigprimes.pl
 examples/1000.txt
 lib/Math/BigInt.pm
 lib/Math/BigInt/Calc.pm
-lib/Math/BigInt/Scalar.pm
 lib/Math/BigFloat.pm
 t/mbimbf.inc			# test accuracy/precision settings in MBI/MBF
 t/mbimbf.t			# test A & P with MBI/MBF
@@ -31,20 +31,29 @@ t/bigintpm.inc			# contains actual tests for MBI
 t/calling.t			# ensure that Class->method('string') works
 t/sub_mbi.t			# empty subclass test for M::BI
 t/sub_mbf.t			# empty subclass test for M::BF
+t/biglog.t			# test the log function
 t/bare_mbi.t			# test Math::BigInt's simulation of Calc
 t/bare_mbf.t			# test Math::BigInt's sim of Calc via BigFloat
 t/bare_mif.t			# Rounding tests under BareCalc
 t/require.t			# test: require Math::BigInt;
+t/req_mbfa.t			# test: require Math::BigFloat; ->bnan();
+t/req_mbf0.t			# test: require Math::BigFloat; ->bzero();
+t/req_mbf1.t			# test: require Math::BigFloat; ->bone();
+t/req_mbfi.t			# test: require Math::BigFloat; ->binf();
+t/req_mbfn.t			# test: require Math::BigFloat; ->new();
+t/req_mbfw.t			# require Math::BigFloat; import ( with => );
 t/use.t				# test: use Math::BigInt();
 t/use_lib1.t			# test various use combos of MBI and MBF w/ lib
 t/use_lib2.t			# test various use combos of MBI and MBF w/ lib
 t/use_lib3.t			# test various use combos of MBI and MBF w/ lib
 t/use_lib4.t			# test various use combos of MBI and MBF w/ lib
+t/use_mbfw.t			# use BigFloat w/ with and lib at the same time
 t/upgrade.t			# see if upgrading in BigInt works
 t/upgradef.t			# see if upgrading in BigFloat works
 t/downgrade.t			# see if downgrading works
 t/constant.t			# test Math::BigInt/BigFloat ':constant'
 t/config.t			# test Math::BigInt->config()
+t/trap.t			# test whether trap_nan and trap_inf works
 t/inf_nan.t			# inf and NaN handling
 t/isa.t				# isa() and new() w/ mixed classes tests
 t/upgrade.inc			# actual tests for upgrading
@@ -53,3 +62,4 @@ t/with_sub.t			# test Math::BigFloat with => 'package'
 t/Math/BigInt/BareCalc.pm	# for testing BigInt's simulation of Calc
 t/Math/BigInt/Subclass.pm	# empty subclass
 t/Math/BigFloat/Subclass.pm	# empty subclass
+t/Math/BigInt/Scalar.pm		# to test replacements for Math::BigInt::Calc

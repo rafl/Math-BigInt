@@ -2,9 +2,8 @@ Rewrite project of Math::BigInt, Math::BigFloat.
 
 (C) Copyright ..--- ----- ----- .---- - ..--- by - . .-.. ... .-.-.-
 
-This package contains new versions of Math::BigInt and Math::BigFloat,
-so please do NOT make 'make install', except when you do no longer want your
-old modules or know what you are doing.
+This package contains completely rewritten versions of Math::BigInt and
+Math::BigFloat.
 
 To test, unzip & untar package, then run
 

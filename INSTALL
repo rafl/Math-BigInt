@@ -2,10 +2,11 @@ Rewrite project of Math::Big*
 
 (C) Copyright ..--- ----- ----- .---- - ..--- by - . .-.. ... .-.-.-
 
-Contains new version of Math::BigInt and Math::bigFloat, so please do NOT
-make 'make install', except when you do no longer want your old Math::BigInt
-or know what you are doing. This rewritten version is mainly compatible, minus
-some bugfixes, and more feature and more speed.
+Contains new version of Math::BigInt and Math::BigFloat as they are in the
+Perl core from v5.8.0 onwards.
+
+This rewritten version is mainly compatible, minus some bugfixes, and more
+features and speed.
 
 To test, unzip & untar package, then run
 
@@ -15,10 +16,10 @@ To test, unzip & untar package, then run
 	make install		# as root
 
 These modules should be installed automatically into the Perl core, and not
-into site-perl.
-You can check whether you get the old or new versions by doing this:
+into site-perl. You can check whether you get the old or new versions by doing
+this:
 
-	perl -MMath::BigInt -e'print "v".$Math::BigInt::VERSION,"\n";'
+	perl -MMath::BigInt -le 'print "v$Math::BigInt::VERSION"'
 
 If it prints undef or v0.01 you still got the old version. Delete the files
 from the Perl core installation path manually, and make sure that you 

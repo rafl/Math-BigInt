@@ -91,6 +91,15 @@ Math::BigInt::Calc:
  * fixed bug in _rsft() that did not set result to 0 in some cases
  * _modinv() now works, thanx to the all-positive algorithmn
  * much more tests in bigintc.t (taken over from FastCalc)
+2002-09-09 v0.33 Tels
+ * _fac() keep $n as scalar if possible
+ * test for when to USE_MUL or not was inverted
+ * _mul() is about 6 times faster if $y is small and $x is big
+2002-09-27 v0.34 Tels
+ * fixed bug in mul_use_div() shortcut that used * $RBASE instead of / $MBASE
+ * $caught & 1 != 0 vs ($caught & 1) != 0 (changed to $caught != 2)
+ * $i %= $MBASE does not work on ARM (v5.003), so make it $i -= $car * $MBASE
+ * removed unused LEN_CONVERT code (smaller memory footprint)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -292,6 +301,31 @@ Math::BigFloat:
    instead of beeing equivalent to $x->bsqrt(undef)
  * ditto for $x->bpow($y,0), $x->blog($base,0) and $x->bdiv($y,0)
  * use File::Spec was needless, since it was required later on again
+2002-11-03 v1.39 Tels
+ * $x->bpow($y,0), $x->blog($base,0) and $x->bdiv($y,0) were still not doing
+    the right thing and no tests caught it *sigh*
+ * blog():
+   + MUCH faster when $x > 10 or $x < 0.1 (constant time vs.
+     time * 10 when doubling/halving $x)
+   + also much faster if $x has many digits (like 1/3 or 123**123)
+   + for $x < 1 and $x > 0 did not work at all (bacmp vs bcmp)
+   + returns now NaN if $base <= 0 or $base == 1
+   + does handle other bases than "undef" (aka e) properly now
+ * require Math::BigFloat did not work (opposed to BigInt, where it does)
+ * _pow() suffered the same bug of bacmp vs bcmp (so 0.2 ** 0.2 failed)
+ * removed unused _pow2() routine
+ * _find_round_parameters() returns ($x,$a,$p,$r) and not ($a,$p,$r), so
+   use it correctly, and also test for $x = NaN afterwards
+  (happens when $a and $p were set and thus $x became NaN)
+ * bsqrt() failed since v1.63 for values like 0.2, 0.002, 0.00134 etc
+ * added broot() method (albeit slow for now)
+ * $x->is_one('-') was broken (never returned true for $x == -1)
+ * config() can take arguments and set them, croak on wrong ones
+ * config(trap_nan => 1) to manipulate former $NaNOK variable
+ * config(trap_inf => 1), too
+ * trap_nan/trap_inf really croak on any attempt to create an NaN/inf
+ * spellings of Bigint => BigInt
+ * simplify config() by using SUPER::config()
 
 ############################################################################## 
 Math::BigInt:
@@ -580,6 +614,20 @@ Math::BigInt:
  * bsqrt() did not modify $x but returned new object when lib does not have
    a _sqrt() routine (BareCalc, BitVect and Pari are affected, Calc, FastCalc
    and GMP were not)
+2002-11-03 v1.64 Tels
+ * removed needless "my $c = ...;" statements in binf() and bnan()
+ * forgot () around "$x->{_f} & MB_NEVER_ROUND"
+ * bsqrt(inf) == inf, not NaN
+ * $x->bdiv($x) did not round the resulting 1 properly
+ * removed the shortcut testcode in bdiv() (Calc handles this now)
+ * added (non-working for now) broot() method
+ * changed length() to CORE::length() in two places (thanx Liz!)
+ * config() can take arguments and set them, croak on wrong ones
+ * config(trap_nan => 1) to manipulate former $NaNOK variable
+ * config(trap_inf => 1), too
+ * trap_nan/trap_inf really croak on any attempt to create an NaN/inf
+ * spellings of Bigint => BigInt
+ * _find_rounding_parameters(): set $a to undef if it is 0
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

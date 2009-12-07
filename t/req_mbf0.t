@@ -1,20 +1,21 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w 
 
-use Test;
+# check that simple requiring BigFloat and then bzero() works
+
 use strict;
+use Test;
 
 BEGIN
   {
   $| = 1;
   # to locate the testing files
-  my $location = $0; $location =~ s/bare_mbf.t//i;
-  print "$0\n";
+  my $location = $0; $location =~ s/req_mbf0.t//i;
   if ($ENV{PERL_CORE})
     {
     # testing with the core distribution
     @INC = qw(../t/lib);
     }
-  unshift @INC, '../lib';
+  unshift @INC, qw(../lib);     # to locate the modules
   if (-d 't')
     {
     chdir 't';
@@ -27,13 +28,10 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 1745;
-  }
+  plan tests => 1;
+  } 
 
-use Math::BigFloat lib => 'BareCalc';
+require Math::BigFloat; my $x = Math::BigFloat->bzero(); ok ($x,0);
 
-use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup $CL);
-$class = "Math::BigFloat";
-$CL = "Math::BigInt::BareCalc";
-   
-require 'bigfltpm.inc';	# all tests here for sharing
+# all tests done
+
