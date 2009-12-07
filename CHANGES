@@ -163,9 +163,13 @@ Math::BigInt::Calc:
  * remove shortcut in div(), it wasn't working properly
 2007-01-27 v0.48 Tels
  * support for octal numbers
-2007-04-16 v1.55 Tels
+2007-04-16 v0.49 Tels
  * API version 2.0 support: add _1ex(), _alen()
  * make _fac() about twice as fast
+2007-05-05 v0.50 Tels
+ * speed up _mul() by "use integer;"
+ * we do not need to remove zeros after mul()
+ * implement an alternative algorithm for _fac()
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -495,6 +499,10 @@ Math::BigFloat:
  * make bexp() much faster (esp. under GMP) by caching the first coefficients
    and rewriting the inner loop
  * support "try" and "only" in import()
+2007-05-05 v1.57 Tels
+ * add bnok() method (n over k)
+2007-05-05 v1.57 Tels
+ * add all the missing modify() hooks
 
 ############################################################################## 
 Math::BigInt:
@@ -920,6 +928,10 @@ Math::BigInt:
  * fix documentation that blsft() and brsft() default to base 2 (not 10)
  * add bexp() and fix overloading for exp()
 2007-04-16 v1.83 Tels
+ * bump version
+2007-05-04 v1.84 Tels
+ * add bnok() method (n over k)
+2007-05-05 v1.85 Tels
  * bump version
 
 Please send me test-reports, your experiences with this and your ideas - I love

@@ -12,7 +12,7 @@ package Math::BigFloat;
 #   _a	: accuracy
 #   _p	: precision
 
-$VERSION = '1.56';
+$VERSION = '1.57';
 require 5.006002;
 
 require Exporter;
@@ -599,6 +599,8 @@ sub badd
     {
     ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
     }
+ 
+  return $x if $x->modify('badd');
 
   # inf and NaN handling
   if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/))
@@ -676,6 +678,8 @@ sub binc
   # increment arg by one
   my ($self,$x,@r) = ref($_[0]) ? (ref($_[0]),@_) : objectify(1,@_);
 
+  return $x if $x->modify('binc');
+
   if ($x->{_es} eq '-')
     {
     return $x->badd($self->bone(),@r);	#  digits after dot
@@ -710,6 +714,8 @@ sub bdec
   {
   # decrement arg by one
   my ($self,$x,@r) = ref($_[0]) ? (ref($_[0]),@_) : objectify(1,@_);
+
+  return $x if $x->modify('bdec');
 
   if ($x->{_es} eq '-')
     {
@@ -747,6 +753,8 @@ sub DEBUG () { 0; }
 sub blog
   {
   my ($self,$x,$base,$a,$p,$r) = ref($_[0]) ? (ref($_[0]),@_) : objectify(1,@_);
+
+  return $x if $x->modify('blog');
 
   # $base > 0, $base != 1; if $base == undef default to $base == e
   # $x >= 0
@@ -920,6 +928,8 @@ sub bnok
     ($self,$x,$y,@r) = objectify(2,@_);
     }
 
+  return $x if $x->modify('bnok');
+
   return $x->bnan() if $x->is_nan() || $y->is_nan();
   return $x->binf() if $x->is_inf();
 
@@ -937,6 +947,8 @@ sub bexp
   {
   # Calculate e ** X (Euler's number to the power of X)
   my ($self,$x,$a,$p,$r) = ref($_[0]) ? (ref($_[0]),@_) : objectify(1,@_);
+
+  return $x if $x->modify('bexp');
 
   return $x->binf() if $x->{sign} eq '+inf';
   return $x->bzero() if $x->{sign} eq '-inf';
@@ -1548,6 +1560,8 @@ sub bmul
     ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
     }
 
+  return $x if $x->modify('bmul');
+
   return $x->bnan() if (($x->{sign} eq $nan) || ($y->{sign} eq $nan));
 
   # inf handling
@@ -1588,6 +1602,8 @@ sub bdiv
     {
     ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
     }
+
+  return $x if $x->modify('bdiv');
 
   return $self->_div_inf($x,$y)
    if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/) || $y->is_zero());
@@ -1724,6 +1740,8 @@ sub bmod
     ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
     }
 
+  return $x if $x->modify('bmod');
+
   # handle NaN, inf, -inf
   if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/))
     {
@@ -1818,6 +1836,8 @@ sub broot
     {
     ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
     }
+
+  return $x if $x->modify('broot');
 
   # NaN handling: $x ** 1/0, x or y NaN, or y inf/-inf or y == 0
   return $x->bnan() if $x->{sign} !~ /^\+/ || $y->is_zero() ||
@@ -1942,6 +1962,8 @@ sub bsqrt
   { 
   # calculate square root
   my ($self,$x,$a,$p,$r) = ref($_[0]) ? (ref($_[0]),@_) : objectify(1,@_);
+
+  return $x if $x->modify('bsqrt');
 
   return $x->bnan() if $x->{sign} !~ /^[+]/;	# NaN, -inf or < 0
   return $x if $x->{sign} eq '+inf';		# sqrt(inf) == inf
@@ -2112,7 +2134,9 @@ sub bfac
   # objectify is costly, so avoid it
   ($self,$x,@r) = objectify(1,@_) if !ref($x);
 
- return $x if $x->{sign} eq '+inf';	# inf => inf
+  # inf => inf
+  return $x if $x->modify('bfac') || $x->{sign} eq '+inf';	
+
   return $x->bnan() 
     if (($x->{sign} ne '+') ||		# inf, NaN, <0 etc => NaN
      ($x->{_es} ne '+'));		# digits after dot?
@@ -2242,6 +2266,8 @@ sub bpow
     {
     ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
     }
+
+  return $x if $x->modify('bpow');
 
   return $x->bnan() if $x->{sign} eq $nan || $y->{sign} eq $nan;
   return $x if $x->{sign} =~ /^[+-]inf$/;
@@ -2805,6 +2831,8 @@ sub as_number
   {
   # return copy as a bigint representation of this BigFloat number
   my ($self,$x) = ref($_[0]) ? (ref($_[0]),$_[0]) : objectify(1,@_);
+
+  return $x if $x->modify('as_number');
 
   my $z = $MBI->_copy($x->{_m});
   if ($x->{_es} eq '-')			# < 0

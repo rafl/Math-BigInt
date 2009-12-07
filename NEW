@@ -1,76 +1,7 @@
 This lists only the changes for the current release over the last version,
 since HISTORY is now quite big:
 
-* Calc: _mul() does not need __strip_zeros() afterwards
-* Calc: _mul() can "use integer;" for about 10% more speed with huge numbers
-* implement an alternative algorithmn for _fac(),making bfac(N) faster for N
-  between about 15 and 10000
-* make 1->bexp() work under "use bigint" (e.g. when BigFloat was not loaded)
-* add bnok() method (n over k)
- 
-Benchmark results for bfac(), done under/with:
-
-  Perl v5.8.8 (64 bit, threading)
-  AMD Athlon 64 3800+
-
-Benchmark: running bfac(10), bfac(100), bfac(1000), bfac(10000), bfac(15), bfac(50),
-           bfac(500), bfac(5000) for at least 5 CPU seconds...
-  bfac(10) :  6s ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 41925/s    (n=221364)
-  bfac(15) :  6s ( 5.25 usr +  0.00 sys =  5.25 CPU) @ 22539/s    (n=118333)
-  bfac(50) :  5s ( 5.32 usr +  0.00 sys =  5.32 CPU) @  7419/s    (n=39470)
- bfac(100) :  5s ( 5.33 usr +  0.00 sys =  5.33 CPU) @  2186/s    (n=11654)
- bfac(500) :  5s ( 5.30 usr +  0.00 sys =  5.30 CPU) @    89/s    (n=473)
-bfac(1000) :  5s ( 5.12 usr +  0.00 sys =  5.12 CPU) @    20/s    (n=106)
-bfac(5000) :  5s ( 5.00 usr +  0.00 sys =  5.00 CPU) @     0.40/s (n=2)
-            (warning: too few iterations for a reliable count)
-bfac(10000): 13s (12.82 usr +  0.16 sys = 12.98 CPU) @     0.08/s (n=1)
-            (warning: too few iterations for a reliable count)
-
-Benchmark: running bfac(10), bfac(100), bfac(1000), bfac(10000), bfac(15), bfac(50),
-           bfac(500), bfac(5000) for at least 5 CPU seconds...
-  bfac(10) :  3s ( 3.14 usr +  0.00 sys =  3.14 CPU) @ 40447/s    (n=127004)
-  bfac(15) :  3s ( 3.11 usr +  0.00 sys =  3.11 CPU) @ 22687/s    (n=70559)
-  bfac(50) :  3s ( 3.17 usr +  0.01 sys =  3.18 CPU) @  8065/s    (n=25648)
- bfac(100) :  4s ( 3.20 usr +  0.00 sys =  3.20 CPU) @  3306/s    (n=10582)
- bfac(500) :  4s ( 3.18 usr +  0.00 sys =  3.18 CPU) @   101/s    (n=324)
-bfac(1000) :  3s ( 3.09 usr +  0.04 sys =  3.13 CPU) @    23/s    (n=74)
-bfac(5000) :  4s ( 3.91 usr +  0.00 sys =  3.91 CPU) @     0.77/s (n=3)
-            (warning: too few iterations for a reliable count)
-bfac(10000): 10s (10.00 usr +  0.00 sys = 10.00 CPU) @     0.10/s (n=1)
-            (warning: too few iterations for a reliable count)
-
-Benchmark results for bexp(), done under/with:
-
-  Perl v5.8.8 (64 bit, threading)
-  GMP 4.1.7 (see note below)
-  gcc 4.1.0
-  AMD Athlon 64 3800+
-
-Times in seconds for 1->bexp(N) or euler(1,N) in case of Math::Big:
-
-         |  M::Big  M::Big   M::BI  M::BI   M::BI  M::BI  M::BI
-         |   v1.11   v1.11   v1.82  v1.82   v1.83  v1.83  v1.84
-         |    Calc     GMP    Calc    GMP    Calc    GMP   Calc
- --------+-------------------------------------------------------
-     100 |     0.3     0.2     0.1    0.1     0.1    0.1
-    1000 |     8.8     0.5     0.2    0.1     0.2    0.1
-    2000 |    54.4     1.2     0.4    0.1     0.3    0.1
-    5000 |             8.8     1.9    0.1     1.6    0.1
-   10000 |            45.5     6.7    0.2     6.0    0.1
-   20000 |                    26.8    0.2    24.3    0.2    21.1
-   25000 |                    45.8    0.2    38.0    0.2    33.7
-   50000 |                   156.0    0.4   148.0    0.3   133.8
-  100000 |                            1.0            0.4
-  200000 |                            3.3            1.3
-  500000 |                           16.0            6.7
- 1000000 |                           61.1           23.1
- 2000000 |                                          98.3
- 5000000 |                              *                   * See note below:
-
-Note: GMP 4.2.x would be required to compute bexp(5000000) under Math::BigInt
-      v1.82 due to a segmentation fault in GMP 4.1.7 when constructing
-      1E5000000 as the limit. Math::BigInt 1.83 works differently and thus
-      works with GMP 4.1.x and GMP 4.2.x, albeit still very slow.
+* add all the missing modify() hooks in BigFloat
 
 ##############################################################################
 
