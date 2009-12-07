@@ -33,6 +33,7 @@ t/sub_mbi.t			# empty subclass test for M::BI
 t/sub_mbf.t			# empty subclass test for M::BF
 t/bare_mbi.t			# test Math::BigInt's simulation of Calc
 t/bare_mbf.t			# test Math::BigInt's sim of Calc via BigFloat
+t/bare_mif.t			# Rounding tests under BareCalc
 t/require.t			# test: require Math::BigInt;
 t/use.t				# test: use Math::BigInt();
 t/use_lib1.t			# test various use combos of MBI and MBF w/ lib

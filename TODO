@@ -12,7 +12,8 @@ Math::BigFloat:
  * do not reduce numbers in new(), rather do it in anything that outputs it
    like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
    number after each op is slow with a binary core math lib like BitVect.
- * ?? add $x->bint(), that rounds with 'trunc' to an integer ??
+ * add $x->bint(), that returns only the integer part truncated
+ * also add bfract() that returns just the fractional part
  * tests for frsft() and flsft() with $n != 2
  * blog() is dead slow, and doesn't work for bases != e (aka only ln() works)
  * bsqrt(): maybe optimize the diff-compare away?

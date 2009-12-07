@@ -104,47 +104,47 @@ Math::BigInt::Scalar:
 ############################################################################## 
 Math::BigFloat:
 
-2000-02-18 1.00: started work
-2000-02-22 1.01: new() and bstr() work now (sort of)
-2000-02-24 1.02: add()/sub() should work now
-2000-03-06 1.03: layed more foundations (mul() etc)
-2000-03-27 1.04: bmul/bdiv/cmp work now, better _norm()
-2000-03-31 1.05: fixed bstr() and bsstr()
+2001-02-18 1.00: started work
+2001-02-22 1.01: new() and bstr() work now (sort of)
+2001-02-24 1.02: add()/sub() should work now
+2001-03-06 1.03: layed more foundations (mul() etc)
+2001-03-27 1.04: bmul/bdiv/cmp work now, better _norm()
+2001-03-31 1.05: fixed bstr() and bsstr()
 	         added AUTOLOAD for fxxx() to work as well as bxxx()
 		 enhanced and fixed testsuite for mul/cmp/add/new
-2000-04-05 1.06: bstr() returns NaN for NaN's
+2001-04-05 1.06: bstr() returns NaN for NaN's
 		 renamed _norm to bnorm, added it to AUTOLOAD for compatibility
 		 fixed bug Math::BigFloat->new(Math::BigInt->new(3));
 		 bug mul/div when second arg was BigInt
 		 bdiv() works now with precision
 		 precision()
 		 doc about mixing different objects in overloaded math
-2000-04-07 1.07: bug in bstr() for 0.xxx style numbers, as well as for "-xxx"
+2001-04-07 1.07: bug in bstr() for 0.xxx style numbers, as well as for "-xxx"
 		 babs(), bneg(), bint() work now
 		 empty stubs for bsqrt(), bround() and bmod()
 		 exponent(), mantissa(), parts() work now as expected
-2000-04-18 1.08: exponent(), mantissa() and parts() now return BigInt's
+2001-04-18 1.08: exponent(), mantissa() and parts() now return BigInt's
 		 bnorm: 0Ey => 0E1 (was wrongly 0E0)
 		 fixed is_zero()
 		 added bround() and bfround() (only truncate mode)
                  fixed bug in bstr() for 1.203E-2 style numbers (Thanx Tom!)
-2000-04-23 1.09: length() in list context return length of mantissa & exponent
+2001-04-23 1.09: length() in list context return length of mantissa & exponent
 		 bug in bstr() for '0.x' style strings
 		 added bsqrt()
 		 workaround for Perl v5.6.0 overload-bool bug (via MBI)
                  fixed rounding
-2000-05-07 1.10: Tom's round fixes (minus one nit)
+2001-05-07 1.10: Tom's round fixes (minus one nit)
  		 new: .xxx, -.xxx, +.xxx etc are valid inputs, while
                  '.', 'x x x' and 'Exxx' are now invalid
                  finally got rid of C&P of overload section and clone()
-2000-05-09 1.11: bug bcmp() (1e-08 was < 0, aka fractions were broken)
-2000-05-11 1.12 Tels
+2001-05-09 1.11: bug bcmp() (1e-08 was < 0, aka fractions were broken)
+2001-05-11 1.12 Tels
  * taken over testsuite from John P.
  * added tests for compare with fraction
  * fixed fcmp/fround/ffround
  * added accuracy/precision/fallback/round_mode
  * bsstr('NaN') returned 'NaNeNaN'
-2000-06-09 1.13 Tels:
+2001-06-09 1.13 Tels:
  * adjusted fdiv() so that it now works proper with old testcases
  * (except a few nits, see testsuite and ACCURACY)
  * fdiv() in listmode (uses non-working fmod())
@@ -153,7 +153,7 @@ Math::BigFloat:
  * fixed fpow(), added tests for it
  * hexadecimal integer input (0xdeadbeef)
  * is_one() for -1 was wrongly true, tests for is_one()
-2000-06-13 1.14 Tels:
+2001-06-13 1.14 Tels:
  * accuracy/precision rounding after fdiv() was missing
  * binary integer input (0b01110 etc)
  * A/P rounding after fdiv() was missing
@@ -260,6 +260,13 @@ Math::BigFloat:
  * import() fixed for older Perls
 2002-06-10 v1.34 Tels
  * upgrade used badd() instead of bmul() inside bmul() (again! arg!)
+2002-07-07 v1.35 Tels
+ * bfround() used accidentily BigInt math; is now about 5.6 times faster for
+   small numbers
+ * bdiv()/badd() etc skip objectify() if possible and are thus faster
+ * doc for accuracy()/precision()
+ * $x->bmod() was not modifying $x in place when returning NaN/inf/-inf
+ * avoid unecc. calls to objectify() for binary op's
 
 ############################################################################## 
 Math::BigInt:
@@ -289,7 +296,7 @@ Math::BigInt:
  fixed bug in bmul (and thus bpow) (self multiply works now)
 2000-11-24 v1.10 Tels
  finally made it Math::BigInt (w/o trailing 's')
-2001-02-14 v1.11 Tels
+2001-02-14 v1.11 Tels (first release)
  * fixed bug in band(), bxor(), etc that used badd($x, fixed_number_here);
  * since subclasses might not be happy with fixed numbers, make sure we pass
    BigInts all the time if using something like $someclass->badd();
@@ -522,6 +529,18 @@ Math::BigInt:
  * pod fixes for bmodpow()/bmodinv()
  * fix in as_hex() and as_bin() for older Perls
  * speedups in bpow(), bmodin() and bmodpow()
+2002-07-07 v1.60 Tels
+ * shortcuts to avoid calls to objectify for add/sub/mul/div/mod/pow/bcmp etc
+ * fix overloaded bcmp() so that the obectify()-avoidance kicks in
+ * avoid calling round() when BigFloat requested 'no rounding please'
+ * bcmp()'s shortcut for comparing x <=> 0, 0 <=> 0, 0 <=> $y was making things
+   slower than just handing the compare to Calc. Even more so for Pari et al.
+ * $x->acuracy() and $x->precision() returned undef, instead of 0 if
+   A/P of $x was 0 and global A/P was undef.
+ * $x->bmod() did not modify $x in place when returning NaN/inf/-inf
+ * some binary ops (band/bxor/bior/bpow) were not properly rounding the result
+   to the requested A/P/R; the same ops also forgot to take $y into account
+ * doc for accuracy()/precision()
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

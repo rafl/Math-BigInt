@@ -14,6 +14,8 @@ I wish to thank the following people:
   testing on a large variety of platforms possible. Thanx!
 * Sisyphus for the discussions and ideas
 * Jarkko for the inf/NaN help and for beeing generally helpful and witty
+* Creager, Robert S for pointing me towards the precision/accuracy bug and for
+  general asking questions and providing feedback
 
 Special thanx must go to John Peacock and Tom Roche, both have helped me a lot
 in developing the latest version, not only by cheerfully kicking my lazy butt

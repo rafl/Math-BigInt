@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.58:
+v1.60:
 
  general:
   + It is subsequent faster than the original in many places
@@ -45,7 +45,7 @@ v1.58:
     other subclasses of Math::BigInt)
   + $a = new Math::BigInt; creates now a +0, while "" still gives a NaN
     This supresses all warnings on undef arguments. Wether this is better...	
-  + import would always use "Math::BigInt" and clash with Exporter
+  + import() would always use "Math::BigInt" and clash with Exporter
   + use Math::BigInt qw(bneg); $a = bneg('1234'); etc did not work at all
   + $x->xxx() now modifies $x in all cases of modifiers and actually returns
     the same $x (e.g. not a plain scalar or a different reference). All
