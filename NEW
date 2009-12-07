@@ -1,90 +1,12 @@
-This lists only the changes for the current release (v1.71) over the last
+This lists only the changes for the current release (v1.72) over the last
 version, since HISTORY is now quite big:
 
-Calc : potential bug with padding elems in _digit()
-       much faster _from_hex() (and thus faster _from_bin())
-       long after-dot-part of $x in fceil() produced undef (Thanx kenny!)
-       combine two BEGIN blocks and remove dead integer detection code
-MBI  : bsub() failed when it was passed the same scalar twice e.g. $x -= $x
-	produced 2*$x instead of 0. Thanx Peter J. Acklam!
-       _scan_for_nonzero() re-uses length/stringform of $x and thus makes
-        rounding faster if the digit after the rounding pos is a '5'
-MBF  : bsub() is now simple inherited from BigInt (fixed also $x -= $x bug)
-       bdiv() fix for $x /= $x (same variable passed in)
-       0 ** $y (non-int $y) returns 0 and no longer warns (Thanx kenny!)
-       bfround()/bround() are 10% faster when going via Math::BigInt::bround()
-       bpow($x,$y) is slightly faster if $x is negative and $y an integer
-tests: tests for $x += $x, $x -= $x, $x /= $x etc
-       incorporate change to "undef" warning from core
-       tests for undef warnings from kenny's examples
+Calc : >= vs. > in _rsft() (triggered bug in FastCalc)
+MBI  : 
+MBF  : blog(10,10) ($x == $y) returned '1.000000...' instead of '1' 
+tests: more flog() tests
 
 ##############################################################################
-
-Benchmark for 120 (1), 1200 (2) and 12000 bit (3) numbers:
-
-Math::BigInt v1.70 Math::BigInt::Calc v0.40
- from_bin1:  	   6s ( 5.31 usr +  0.02 sys =  5.33 CPU) @ 3244/s (n=17294)
- from_bin2:  	   5s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  113/s (n=599)
- from_bin3:  	   6s ( 5.65 usr +  0.02 sys =  5.67 CPU) @    1.41/s (n=8)
- from_hex1:  	   5s ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 7006/s (n=36644)
- from_hex2:  	   5s ( 5.18 usr +  0.02 sys =  5.20 CPU) @  368/s (n=1915)
- from_hex3:  	   5s ( 5.06 usr +  0.02 sys =  5.08 CPU) @    5.51/s (n=28)
-
-Math::BigInt v1.71 Math::BigInt::Calc v0.41
- from_bin1:  	   6s ( 5.27 usr +  0.03 sys =  5.30 CPU) @ 4481/s (n=23751)
- from_bin2:  	   5s ( 5.22 usr +  0.02 sys =  5.24 CPU) @  209/s (n=1099)
- from_bin3:  	   5s ( 4.99 usr +  0.01 sys =  5.00 CPU) @    2.80/s (n=14)
- from_hex1:  	   6s ( 5.25 usr +  0.02 sys =  5.27 CPU) @ 7628/s (n=40201)
- from_hex2:  	   5s ( 5.31 usr +  0.02 sys =  5.33 CPU) @  643/s (n=3431)
- from_hex3:  	   5s ( 5.07 usr +  0.01 sys =  5.08 CPU) @   10.63/s (n=54)
-
-Math::BigInt v1.70 Math::BigInt::Calc v0.40
- bround(45."0"x1000,1): 5s ( 5.31 usr +  0.01 sys =  5.32 CPU) @  2085/s (n=11094)
- bround(45000000,1):    4s ( 5.28 usr +  0.01 sys =  5.29 CPU) @ 12823/s (n=67836)
- bround(45000001,1):    5s ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 12301/s (n=65323)
- ffround(0.00491,-4):   5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @  5633/s (n=29578)
- fround(0.0045000001,1):6s ( 5.38 usr +  0.02 sys =  5.40 CPU) @  4880/s (n=26352)
- fround(0.00491,2):     5s ( 5.23 usr +  0.02 sys =  5.25 CPU) @  5965/s (n=31321)
- fround(0.00491,4):     6s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 26115/s (n=136843)
-
-Math::BigInt v1.71 Math::BigInt::Calc v0.41
- bround(45."0"x1000,1): 5s ( 5.29 usr +  0.01 sys =  5.30 CPU) @  2954/s (n=15660)
- bround(45000000,1):    4s ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 16403/s (n=87101)
- bround(45000001,1):    5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 15603/s (n=81919)
- ffround(0.00491,-4):   6s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  6550/s (n=34588)
- fround(0.0045000001,1):5s ( 5.29 usr +  0.01 sys =  5.30 CPU) @  6698/s (n=35501)
- fround(0.00491,2):     6s ( 5.22 usr +  0.01 sys =  5.23 CPU) @  7008/s (n=36654)
- fround(0.00491,4):     5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @ 26015/s (n=136843)
-
-Math::BigInt v1.70 Math::BigInt::GMP v1.14
- bround(45."0"x1000,1): 5s ( 5.33 usr +  0.01 sys =  5.34 CPU) @  2374/s (n=12679)
- bround(45000000,1):    6s ( 5.31 usr +  0.01 sys =  5.32 CPU) @ 12236/s (n=65099)
- bround(45000001,1):    5s ( 5.21 usr +  0.02 sys =  5.23 CPU) @ 11542/s (n=60365)
- ffround(0.00491,-4):   6s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  5932/s (n=31321)
- fround(0.0045000001,1):5s ( 5.22 usr +  0.02 sys =  5.24 CPU) @  5248/s (n=27504)
- fround(0.00491,2):     6s ( 5.28 usr +  0.02 sys =  5.30 CPU) @  6277/s (n=33273)
- fround(0.00491,4):     5s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 20997/s (n=110026)
-
-Math::BigInt v1.71 Math::BigInt::GMP v1.14
- bround(45."0"x1000,1): 5s ( 5.21 usr +  0.00 sys =  5.21 CPU) @  3650/s (n=19018)
- bround(45000000,1):    5s ( 5.19 usr +  0.01 sys =  5.20 CPU) @ 15507/s (n=80640)
- bround(45000001,1):    6s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 14488/s (n=76065)
- ffround(0.00491,-4):   5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @  6966/s (n=36644)
- fround(0.0045000001,1):6s ( 5.23 usr +  0.02 sys =  5.25 CPU) @  6892/s (n=36184)
- fround(0.00491,2):     5s ( 5.27 usr +  0.02 sys =  5.29 CPU) @  7461/s (n=39470)
- fround(0.00491,4):     5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 20674/s (n=108543)
-
-Math::BigInt v1.70 Math::BigInt::Calc v0.40
- fpow(-145,2): 5s ( 5.24 usr +  0.02 sys =  5.26 CPU) @  7229/s (n=38027)
- bsub(3,1):    5s ( 5.24 usr +  0.00 sys =  5.24 CPU) @ 26113/s (n=136834)
- fdiv(1,3):    5s ( 5.22 usr +  0.02 sys =  5.24 CPU) @  1966/s (n=10306)
- fsub(3,1):    5s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 10880/s (n=57014)
-
-Math::BigInt v1.71 Math::BigInt::Calc v0.41
- fpow(-145,2): 5s ( 5.17 usr +  0.01 sys =  5.18 CPU) @  7483/s (n=38765)
- bsub(3,1):    5s ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 25943/s (n=135682)
- fdiv(1,3):    6s ( 5.24 usr +  0.01 sys =  5.25 CPU) @  2151/s (n=11297)
- fsub(3,1):    5s ( 5.31 usr +  0.01 sys =  5.32 CPU) @ 10007/s (n=53242)
 
 ##############################################################################
 

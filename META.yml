@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Math-BigInt
-version:      1.71
+version:      1.72
 version_from: lib/Math/BigInt.pm
 installdirs:  perl
 requires:

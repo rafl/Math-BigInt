@@ -428,6 +428,8 @@ Math::BigFloat:
  * bfround() and bround() are about 10% faster when going via Math::BigInt's
    bround() due to constructing a fake BigInt instead of going via ->new()
  * fixed undef warnings in bpow(0,$y) ($y non-integer) (thanx kenny!)
+2004-08-13 v1.46 Tels
+ * blog(10,10) ($x == $y) returned '1.0000...' instead of '1'
 
 ############################################################################## 
 Math::BigInt:
@@ -792,6 +794,7 @@ Math::BigInt:
  * fixed bsub() failing under $x -= $x; Thanx Peter J. Acklam!
  * _scan_for_nonzero() reuses length/stringform of $x and is thus faster, this
    helps rounding if the number after the roundposition is '5'
+2004-07-13 v1.72 Tels
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
