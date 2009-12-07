@@ -447,7 +447,6 @@ sub _mul_use_div
   # modifies first arg, second need not be different from first
   my ($c,$xv,$yv) = @_;
 
-  use integer;
   if (@$yv == 1)
     {
     # shortcut for two small numbers, also handles $x == 0
@@ -472,9 +471,9 @@ sub _mul_use_div
     my $y = $yv->[0]; my $car = 0;
     foreach my $i (@$xv)
       {
-      # old, slower code (before use integer;)
-      #$i = $i * $y + $car; $car = int($i / $MBASE); $i -= $car * $MBASE;
-      $i = $i * $y + $car; $i -= ($car = $i / $MBASE) * $MBASE;
+      $i = $i * $y + $car; $car = int($i / $MBASE); $i -= $car * $MBASE;
+      # This (together with use integer;) does not work on 32-bit Perls
+      #$i = $i * $y + $car; $i -= ($car = $i / $MBASE) * $MBASE;
       }
     push @$xv, $car if $car != 0;
     return $xv;
@@ -494,7 +493,7 @@ sub _mul_use_div
     for $yi (@$yv)
       {
       $prod = $xi * $yi + ($prod[$cty] || 0) + $car;
-      $prod[$cty++] = $prod - ($car = $prod / $MBASE) * $MBASE;
+      $prod[$cty++] = $prod - ($car = int($prod / $MBASE)) * $MBASE;
       }
     $prod[$cty] += $car if $car; # need really to check for 0?
     $xi = shift @prod || 0;	# || 0 makes v5.005_3 happy

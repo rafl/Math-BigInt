@@ -1,6 +1,5 @@
 BENCHMARK
 BUGS
-Build.PL
 CHANGES				# changes from the original v0.01
 CREDITS
 examples/1000.txt
@@ -11,7 +10,6 @@ GOALS
 HISTORY				# detailed version history
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
-inc/Module/Install/Build.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
