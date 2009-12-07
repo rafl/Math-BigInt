@@ -769,6 +769,10 @@ NaN:inf:
 -inf:NaN:
 NaN:-inf:
 &bnorm
+0e999:0
+0e-999:0
+-0e999:0
+-0e-999:0
 123:123
 # binary input
 0babc:NaN

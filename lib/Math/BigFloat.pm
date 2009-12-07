@@ -12,7 +12,7 @@ package Math::BigFloat;
 #   _p: precision
 #   _f: flags, used to signal MBI not to touch our private parts
 
-$VERSION = '1.38';
+$VERSION = '1.39';
 require 5.005;
 use Exporter;
 @ISA =       qw(Exporter Math::BigInt);
@@ -188,8 +188,8 @@ sub new
       }
     return $downgrade->new("$$mis$$miv$$mfv"."E$$es$$ev");
     }
-    #print "mbf new $self->{sign} $self->{_m} e $self->{_e} ",ref($self),"\n";
-  $self->bnorm()->round(@r);		# first normalize, then round
+  #print "mbf new $self->{sign} $self->{_m} e $self->{_e} ",ref($self),"\n";
+  $self->bnorm()->round(@r);			# first normalize, then round
   }
 
 sub _bnan
@@ -276,8 +276,6 @@ sub bstr
   #my $x = shift; my $class = ref($x) || $x;
   #$x = $class->new(shift) unless ref($x);
 
-  #die "Oups! e was $nan" if $x->{_e}->{sign} eq $nan;
-  #die "Oups! m was $nan" if $x->{_m}->{sign} eq $nan;
   if ($x->{sign} !~ /^[+-]$/)
     {
     return $x->{sign} unless $x->{sign} eq '+inf';      # -inf, NaN
@@ -342,8 +340,6 @@ sub bsstr
   #my $x = shift; my $class = ref($x) || $x;
   #$x = $class->new(shift) unless ref($x);
 
-  #die "Oups! e was $nan" if $x->{_e}->{sign} eq $nan;
-  #die "Oups! m was $nan" if $x->{_m}->{sign} eq $nan;
   if ($x->{sign} !~ /^[+-]$/)
     {
     return $x->{sign} unless $x->{sign} eq '+inf';      # -inf, NaN
@@ -716,6 +712,7 @@ sub blog
   delete $x->{_a}; delete $x->{_p};
   # need to disable $upgrade in BigInt, to avoid deep recursion
   local $Math::BigInt::upgrade = undef;
+  local $Math::BigFloat::downgrade = undef;
 
   # upgrade $x if $x is not a BigFloat (handle BigInt input)
   if (!$x->isa('Math::BigFloat'))
@@ -729,6 +726,7 @@ sub blog
   # and if a different base was requested, convert it
   if (defined $base)
     {
+    $base = Math::BigFloat->new($base) unless $base->isa('Math::BigFloat');
     # not ln, but some other base
     $x->bdiv( $base->copy()->blog(undef,$scale), $scale );
     }
@@ -1824,7 +1822,10 @@ sub bround
   # accuracy: preserve $N digits, and overwrite the rest with 0's
   my $x = shift; my $self = ref($x) || $x; $x = $self->new(shift) if !ref($x);
   
-  die ('bround() needs positive accuracy') if ($_[0] || 0) < 0;
+  if (($_[0] || 0) < 0)
+    {
+    require Carp; Carp::croak ('bround() needs positive accuracy');
+    }
 
   my ($scale,$mode) = $x->_scale_a($self->accuracy(),$self->round_mode(),@_);
   return $x if !defined $scale;				# no-op
@@ -2100,7 +2101,10 @@ sub import
       eval $rc;
       }
     }
-  die ("Couldn't load $MBI: $! $@") if $@;
+  if ($@)
+    {
+    require Carp; Carp::croak ("Couldn't load $MBI: $! $@");
+    }
 
   # any non :constant stuff is handled by our parent, Exporter
   # even if @_ is empty, to give it a chance
@@ -2733,6 +2737,7 @@ the same terms as Perl itself.
 =head1 AUTHORS
 
 Mark Biggar, overloaded interface by Ilya Zakharevich.
-Completely rewritten by Tels http://bloodgate.com in 2001, 2002.
+Completely rewritten by Tels http://bloodgate.com in 2001, 2002, and still
+at it in 2003.
 
 =cut

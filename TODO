@@ -1,11 +1,14 @@
 See also various .pm files.
 
+Doc:
+  * document that config() can now set certain parameters
+
 General:
  * Copy on write (helps for $x = -$x; cases etc) (seems to make it slower :/
  * try to cash UNIVERSAL::can results, since $CALC shouldn't change (or even
    unset them when $CALC changes)
  * run config() and die_on_nan() tests under Subclass.pm
-
+ 
 Math::BigFloat:
  * finish upgrading and downgrading
  * ! bround()/bfround(): some bugs may lurk in there

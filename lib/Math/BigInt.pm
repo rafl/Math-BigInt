@@ -18,7 +18,7 @@ package Math::BigInt;
 my $class = "Math::BigInt";
 require 5.005;
 
-$VERSION = '1.64';
+$VERSION = '1.65';
 use Exporter;
 @ISA =       qw( Exporter );
 @EXPORT_OK = qw( objectify _swap bgcd blcm); 
@@ -160,11 +160,13 @@ sub round_mode
   if (defined $_[0])
     {
     my $m = shift;
-    die "Unknown round mode $m"
-     if $m !~ /^(even|odd|\+inf|\-inf|zero|trunc)$/;
+    if ($m !~ /^(even|odd|\+inf|\-inf|zero|trunc)$/)
+      {
+      require Carp; Carp::croak ("Unknown round mode '$m'");
+      }
     return ${"${class}::round_mode"} = $m;
     }
-  return ${"${class}::round_mode"};
+  ${"${class}::round_mode"};
   }
 
 sub upgrade
@@ -179,7 +181,7 @@ sub upgrade
     my $u = shift;
     return ${"${class}::upgrade"} = $u;
     }
-  return ${"${class}::upgrade"};
+  ${"${class}::upgrade"};
   }
 
 sub downgrade
@@ -194,7 +196,7 @@ sub downgrade
     my $u = shift;
     return ${"${class}::downgrade"} = $u;
     }
-  return ${"${class}::downgrade"};
+  ${"${class}::downgrade"};
   }
 
 sub div_scale
@@ -205,10 +207,13 @@ sub div_scale
   my $class = ref($self) || $self || __PACKAGE__;
   if (defined $_[0])
     {
-    die ('div_scale must be greater than zero') if $_[0] < 0;
+    if ($_[0] < 0)
+      {
+      require Carp; Carp::croak ('div_scale must be greater than zero');
+      }
     ${"${class}::div_scale"} = shift;
     }
-  return ${"${class}::div_scale"};
+  ${"${class}::div_scale"};
   }
 
 sub accuracy
@@ -226,21 +231,39 @@ sub accuracy
   if (@_ > 0)
     {
     my $a = shift;
-    die ('accuracy must not be zero') if defined $a && $a == 0;
+    # convert objects to scalars to avoid deep recursion. If object doesn't
+    # have numify(), then hopefully it will have overloading for int() and
+    # boolean test without wandering into a deep recursion path...
+    $a = $a->numify() if ref($a) && $a->can('numify');
+
+    if (defined $a)
+      {
+      # also croak on non-numerical
+      if (!$a || $a <= 0)
+        {
+        require Carp;
+        Carp::croak ('Argument to accuracy must be greater than zero');
+        }
+      if (int($a) != $a)
+        {
+        require Carp; Carp::croak ('Argument to accuracy must be an integer');
+        }
+      }
     if (ref($x))
       {
       # $object->accuracy() or fallback to global
-      $x->bround($a) if defined $a;
-      $x->{_a} = $a;			# set/overwrite, even if not rounded
-      $x->{_p} = undef;			# clear P
+      $x->bround($a) if $a;             # not for undef, 0
+      $x->{_a} = $a;                    # set/overwrite, even if not rounded
+      $x->{_p} = undef;                 # clear P
+      $a = ${"${class}::accuracy"} unless defined $a;   # proper return value
       }
     else
       {
       # set global
       ${"${class}::accuracy"} = $a;
-      ${"${class}::precision"} = undef;	# clear P
+      ${"${class}::precision"} = undef; # clear P
       }
-    return $a;				# shortcut
+    return $a;                          # shortcut
     }
 
   my $r;
@@ -249,7 +272,7 @@ sub accuracy
   # but don't return global undef, when $x's accuracy is 0!
   $r = ${"${class}::accuracy"} if !defined $r;
   $r;
-  } 
+  }
 
 sub precision
   {
@@ -262,24 +285,32 @@ sub precision
   my $class = ref($x) || $x || __PACKAGE__;
 
   no strict 'refs';
-  # need to set new value?
   if (@_ > 0)
     {
     my $p = shift;
+    # convert objects to scalars to avoid deep recursion. If object doesn't
+    # have numify(), then hopefully it will have overloading for int() and
+    # boolean test without wandering into a deep recursion path...
+    $p = $p->numify() if ref($p) && $p->can('numify');
+    if ((defined $p) && (int($p) != $p))
+      {
+      require Carp; Carp::croak ('Argument to precision must be an integer');
+      }
     if (ref($x))
       {
       # $object->precision() or fallback to global
-      $x->bfround($p) if defined $p;
-      $x->{_p} = $p;			# set/overwrite, even if not rounded
-      $x->{_a} = undef;			# clear A
+      $x->bfround($p) if $p;            # not for undef, 0
+      $x->{_p} = $p;                    # set/overwrite, even if not rounded
+      $x->{_a} = undef;                 # clear A
+      $p = ${"${class}::precision"} unless defined $p;  # proper return value
       }
     else
       {
       # set global
       ${"${class}::precision"} = $p;
-      ${"${class}::accuracy"} = undef;	# clear A
+      ${"${class}::accuracy"} = undef;  # clear A
       }
-    return $p;				# shortcut
+    return $p;                          # shortcut
     }
 
   my $r;
@@ -288,7 +319,7 @@ sub precision
   # but don't return global undef, when $x's precision is 0!
   $r = ${"${class}::precision"} if !defined $r;
   $r;
-  } 
+  }
 
 sub config
   {
@@ -841,7 +872,10 @@ sub _find_round_parameters
   return ($self->bnan()) if defined $a && defined $p;		# error
 
   $r = ${"$c\::round_mode"} unless defined $r;
-  die "Unknown round mode '$r'" if $r !~ /^(even|odd|\+inf|\-inf|zero|trunc)$/;
+  if ($r !~ /^(even|odd|\+inf|\-inf|zero|trunc)$/)
+    {
+    require Carp; Carp::croak ("Unknown round mode '$r'");
+    }
 
   ($self,$a,$p,$r);
   }
@@ -898,7 +932,10 @@ sub round
   return $self->bnan() if defined $a && defined $p;
 
   $r = ${"$c\::round_mode"} unless defined $r;
-  die "Unknown round mode '$r'" if $r !~ /^(even|odd|\+inf|\-inf|zero|trunc)$/;
+  if ($r !~ /^(even|odd|\+inf|\-inf|zero|trunc)$/)
+    {
+   
+    }
 
   # now round, by calling either fround or ffround:
   if (defined $a)
@@ -1714,7 +1751,7 @@ sub bpow
   # (BINT or num_str, BINT or num_str) return BINT
   # compute power of two numbers -- stolen from Knuth Vol 2 pg 233
   # modifies first argument
-  
+
   # set up parameters
   my ($self,$x,$y,@r) = (ref($_[0]),@_);
   # objectify is costly, so avoid it
@@ -2151,22 +2188,22 @@ sub broot
   #my $lastlast = $x+$y;
   my $divider = $self->new(2);
   my $up = $y-1;
-  print "start $org divider $divider up $up\n";
+  #print "start $org divider $divider up $up\n";
   while ($last != $x && $lastlast != $x)
     {
-    print "at $x ($last $lastlast)\n";
+    #print "at $x ($last $lastlast)\n";
     $lastlast = $last; $last = $x->copy(); 
-    print "at $x ($last ",($org / ($x ** $up)),"\n";
+    #print "at $x ($last ",($org / ($x ** $up)),"\n";
     $x->badd($org / ($x ** 2)); 
     $x->bdiv($divider);
     }
-  print $x ** $y," org ",$org,"\n";
+  #print $x ** $y," org ",$org,"\n";
   # correct overshot
   while ($x ** $y < $org)
     {
-    print "correcting $x to ";
+    #print "correcting $x to ";
     $x->binc();
-    print "$x ( $x ** $y == ",$x ** $y,")\n";
+    #print "$x ( $x ** $y == ",$x ** $y,")\n";
     }
   $x->round(@r);
   }
@@ -2514,7 +2551,10 @@ sub objectify
       }
     push @a,@_;		# return other params, too
     }
-  die "$class objectify needs list context" unless wantarray;
+  if (! wantarray)
+    {
+    require Carp; Carp::croak ("$class objectify needs list context");
+    }
   ${"$a[0]::downgrade"} = $d;
   @a;
   }
@@ -2580,7 +2620,11 @@ sub import
       }
     $CALC = $lib, last if $@ eq '';	# no error in loading lib?
     }
-  die "Couldn't load any math lib, not even the default" if $CALC eq '';
+  if ($CALC eq '')
+    {
+    require Carp;
+    Carp::croak ("Couldn't load any math lib, not even the default");
+    }
   }
 
 sub __from_hex
@@ -2698,7 +2742,7 @@ sub _split
 
   # some possible inputs: 
   # 2.1234 # 0.12        # 1 	      # 1E1 # 2.134E1 # 434E-10 # 1.02009E-2 
-  # .2 	   # 1_2_3.4_5_6 # 1.4E1_2_3  # 1e3 # +.2
+  # .2 	   # 1_2_3.4_5_6 # 1.4E1_2_3  # 1e3 # +.2     # 0e999	
 
   #return if $$x =~ /[Ee].*[Ee]/;	# more than one E => error
 
@@ -2724,6 +2768,8 @@ sub _split
       $mis = $1||'+'; $miv = $2;
       return unless ($mf =~ /^(\d*?)0*$/);	# strip trailing zeros
       $mfv = $1;
+      # handle the 0e999 case here
+      $ev = 0 if $miv eq '0' && $mfv eq '';
       return (\$mis,\$miv,\$mfv,\$es,\$ev);
       }
     }
@@ -2746,7 +2792,6 @@ sub as_hex
   my $x = shift; $x = $class->new($x) if !ref($x);
 
   return $x->bstr() if $x->{sign} !~ /^[+-]$/;	# inf, nan etc
-  return '0x0' if $x->is_zero();
 
   my $es = ''; my $s = '';
   $s = $x->{sign} if $x->{sign} eq '-';
@@ -2756,6 +2801,8 @@ sub as_hex
     }
   else
     {
+    return '0x0' if $x->is_zero();
+
     my $x1 = $x->copy()->babs(); my ($xr,$x10000,$h);
     if ($] >= 5.006)
       {
@@ -2783,7 +2830,6 @@ sub as_bin
   my $x = shift; $x = $class->new($x) if !ref($x);
 
   return $x->bstr() if $x->{sign} !~ /^[+-]$/;	# inf, nan etc
-  return '0b0' if $x->is_zero();
 
   my $es = ''; my $s = '';
   $s = $x->{sign} if $x->{sign} eq '-';
@@ -2793,6 +2839,7 @@ sub as_bin
     }
   else
     {
+    return '0b0' if $x->is_zero();
     my $x1 = $x->copy()->babs(); my ($xr,$x10000,$b);
     if ($] >= 5.006)
       {
@@ -2861,6 +2908,12 @@ Math::BigInt - Arbitrary size integer math package
 =head1 SYNOPSIS
 
   use Math::BigInt;
+
+  # or make it faster: install (optional) Math::BigInt::GMP
+  # and always use (it will fall back to pure Perl if the
+  # GMP library is not installed):
+
+  use Math::BigInt lib => 'GMP';
 
   # Number creation	
   $x = Math::BigInt->new($str);		# defaults to 0
@@ -3068,8 +3121,14 @@ appropriate information.
 	div_scale	Fallback acccuracy for div
 			40
 
-It is currently not supported to set the configuration parameters by passing
-a hash ref to C<config()>.
+The following values can be set by passing config a reference to a hash:
+
+	trap_inf trap_nan
+        upgrade downgrade precision accuracy round_mode div_scale
+
+Example:
+	
+	$new_cfg = Math::BigInt->config( { trap_inf => 1, precision => 5 } );
 
 =head2 accuracy
 
@@ -4495,8 +4554,8 @@ subclass files and benchmarks.
 =head1 AUTHORS
 
 Original code by Mark Biggar, overloaded interface by Ilya Zakharevich.
-Completely rewritten by Tels http://bloodgate.com in late 2000, 2001 and still
-at it in 2002.
+Completely rewritten by Tels http://bloodgate.com in late 2000, 2001, 2002
+and still at it in 2003.
 
 Many people contributed in one or more ways to the final beast, see the file
 CREDITS for an (uncomplete) list. If you miss your name, please drop me a

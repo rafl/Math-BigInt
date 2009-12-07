@@ -14,7 +14,7 @@ use Math::BigInt::Calc;
 
 BEGIN
   {
-  plan tests => 252;
+  plan tests => 258;
   }
 
 # testing of Math::BigInt::Calc
@@ -280,6 +280,12 @@ ok (${$C->_str(scalar $C->_from_bin(\"0b10101011"))},160+11);
 # _as_hex, _as_bin
 ok (${$C->_str(scalar $C->_from_hex( $C->_as_hex( $C->_new(\"128"))))}, 128);
 ok (${$C->_str(scalar $C->_from_bin( $C->_as_bin( $C->_new(\"128"))))}, 128);
+ok (${$C->_str(scalar $C->_from_hex( $C->_as_hex( $C->_new(\"0"))))}, 0);
+ok (${$C->_str(scalar $C->_from_bin( $C->_as_bin( $C->_new(\"0"))))}, 0);
+ok ( ${$C->_as_hex( $C->_new(\"0"))}, '0x0');
+ok ( ${$C->_as_bin( $C->_new(\"0"))}, '0b0');
+ok ( ${$C->_as_hex( $C->_new(\"12"))}, '0xc');
+ok ( ${$C->_as_bin( $C->_new(\"12"))}, '0b1100');
 
 # _check
 $x = $C->_new(\"123456789");

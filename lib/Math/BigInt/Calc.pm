@@ -8,7 +8,7 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '0.34';
+$VERSION = '0.35';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -27,7 +27,7 @@ $VERSION = '0.34';
 
 # Beware of things like:
 # $i = $i * $y + $car; $car = int($i / $MBASE); $i = $i % $MBASE;
-# This works on x86, but fails on ARM (SA1100, iPAQ) due to whoeknows what
+# This works on x86, but fails on ARM (SA1100, iPAQ) due to whoknows what
 # reasons. So, use this instead (slower, but correct):
 # $i = $i * $y + $car; $car = int($i / $MBASE); $i -= $MBASE * $car;
 
@@ -1080,7 +1080,7 @@ sub _rsft
   my $dst = 0;				# destination
   my $src = _num($c,$y);		# as normal int
   my $xlen = (@$x-1)*$BASE_LEN+length(int($x->[-1]));  # len of x in digits
-  if ($src > $xlen)
+  if ($src > $xlen or ($src == $xlen and ! defined $x->[1]))
     {
     # 12345 67890 shifted right by more than 10 digits => 0
     splice (@$x,1);                    # leave only one element
@@ -1463,6 +1463,13 @@ sub _as_hex
   # convert a decimal number to hex (ref to array, return ref to string)
   my ($c,$x) = @_;
 
+  # fit's into one element
+  if (@$x == 1)
+    {
+    my $t = '0x' . sprintf("%x",$x->[0]);
+    return \$t;
+    }
+
   my $x1 = _copy($c,$x);
 
   my $es = '';
@@ -1491,6 +1498,12 @@ sub _as_bin
   # convert a decimal number to bin (ref to array, return ref to string)
   my ($c,$x) = @_;
 
+  # fit's into one element
+  if (@$x == 1)
+    {
+    my $t = '0b' . sprintf("%b",$x->[0]);
+    return \$t;
+    }
   my $x1 = _copy($c,$x);
 
   my $es = '';

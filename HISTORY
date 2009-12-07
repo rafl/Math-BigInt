@@ -100,6 +100,11 @@ Math::BigInt::Calc:
  * $caught & 1 != 0 vs ($caught & 1) != 0 (changed to $caught != 2)
  * $i %= $MBASE does not work on ARM (v5.003), so make it $i -= $car * $MBASE
  * removed unused LEN_CONVERT code (smaller memory footprint)
+2003-07-06 v0.35 Tels
+ * fixed a bug in _floor() which caused ffloor(0.1234567) to fail.
+   (Thanx to cpan@ali.as for finding it and sending a fix/testcases)
+ * make _as_hex() and _as_bin() handle 0, and make them faster for very
+   short numbers (less than BASE_LEN digits)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -326,6 +331,9 @@ Math::BigFloat:
  * trap_nan/trap_inf really croak on any attempt to create an NaN/inf
  * spellings of Bigint => BigInt
  * simplify config() by using SUPER::config()
+2003-07-06 v1.39 Tels
+ * $x->blog($base) can handle a $base which is a Math::Bigint
+ * replace die() with Carp::croak
 
 ############################################################################## 
 Math::BigInt:
@@ -628,6 +636,13 @@ Math::BigInt:
  * trap_nan/trap_inf really croak on any attempt to create an NaN/inf
  * spellings of Bigint => BigInt
  * _find_rounding_parameters(): set $a to undef if it is 0
+2003-07-13 v1.65 Tels
+ * document that config() can set certain values
+ * replace die() with Carp::croak()
+ * remove needless is_zero() check in as_bin() and as_hex(), making them
+   faster, especially when under a different lib like GMP.
+ * Fixed the infinite recursion in bignum. See http://xrl.us/k6y
+ * fix handling of 0e999, 0e-999 etc
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

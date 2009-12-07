@@ -1,7 +1,8 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
-to the rewritten one. For a complete list of changes see the fileHISTORY:
+to the rewritten one. For what has changed in the latest version see NEW
+and for a complete list of changes see the file HISTORY.
 
-v1.64:
+v1.65:
 
  general:
   + It is subsequent faster than the original in many places
