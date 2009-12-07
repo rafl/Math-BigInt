@@ -163,6 +163,9 @@ Math::BigInt::Calc:
  * remove shortcut in div(), it wasn't working properly
 2007-01-27 v0.48 Tels
  * support for octal numbers
+2007-04-16 v1.55 Tels
+ * API version 2.0 support: add _1ex(), _alen()
+ * make _fac() about twice as fast
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -488,6 +491,10 @@ Math::BigFloat:
    This makes computing _log(10) much faster, so that computing blog(N) is
    about a factor of 5 faster when N >= 10 or N <= 0.1
  * add bexp()
+2007-04-16 v1.55 Tels
+ * make bexp() much faster (esp. under GMP) by caching the first coefficients
+   and rewriting the inner loop
+ * support "try" and "only" in import()
 
 ############################################################################## 
 Math::BigInt:
@@ -899,6 +906,7 @@ Math::BigInt:
 2007-02-02 v1.79 Tels
  * fix typos
 2007-03-04 v1.80 Tels
+ * require Perl v5.6.2 as minimum
  * fix bug #24969 (Can't use an undefined value as an ARRAY reference)
  * fix bug #12857: Subclasses and overload
  * fix bug #13866: NaN (in bignum queue)
@@ -911,6 +919,8 @@ Math::BigInt:
    exponent() and mantissa()
  * fix documentation that blsft() and brsft() default to base 2 (not 10)
  * add bexp() and fix overloading for exp()
+2007-04-16 v1.83 Tels
+ * bump version
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

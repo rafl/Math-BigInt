@@ -19,25 +19,23 @@ requires	'perl'		=> 5.006002;
 
 my @checks;
 
-check_minimum_version ('Math::BigInt::FastCalc' => 0.12);
-check_minimum_version ('Math::BigInt::GMP'	=> 1.19);
-check_minimum_version ('Math::BigRat'		=> 0.17);
-check_minimum_version ('bignum' 		=> 0.19);
+check_minimum_version ('Math::BigInt::FastCalc' => 0.14);
+check_minimum_version ('Math::BigInt::GMP'	=> 1.21);
+check_minimum_version ('Math::BigInt::Pari'	=> 1.12);
+check_minimum_version ('Math::BigRat'		=> 0.19);
+check_minimum_version ('bignum' 		=> 0.21);
 
 if (@checks > 0)
   {
   print ("\n" . '*' x 70 . "\n Attention: After installing this package, you also need to update:\n\n");
   for my $need (@checks)
     {
-    print "  $need->[0]  to at least  v$need->[1]!\n";
+    my $name = $need->[0]; while (length($name) < 24) { $name .= ' '; }
+    print "  $name to at least v$need->[1]\t (you have v$need->[2])\n";
     }
   print "\n";
   sleep(5);
   };
-
-recommends	'Math::BigRat'		=> 0.17;
-recommends	'Math::BigInt::GMP'	=> 1.19;
-recommends	'bignum'		=> 0.19;
 
 build_requires	'Test::More'	=> 0.42;
 
@@ -61,10 +59,12 @@ sub check_minimum_version
 
   my $v; eval " require $module; \$v = \$${module}::VERSION;";
 
+  recommends	$module, $version;
+
   # if the module is installed, but outdated, add it to the requirements
   if (defined $v && $v < $version)
     {
-    push @checks, [ $module, $version];
+    push @checks, [ $module, $version, $v ];
     } 
   }
 

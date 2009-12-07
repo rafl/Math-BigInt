@@ -17,9 +17,11 @@ no_index:
     - inc
     - t
 recommends: 
-  Math::BigInt::GMP: 1.19
-  Math::BigRat: 0.17
-  bignum: 0.19
+  Math::BigInt::FastCalc: 0.14
+  Math::BigInt::GMP: 1.21
+  Math::BigInt::Pari: 1.12
+  Math::BigRat: 0.19
+  bignum: 0.21
 requires: 
   perl: 5.6.2
-version: 1.82
+version: 1.83
