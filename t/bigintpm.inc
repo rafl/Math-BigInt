@@ -89,6 +89,8 @@ while (<DATA>)
     $try .= '$m = $m->bstr(); $m = "NaN" if !defined $m;';
     $try .= '$e = $e->bstr(); $e = "NaN" if !defined $e;';
     $try .= '"$m,$e";';
+   }elsif ($f eq "bexp"){
+    $try .= "\$x->bexp();";
    } else {
     # binary ops
     $try .= "\$y = $class->new('$args[1]');";
@@ -154,6 +156,8 @@ while (<DATA>)
           {
           $try .= "\$x >> \$y;";
           }
+      }elsif ($f eq "bnok"){
+        $try .= "\$x->bnok(\$y);";
       }elsif ($f eq "broot"){
         $try .= "\$x->broot(\$y);";
       }elsif ($f eq "blog"){
@@ -2192,7 +2196,7 @@ NaN:inf:NaN
 18446744073709551616:128:1
 # 213 ** 15
 84274086103068221283760416414557757:15:213
-# see t/bigroot for more tests
+# see t/bigroot.t for more tests
 &bsqrt
 145:12
 144:12
@@ -2222,6 +2226,29 @@ NaN:inf:NaN
 Nan:NaN
 +inf:inf
 -inf:NaN
+# see t/biglog.t for more tests
+&bexp
+NaN:NaN
+inf:inf
+1:2
+2:7
+# see t/bignok.t for more tests
+&bnok
++inf:10:inf
+NaN:NaN:NaN
+NaN:1:NaN
+1:NaN:NaN
+1:1:1
+# k > n
+1:2:0
+2:3:0
+# k < 0
+1:-2:0
+# 7 over 3 = 35
+7:3:35
+7:6:1
+100:90:17310309456440
+100:95:75287520
 &bround
 $round_mode('trunc')
 0:12:0

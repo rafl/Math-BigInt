@@ -12,7 +12,7 @@ package Math::BigFloat;
 #   _a	: accuracy
 #   _p	: precision
 
-$VERSION = '1.55';
+$VERSION = '1.56';
 require 5.006002;
 
 require Exporter;
@@ -906,6 +906,31 @@ sub _len_to_steps
     $ramanujan > $d ? $r = $n : $l = $n;
     }
   $l;
+  }
+
+sub bnok
+  {
+  # Calculate n over k (binomial coefficient or "choose" function) as integer.
+  # set up parameters
+  my ($self,$x,$y,@r) = (ref($_[0]),@_);
+
+  # objectify is costly, so avoid it
+  if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
+    {
+    ($self,$x,$y,@r) = objectify(2,@_);
+    }
+
+  return $x->bnan() if $x->is_nan() || $y->is_nan();
+  return $x->binf() if $x->is_inf();
+
+  my $u = $x->as_int();
+  $u->bnok($y->as_int());
+
+  $x->{_m} = $u->{value};
+  $x->{_e} = $MBI->_zero();
+  $x->{_es} = '+';
+  $x->{sign} = '+';
+  $x->bnorm(@r);
   }
 
 sub bexp

@@ -37,7 +37,7 @@ if (@checks > 0)
   sleep(5);
   };
 
-build_requires	'Test::More'	=> 0.42;
+build_requires	'Test::More'	=> 0.62;
 
 install_as_core();
 

@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 # use warnings;	# dont use warnings for older Perls
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -435,7 +435,8 @@ sub _mul_use_mul
     $xi = shift @prod || 0;	# || 0 makes v5.005_3 happy
     }
   push @$xv, @prod;
-  __strip_zeros($xv);
+  # can't have leading zeros
+#  __strip_zeros($xv);
   $xv;
   }                                                                             
 
@@ -445,7 +446,8 @@ sub _mul_use_div
   # multiply two numbers in internal representation
   # modifies first arg, second need not be different from first
   my ($c,$xv,$yv) = @_;
- 
+
+  use integer;
   if (@$yv == 1)
     {
     # shortcut for two small numbers, also handles $x == 0
@@ -470,7 +472,9 @@ sub _mul_use_div
     my $y = $yv->[0]; my $car = 0;
     foreach my $i (@$xv)
       {
-      $i = $i * $y + $car; $car = int($i / $MBASE); $i -= $car * $MBASE;
+      # old, slower code (before use integer;)
+      #$i = $i * $y + $car; $car = int($i / $MBASE); $i -= $car * $MBASE;
+      $i = $i * $y + $car; $i -= ($car = $i / $MBASE) * $MBASE;
       }
     push @$xv, $car if $car != 0;
     return $xv;
@@ -490,14 +494,14 @@ sub _mul_use_div
     for $yi (@$yv)
       {
       $prod = $xi * $yi + ($prod[$cty] || 0) + $car;
-      $prod[$cty++] =
-       $prod - ($car = int($prod / $MBASE)) * $MBASE;
+      $prod[$cty++] = $prod - ($car = $prod / $MBASE) * $MBASE;
       }
     $prod[$cty] += $car if $car; # need really to check for 0?
     $xi = shift @prod || 0;	# || 0 makes v5.005_3 happy
     }
   push @$xv, @prod;
-  __strip_zeros($xv);
+  # can't have leading zeros
+#  __strip_zeros($xv);
   $xv;
   }                                                                             
 
@@ -1252,17 +1256,132 @@ sub _pow
   $cx;
   }
 
+sub _nok
+  {
+  # n over k
+  # ref to array, return ref to array
+  my ($c,$n,$k) = @_;
+
+  # ( 7 )    7!          7*6*5 * 4*3*2*1   7 * 6 * 5
+  # ( - ) = --------- =  --------------- = ---------
+  # ( 3 )   3! (7-3)!    3*2*1 * 4*3*2*1   3 * 2 * 1 
+
+  # compute n - k + 2 (so we start with 5 in the example above)
+  my $x = _copy($c,$n);
+
+  _sub($c,$n,$k);
+  if (!_is_one($c,$n))
+    {
+    _inc($c,$n);
+    my $f = _copy($c,$n); _inc($c,$f);		# n = 5, f = 6, d = 2
+    my $d = _two($c);
+    while (_acmp($c,$f,$x) <= 0)		# f < n ?
+      {
+      # n = (n * f / d) == 5 * 6 / 2 => n == 3
+      $n = _mul($c,$n,$f); $n = _div($c,$n,$d);
+      # f = 7, d = 3
+      _inc($c,$f); _inc($c,$d);
+      }
+    }
+  else 
+    {
+    # keep ref to $n and set it to 1
+    splice (@$n,1); $n->[0] = 1;
+    }
+  $n;
+  }
+
+my @factorials = (
+  1,
+  1,
+  2,
+  2*3,
+  2*3*4,
+  2*3*4*5,
+  2*3*4*5*6,
+  2*3*4*5*6*7,
+);
+
 sub _fac
   {
   # factorial of $x
   # ref to array, return ref to array
   my ($c,$cx) = @_;
 
-  if ((@$cx == 1) && ($cx->[0] <= 2))
+  if ((@$cx == 1) && ($cx->[0] <= 7))
     {
-    $cx->[0] ||= 1;		# 0 => 1, 1 => 1, 2 => 2
+    $cx->[0] = $factorials[$cx->[0]];		# 0 => 1, 1 => 1, 2 => 2 etc.
     return $cx;
     }
+
+  if ((@$cx == 1) && 		# we do this only if $x >= 12 and $x <= 7000
+      ($cx->[0] >= 12 && $cx->[0] < 7000))
+    {
+
+  # Calculate (k-j) * (k-j+1) ... k .. (k+j-1) * (k + j)
+  # See http://blogten.blogspot.com/2007/01/calculating-n.html
+  # The above series can be expressed as factors:
+  #   k * k - (j - i) * 2
+  # We cache k*k, and calculate (j * j) as the sum of the first j odd integers
+
+  # This will not work when N exceeds the storage of a Perl scalar, however,
+  # in this case the algorithm would be way to slow to terminate, anyway.
+
+  # As soon as the last element of $cx is 0, we split it up and remember
+  # how many zeors we got so far. The reason is that n! will accumulate
+  # zeros at the end rather fast.
+  my $zero_elements = 0;
+
+  # If n is even, set n = n -1
+  my $k = _num($c,$cx); my $even = 1;
+  if (($k & 1) == 0)
+    {
+    $even = $k; $k --;
+    }
+  # set k to the center point
+  $k = ($k + 1) / 2;
+#  print "k $k even: $even\n";
+  # now calculate k * k
+  my $k2 = $k * $k;
+  my $odd = 1; my $sum = 1;
+  my $i = $k - 1;
+  # keep reference to x
+  my $new_x = _new($c, $k * $even);
+  @$cx = @$new_x;
+  if ($cx->[0] == 0)
+    {
+    $zero_elements ++; shift @$cx;
+    }
+#  print STDERR "x = ", _str($c,$cx),"\n";
+  my $BASE2 = int(sqrt($BASE))-1;
+  my $j = 1; 
+  while ($j <= $i)
+    {
+    my $m = ($k2 - $sum); $odd += 2; $sum += $odd; $j++;
+    while ($j <= $i && ($m < $BASE2) && (($k2 - $sum) < $BASE2))
+      {
+      $m *= ($k2 - $sum);
+      $odd += 2; $sum += $odd; $j++;
+#      print STDERR "\n k2 $k2 m $m sum $sum odd $odd\n"; sleep(1);
+      }
+    if ($m < $BASE)
+      {
+      _mul($c,$cx,[$m]);
+      }
+    else
+      {
+      _mul($c,$cx,$c->_new($m));
+      }
+    if ($cx->[0] == 0)
+      {
+      $zero_elements ++; shift @$cx;
+      }
+#    print STDERR "Calculate $k2 - $sum = $m (x = ", _str($c,$cx),")\n";
+    }
+  # multiply in the zeros again
+  unshift @$cx, (0) x $zero_elements; 
+  return $cx;
+  }
 
   # go forward until $base is exceeded
   # limit is either $x steps (steps == 100 means a result always too high) or
@@ -1327,6 +1446,9 @@ sub _fac
   else
     {
     # Yes, so we can speed it up slightly
+  
+#    print "# left over steps $n\n";
+
     my $base_4 = int(sqrt(sqrt($BASE))) - 2;
     #print STDERR "base_4: $base_4\n";
     my $n4 = $n - 4; 
@@ -1352,7 +1474,7 @@ sub _fac
       _mul($c,$cx,[$b]);
       }
     # do what's left over
-    while ($step < $n)
+    while ($step <= $n)
       {
       _mul($c,$cx,[$step]); $step++;
       if ($cx->[0] == 0)
@@ -1360,10 +1482,9 @@ sub _fac
         $zero_elements ++; shift @$cx;
         }
       }
-    _mul($c,$cx,[$step]) if $step == $n;
     }
   # multiply in the zeros again
-  unshift @$cx, (0) x $zero_elements; 
+  unshift @$cx, (0) x $zero_elements;
   $cx;			# return result
   }
 
@@ -2139,6 +2260,7 @@ The following functions are REQUIRED for an api_version of 2 or greater:
 	_alen(obj)	returns approximate count of the decimal digits of the
 			object. This estimate MUST always be greater or equal
 			to what _len() returns.
+        _nok(n,k)	calculate n over k (binomial coefficient)
 
 The following functions are optional, and can be defined if the underlying lib
 has a fast way to do them. If undefined, Math::BigInt will use pure Perl (hence
