@@ -132,6 +132,8 @@ Math::BigInt::Calc:
  * _root() was wrong for numbers like 9 (0b1001) because they start with
    the pattern /^0b1(0+)/ (missing '$' in regexp) and after fixing this
    it was dead slow for large numbers.
+2004-01-25 v0.39 Tels
+ * _zeros(0) is 0, not 1
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -396,6 +398,12 @@ Math::BigFloat:
 2004-01-13 v1.43 Tels
  * small fixes in AUTOLOAD
  * delete $x->{_a} vs. $x->{_a} = undef to save memory
+2004-03-12 v1.44 Tels
+ * bpow() computed -X ** Y wrong for Y that are odd
+ * use $HALF instead of 0.5 to speed up broot()
+ * use Calc instead of BigInt for parts, that makes it roughly 2x faster
+   it also saves memory (419 vs. 767 bytes per (small number) object)
+ * bmod() did needlessly test for NaN arguments twice
  
 ############################################################################## 
 Math::BigInt:
@@ -747,6 +755,15 @@ Math::BigInt:
  * digit($x,$y) segfaulted under 5.6.1 if $y was a BigInt
  * blog() was missing the modify() check (breaking MBI::Constant)
  * delete $x->{_a} vs. $x->{_a} = undef to save memory
+2004-03-12 v1.70 Tels
+ * bpow() computed -X ** Y wrong for Y that are odd
+ * 0 ** -Y => +inf (was NaN) due to 0 ** -Y => 1/0**Y => 1/0 => +inf
+ * fixed bug in perl -Mbignum -le 'print 2 ** 46 * 3' under Bigint::Lite
+   leading to "Can't use an undefined value as an ARRAY reference at
+   /usr/local/lib/perl5/5.8.2/Math/BigInt/Calc.pm line 462."
+ * fixed upgrading of blog() with base = undef (means: base e)
+ * make the synopsis actually runnable (Thanx Paul McCarthy)
+ * blcm(): handle a list of strings (instead one obj and some strings), too
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

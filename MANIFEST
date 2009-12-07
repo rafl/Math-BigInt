@@ -20,6 +20,7 @@ lib/Math/BigInt.pm
 lib/Math/BigInt/Calc.pm
 lib/Math/BigInt/CalcEmu.pm	# emulate missing low-level math routines
 lib/Math/BigFloat.pm
+t/_e_math.t			# test _e_foo() helper routines in MBF
 t/mbimbf.inc			# test accuracy/precision settings in MBI/MBF
 t/mbimbf.t			# test A & P with MBI/MBF
 t/sub_mif.t			# test A & P with Subclasses

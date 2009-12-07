@@ -1,15 +1,15 @@
 
 Known bugs:
 
+* TODO BUGS:
+  + implement test for the upgrading bug in bsub()
+  + negative operands in &, ^ and | are borken [perl #26559]
+
 * General:
   + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
     you need it, please bug the autor(s) about it.
 
 * BigFloat:
-  + with 'Math::BigInt::Lite' does not work as of Lite v0.08. The reason
-    is that BigFloat does unholy things with it's "BigInt" minion, and Lite
-    isn't a proper BigInt subclass. Fixes either in Lite (slow) or BigFloat
-    (slow, too).
   + comparing (<=> or == or !=) a BigFloat to a BigInt don't work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
