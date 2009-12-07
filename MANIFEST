@@ -1,5 +1,6 @@
 BENCHMARK
 BUGS
+Build.PL
 CHANGES				# changes from the original v0.01
 CREDITS
 examples/1000.txt
@@ -8,6 +9,15 @@ examples/hailstone.pl
 examples/prime.pl
 GOALS
 HISTORY				# detailed version history
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 INSTALL
 lib/Math/BigFloat.pm
 lib/Math/BigInt.pm
@@ -16,6 +26,7 @@ lib/Math/BigInt/CalcEmu.pm	# emulate missing low-level math routines
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.yml			# Module meta-data (added by MakeMaker)
 NEW				# what's new in this version
 README
@@ -51,6 +62,8 @@ t/mbi_ali.t			# test alias subrotuines w/ alias.inc
 t/mbi_rand.t			# do some testing w/ random inputs/outputs
 t/mbimbf.inc			# test accuracy/precision settings in MBI/MBF
 t/mbimbf.t			# test A & P with MBI/MBF
+t/nan_cmp.t
+t/new_overloaded.t
 t/pod.t				# test that the POD is well-formed
 t/pod_cov.t			# test that the POD covers all public functions
 t/req_mbf0.t			# test: require Math::BigFloat; ->bzero();

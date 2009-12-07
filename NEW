@@ -1,7 +1,17 @@
-This lists only the changes for the current release (v1.78) over the last
+This lists only the changes for the current release (v1.80) over the last
 version, since HISTORY is now quite big:
 
-* fix typos (beeig vs being etc.)
+* fix bug #24969 (Can't use an undefined value as an ARRAY reference)
+* fix bug #25144: [PATCH] Math::BigFloat->new considers any reference a BigInt
+  (Thanx mschwern!)
+* fix bug #12857: Subclasses and overload
+* fix bug #13866: NaN (in bignum queue)
+* fix bug #21586: Incorrect result when comparing with NaN
+* fix bug #15896: "==" overloading is broken for "NaN"
+* fix bug #17447: Can't call method Math::BigFloat->bsub, not a valid method
+* bundle Module::Install and use it
+* check for older installed math modules and force upgrading
+* fix t/calling.t under Perl core (Thanx Steve Peters!)
 
 ##############################################################################
 

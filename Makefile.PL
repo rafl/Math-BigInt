@@ -1,39 +1,57 @@
-use ExtUtils::MakeMaker;
 
-sub MY::metafile {
-  package MY;
-  my $self = shift;
-  if (!eval { require YAML; 1 })
+# We need at least Perl 5.6.2
+require 5.6.2;
+use strict;
+
+# Load the Module::Install bundled in ./inc/
+use inc::Module::Install;
+
+# The name of your distribution
+name		'Math-BigInt';
+
+# Get most of the details from the primary module
+all_from	'lib/Math/BigInt.pm';
+
+requires	'perl'		=> 5.006002;
+
+# see if old versions are installed, and if so, force
+# and upgrade:
+
+check_minimum_version ('Math::BigInt::FastCalc' => 0.12);
+check_minimum_version ('Math::BigInt::GMP'	=> 1.19);
+check_minimum_version ('Math::BigRat'		=> 0.17);
+check_minimum_version ('bignum' 		=> 0.19);
+
+recommends	'Math::BigRat'		=> 0.17;
+recommends	'Math::BigInt::GMP'	=> 1.19;
+recommends	'bignum'		=> 0.19;
+
+build_requires	'Test::More'	=> 0.42;
+
+makemaker_args	INSTALLDIRS => 'perl';
+
+license		'perl';
+
+author		'Tels <nospam-abuse@bloodgate.com>';
+
+# Do not index these
+no_index	directory	=> 'examples';
+
+# Generate the Makefile
+WriteAll;
+
+1;
+
+sub check_minimum_version
   {
-    warn ("YAML not installed, will not override META.yml");
-    return $self->SUPER::metafile_target(@_);
-  };
+  my ($module, $version) = @_;
 
-  require YAML::Node;
-  my $node = new YAML::Node {};
+  my $v; eval " require $module; \$v = \$${module}::VERSION;";
 
-  $node->{name}			= $self->{DISTNAME};
-  $node->{version}		= $self->{VERSION};
-  $node->{author}		= 'Tels',
-  $node->{abstract}		= 'Arbitrary size integer/float math package';
-  $node->{version_from}		= $self->{VERSION_FROM};
-  $node->{license}		= 'perl';
-  $node->{distribution_type}	= 'module';
-  $node->{generated_by}		= "$self->{DISTNAME} version $self->{VERSION}";
-  $node->{installdirs}		= 'perl';
-  $node->{requires}		= $self->{PREREQ_PM};
-
-  my $dump = YAML::Dump( $node );
-
-  $dump =~ s/^(.*)$/\t\$(NOECHO) \$(ECHO) "$1" >>META.yml/gm;
-  $dump =~ s/>>META\.yml/>META.yml/;
-
-  "metafile:\n$dump";
+  # if the module is installed, but outdated, add it to the requirements
+  if (defined $v && $v < $version)
+    {
+    requires $module => $version;
+    } 
   }
 
-WriteMakefile(
-    'NAME'		=> 'Math-BigInt',
-    'VERSION_FROM'	=> 'lib/Math/BigInt.pm',
-    'PREREQ_PM'		=> { },
-    'INSTALLDIRS'	=> 'perl',
-);

@@ -4,7 +4,7 @@
 
 package Math::BigInt::Scalar;
 
-use 5.005;
+use 5.006002;
 use strict;
 # use warnings; # dont use warnings for older Perls
 

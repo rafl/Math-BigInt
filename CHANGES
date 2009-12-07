@@ -470,6 +470,12 @@ Math::BigFloat:
  * make as_int() return a BigInt, too (not just as_number()) (bug #21412)
  * add as_oct()
  * bpow(): handle negative X and negative Y (instead of returning NaN)
+2007-03-04 v1.53 Tels
+ * fix #25144: [PATCH] Math::BigFloat->new considers any reference a BigInt
+   (Thanx mschwern!)
+ * fix bug #13866: NaN (in bignum queue)
+ * fix bug #21586: Incorrect result when comparing with NaN
+ * fix bug #15896: "==" overloading is broken for "NaN"
 
 ############################################################################## 
 Math::BigInt:
@@ -880,6 +886,12 @@ Math::BigInt:
  * add as_oct()
 2007-02-02 v1.79 Tels
  * fix typos
+2007-03-04 v1.80 Tels
+ * fix bug #24969 (Can't use an undefined value as an ARRAY reference)
+ * fix bug #12857: Subclasses and overload
+ * fix bug #13866: NaN (in bignum queue)
+ * fix bug #21586: Incorrect result when comparing with NaN
+ * fix bug #15896: "==" overloading is broken for "NaN"
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
