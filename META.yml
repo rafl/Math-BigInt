@@ -1,10 +1,11 @@
 ---
 name: Math-BigInt
-version: 1.78
+version: 1.79
 author: Tels
+abstract: Arbitrary size integer/float math package
 version_from: lib/Math/BigInt.pm
 license: perl
 distribution_type: module
-generated_by: Math-BigInt version 1.78
+generated_by: Math-BigInt version 1.79
 installdirs: perl
 requires: {}

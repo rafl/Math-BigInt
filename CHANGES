@@ -174,7 +174,7 @@ Math::BigInt::CalcEmu:
 2004-01-13 v0.03 Tels
  * $VERSION was overriding the $VERSION from MBI (Thanx Gisle Aas!)
 2004-03-12 v0.04 Tels
- * removed unnecc. emulation routines (all except _signed_foo)
+ * removed unnec. emulation routines (all except _signed_foo)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -358,7 +358,7 @@ Math::BigFloat:
  * bdiv()/badd() etc skip objectify() if possible and are thus faster
  * doc for accuracy()/precision()
  * $x->bmod() was not modifying $x in place when returning NaN/inf/-inf
- * avoid unecc. calls to objectify() for binary op's
+ * avoid unec. calls to objectify() for binary op's
 2002-08-13 v1.36 Tels
  * as_hex() and as_bin() work now at least for inf, NaN and integers
  * fixed bsstr() (and thus also numify()) for negative numbers - Ouch!
@@ -406,7 +406,7 @@ Math::BigFloat:
  * $x->blog($base) can handle a $base which is a Math::Bigint
  * replace die() with Carp::croak
 2003-09-23 v1.40 Tels
- * bstr(): removed unnecc. BigInt math and inlined is_zero() => great speedup
+ * bstr(): removed unnec. BigInt math and inlined is_zero() => great speedup
    (10% to factor 6.5 depending on input)
  * replace $self->_one() by $self->bone()
 2003-12-11 v1.41 Tels
@@ -658,7 +658,7 @@ Math::BigInt:
  * bpow() about 10-15% faster for small numbers (like 2 ** 150, 3 * 200 etc)
 2001-11-11 v1.46 Tels
  * binc(),bdec() use lib (via _inc(),_dec()) => faster (see BENCHMARK)
- * avoid the unnecc. rounding bsub()/binc()/bdec() (badd() already took care)
+ * avoid the unnec. rounding bsub()/binc()/bdec() (badd() already took care)
  * made bsub() faster by removing the bneg() overhead from it 
 2001-11-18 v1.47 Tels
  * added $rnd_mode support for compatibility
@@ -671,7 +671,7 @@ Math::BigInt:
  * bsqrt: use _sqrt() from lib, if possible
  * bsqrt: would hang for certain (most?) inputs
  * bdiv: slow check for 1 || -1 replaced by much faster version
- * bdiv: call _div() only when necc. in list context, otherwise scalar
+ * bdiv: call _div() only when nec. in list context, otherwise scalar
  * streamlined copy(), _find_round_parameters()
  * removed the EXPORT_OK except for objectify, _swap and bgcd/blcm
  * bzero(), bone(): take additional A and P and store 'em
@@ -878,6 +878,8 @@ Math::BigInt:
  * fix bug perl #41050 - NaN returned when raising integer value to negative power
  * add from_hex(), from_oct(), and from_bin()
  * add as_oct()
+2007-02-02 v1.79 Tels
+ * fix typos
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

@@ -51,8 +51,8 @@ t/mbi_ali.t			# test alias subrotuines w/ alias.inc
 t/mbi_rand.t			# do some testing w/ random inputs/outputs
 t/mbimbf.inc			# test accuracy/precision settings in MBI/MBF
 t/mbimbf.t			# test A & P with MBI/MBF
-t/pod.t				# is the POD wellformed?
-t/pod_cov.t			# does the POD cover all public functions?
+t/pod.t				# test that the POD is well-formed
+t/pod_cov.t			# test that the POD covers all public functions
 t/req_mbf0.t			# test: require Math::BigFloat; ->bzero();
 t/req_mbf1.t			# test: require Math::BigFloat; ->bone();
 t/req_mbfa.t			# test: require Math::BigFloat; ->bnan();
