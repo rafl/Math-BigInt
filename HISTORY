@@ -140,6 +140,8 @@ Math::BigInt::CalcEmu:
  * first version, taken over all the code from BigInt
 2003-12-30 v0.02 Tels
  * the code in Calc::_root() uses now sprintf(), but the one in Emu was not
+2004-01-13 v0.03 Tels
+ * $VERSION was overriding the $VERSION from MBI (Thanx Gisle Aas!)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -391,7 +393,10 @@ Math::BigFloat:
    this makes it much faster in case the result is a perfect integer
  * require (instead of use) Exporter
  * froot() calculates an integer result first, and it if fits, returns it
-
+2004-01-13 v1.43 Tels
+ * small fixes in AUTOLOAD
+ * delete $x->{_a} vs. $x->{_a} = undef to save memory
+ 
 ############################################################################## 
 Math::BigInt:
 
@@ -737,6 +742,11 @@ Math::BigInt:
  * bpow(): removed some now needless tests for 0 and 1: about 30% faster
    for small numbers
  * streamlined exponent() (parts() benefits from this, too)
+2004-01-13 v1.69 Tels
+ * bacmp(+-$x,-inf) was wrong (Thanx William T. Morgan!)
+ * digit($x,$y) segfaulted under 5.6.1 if $y was a BigInt
+ * blog() was missing the modify() check (breaking MBI::Constant)
+ * delete $x->{_a} vs. $x->{_a} = undef to save memory
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
