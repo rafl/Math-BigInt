@@ -11,7 +11,7 @@ Known bugs:
     is that BigFloat does unholy things with it's "BigInt" minion, and Lite
     isn't a proper BigInt subclass. Fixes either in Lite (slow) or BigFloat
     (slow, too).
-  + comparing (<=> or == or !=) a BigFloat to an BigInt does not work yet
+  + comparing (<=> or == or !=) a BigFloat to a BigInt don't work yet
   + new is first running the entire number trough _split, then again the parts
     to construct BigInts. Could be a bit more optimzed.
   + fdiv() using F (fallback) mode does not work properly in all cases of
@@ -31,8 +31,6 @@ Known bugs:
   + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
   
 * BigInt:
-  + blog() is not finished yet
-  + .2e2 is not yet recognized as valid input
   + exponent on input is limited to a Perl int (bigger numbers won't fit
     into your memory, anyway - use BigFloat)
   + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
@@ -40,8 +38,9 @@ Known bugs:
   + Handling of undef arguments is somewhat broken (no proper warnings)
   + eval('use...') and use Math::BigInt qw/:constant/ fail on Perl prior 5.6.0
     This is likely an Exporter bug, and causes Math::BigInt to eval require on
-    earlier Perls when loading the core math lib. Thus the loading can fail on
-    filesystems that can not cope with 'Math/BigInt/Calc.pm' style filenames.
+    earlier Perls when loading the core math lib. Thus the loading can fail 
+    under older Perls on filesystems that can not cope with the
+    'Math/BigInt/Calc.pm'-style filenames.
 
 ###############################################################################
 
@@ -87,7 +86,7 @@ confronted with mixed arguments, but for others it works by suprise.
 
 My new code is only partially better, I am afraid.
 
-Update: use bignum; use bigint; and use bigrat; solve this problem.
+Update: use bignum; use bigint; and use bigrat; should solve this problem.
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

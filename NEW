@@ -1,97 +1,53 @@
-This lists only the changes for the current release (v1.66) over the last
+This lists only the changes for the current release (v1.67) over the last
 version, since HISTORY is now quite big:
 
-Calc : fixed a bug in _div_use_div() where the remainder was computed as X,
-	instead of 0, when X == Y and both X and Y were very big
-        (Thanx to the rand testing in a loop (thanx Paul Green!) we found it)
-       fixed bug in div that computed result off by one when one of the scratch
-	values overflowed
-       _div_use_div() hat a shortcurt for X beeing bigger than/equal to Y, but
-	_div_use_mul() didn't - so let's C&P the shortcut code over
-       _root(): warn if result cannot yet be computed
-       _root(): compute proper result if $n is a power of 2	
-MBI  : increased version
-       better doc for accepted inputs (thanx and sorry abigail!)
-       removed section about "Canonical Form" from doc - it was unclear why
-	this was in the doc, where it is used or important at all
-       fixed parameter handling in broot() regarding undefined $Y (see below)
-       broot(): w/o _root() in lib: 
-	compute proper result if $n is a power of 2
-	compute proper result if $x is small (len < 6)
-        warn if proper result cannot be computed
-       removed the needless _one() (which was just a wrapper around bone()) -
-	this makes binc() about 3% faster...
-       inlined the code from _swap() into the overload section, improving
-	speed of overloaded math a trifle (or more, in case of GMP)
-MBF  : simplified logic in bsrt() and cut out unnecc. BigInt math -> speedup
-       replaced lone call to $self->_one() by $self->bone()
-Misc : 
-tests: tests for bmod(X,X) with large X
-       the mbi_rand test now uses a larger seed, giving more different tests
-       the mbi_rand test also prints the seed for each failure, so that I get
-       it from failure reports.
-       added tests for the fixed bugs
-       tests for broot() (upgrading, and proper results)
-
-##############################################################################
-
-Benchmark: running 0, 0.123456789, 0.5, 100, 100.123456789, 123.123456789 for at least 5 CPU seconds...
-
-v1.66:
-            0:  4s (5.27 usr +  0.00 sys =  5.27 CPU) 91547/s (n=482454)
-  0.123456789:  6s (5.23 usr +  0.00 sys =  5.23 CPU) 28034/s (n=146618)
-          0.5:  5s (5.23 usr +  0.00 sys =  5.23 CPU) 29090/s (n=152141)
-          100:  6s (5.23 usr +  0.00 sys =  5.23 CPU) 29090/s (n=152141)
-100.123456789:  5s (5.16 usr +  0.00 sys =  5.16 CPU) 27011/s (n=139377)
-123.123456789:  6s (5.24 usr +  0.00 sys =  5.24 CPU) 27100/s (n=142007)
-
-v1.65:
-            0:  6s (5.31 usr +  0.00 sys =  5.31 CPU) 80228/s (n=426012)
-  0.123456789:  5s (5.30 usr +  0.00 sys =  5.30 CPU)  3023/s  (n=16026)
-          0.5:  6s (5.27 usr +  0.00 sys =  5.27 CPU)  3040/s  (n=16026)
-          100:  5s (5.26 usr +  0.00 sys =  5.26 CPU)  7503/s  (n=39470)
-100.123456789:  5s (5.28 usr +  0.00 sys =  5.28 CPU)  9376/s  (n=49506)
-123.123456789:  6s (5.29 usr +  0.00 sys =  5.29 CPU)  9358/s  (n=49506)
-
-##############################################################################
-
-Benchmark: and for at least 5 CPU seconds...
-(Similiar numbers for other operations like *, /, % etc)
-
-v1.65:
-      Calc and: 5s (5.32 usr +  0.00 sys =  5.32 CPU)   3922/s (n=20868)
-       GMP and: 5s (5.23 usr +  0.00 sys =  5.23 CPU)  13576/s (n=71003)
-
-v1.66:
-      Calc and: 5s (5.29 usr +  0.00 sys =  5.29 CPU)   3967/s (n=20990)
-       GMP and: 6s (5.09 usr +  0.20 sys =  5.29 CPU)  14380/s (n=76075)
-
-##############################################################################
-
- v1.65: perl -Mbigint -le 'print 123->broot()'
- Can't call method "is_zero" on an undefined value at BigInt.pm line 2161.
- v1.66: perl -Mbigint -le 'print 123->broot()'
- 11
-
- v1.65: perl -Mbignum -le 'print 123->broot(2)'
- NaN
- v1.66: perl -Mbignum -le 'print 123->broot(2)'
- 11.09053650640941716205160010260993291846
-
- v1.65: perl -Mbignum -le 'print 123->broot()'
- Can't call method "is_zero" on an undefined value at BigInt.pm line 2161.
- v1.66: perl -Mbignum -le 'print 123->broot()'
- 11.09053650640941716205160010260993291846
-
- v1.65: perl -Mbignum -le 'print +(2 ** 64)->broot(8)'
- NaN
- v1.66: perl -Mbignum -le 'print +(2 ** 64)->broot(8)'
- 256
-
- v1.65: perl -Mbigint -le 'print +(2 ** 64)->broot(8)'
- 18446744073709551616
- v1.66: perl -Mbigint -le 'print +(2 ** 64)->broot(8)'
- 256
+Calc : fixed bug in _root(): int() rounds sometimes wrong, so use sprintf()
+       _as_bin() and _as_hex() are faster (for small values) due to inlining
+	is_zero()
+       _acmp() is about 26% faster for very small numbers or numbers that
+	differ in length, and slightly faster for bigger numbers. This helps
+	both bacmp() and bcmp()
+       _fac() did:
+	+ not modify $x in place for small arguments
+	+ something strange for large arguments
+	+ not handle 0..2 optimal (code now simplified)
+       _as_bin() used %b, which was not known to v5.5.3 - workaround that
+       implemented _log_int(), which is simple and very fast
+       implemented the missing pieces for _root() (which is quite fast)
+MBI  : reorder is_zero() check for band(), bior() and bxor() to speed up the
+	case for when the underlying lib has _and(), _ior() and _xor()
+       implement a new way of emulating AND, OR and XOR, this tremendously
+	helps if band() et. al. are called with negative arguments
+       try to call _signed_or(), _signed_and() and _signed_xor() in lib
+       is_foobar() methods are slightly faster
+       bnot() is about 12% faster
+       bsqrt(): moved is_zero() || is_one() test out of the way => 28% faster
+	for "small" values (Calc and GMP)
+       small change for overload::constant
+       bfac(): do 0 or 1 check only if CALC cannot do _fac() (thus faster)
+       cache $CALC->can() results in global %CAN hash for more speed
+       overload for cos()/sin() to make cos(Math::BigInt->new(...)) work
+       implemented an all-integer version of blog(), which is simple and fast
+       removed a needless _copy() in bmod() with negative arguments
+MBF  : flog(): 0.5, 0.25, 0.125, 2, 4 and 8 were not scaled properly back to
+	1, instead they remained 0.5 and 2, respectively. This was a '<' vs.
+	'>=' respective '<' vs. '<=' issue. No other values are affected
+	(neither getting slower nor faster), but the ones in question (incl.
+	their multiples like 20, 80, 0.0125 etc) are now tremendously faster -
+	about a factor of 30 to 60! :-)
+       removed some crufty logic from _log_10() and made the special cases of
+	2, 10 and 0.1 slightly faster. This also helps log($x,2) & log($x,10).
+       bfac() slightly faster for small arguments
+       downgrading to bigint failed for .2e2 (produced 200 vs. 20)
+Misc : warn if blog() fails to compute result 
+tests: more tests for _pow(), _root(), _acmp() and _fac() in bigintc.t
+       added const_mbf.t: test for BigFloat constant w/o BigInt, also make
+	these constant tests better when running in core
+       added t/fallback.t
+       fixed bigintc.t tests for BASE_LEN < 7 (e.g. obscure archs :)
+       added tests for _log_int() 
+       more tests for downgrading
+       tests for MBI blog()
 
 ##############################################################################
 

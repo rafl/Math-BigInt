@@ -110,6 +110,21 @@ Math::BigInt::Calc:
    X was very large
  * fixed a off-by-one error discovered with mbi_rand.t in _div_use_XXX()
    (one internal in $x overflowed, thus the wrong computation)
+2003-12-11 v0.37 Tels
+ * implemented _log_int() with a simple and fast "iterative" method
+ * fixed bug in _root(): int() rounds sometimes wrong, so use sprintf()
+ * _as_bin() and _as_hex() are faster (for small values) due to inlining
+   is_zero()
+ * _acmp() is about 26% faster for very small numbers or numbers that
+   differ in length, and slightly faster for bigger numbers. This helps
+   both bacmp() and bcmp()
+ * _fac() did:
+   + not modify $x in place for small arguments
+   + something strange for large arguments
+   + not handle 0..2 optimal (code now simplified)
+ * _as_bin() used %b, which was not known to v5.5.3 - workaround that
+ * implemented _log_int(), which is simple and very fast
+ * implemented the missing pieces for _root() (which is quite fast)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -339,9 +354,21 @@ Math::BigFloat:
 2003-07-06 v1.39 Tels
  * $x->blog($base) can handle a $base which is a Math::Bigint
  * replace die() with Carp::croak
-2003-09-22 v1.40 Tels
+2003-09-23 v1.40 Tels
  * bstr(): removed unnecc. BigInt math and inlined is_zero() => great speedup
    (10% to factor 6.5 depending on input)
+ * replace $self->_one() by $self->bone()
+2003-12-11 v1.41 Tels
+ * flog(): 0.5, 0.25, 0.125, 2, 4 and 8 were not scaled properly back to
+   1, instead they remained 0.5 and 2, respectively. This was a '<' vs.
+   '>=' respective '<' vs. '<=' issue. No other values are affected
+   (neither getting slower nor faster), but the ones in question (incl.
+   their multiples like 20, 80, 0.0125 etc) are now tremendously faster -
+   about a factor of 30 to 60! :-)
+ * removed some crufty logic from _log_10() and made the special cases of
+   2, 10 and 0.1 slightly faster. This also helps log($x,2) and log($x,10).
+ * bfac() slightly faster for small arguments
+ * downgrading to bigint failed for .2e2 (produced 200 vs. 20)
 
 ############################################################################## 
 Math::BigInt:
@@ -657,6 +684,25 @@ Math::BigInt:
  * implement broot() if lib doesn't have a _root() routine for $y that are
    powers of two and for small $x
  * warn if broot() cannot yet compute proper result
+ * remove needless _one(): 3% speedup for binc()
+ * remove needless _swap(): 1% (Calc) - 6% (GMP) speedup for overloaded math
+2003-12-02 v1.67 Tels
+ * overload for cos/sin/exp/atan2 to make cos(Math::BigInt->new(...)) work
+ * implemented blog() with a simple and fast "iterative" method
+ * use _log_int() in $CALC if possible
+ * cache $CALC->can(...) calls in global %CAN hash for speed
+ * reorder is_zero() check for band(), bior() and bxor() to speed up the
+   case for when the underlying lib has _and(), _ior() and _xor()
+ * implement a new way of emulating AND, OR and XOR, this tremendously
+    helps if band() et. al. are called with negative arguments
+ * try to call _signed_or(), _signed_and() and _signed_xor() in lib
+ * is_foobar() methods are slightly faster
+ * bnot() is about 12% faster
+ * bsqrt(): moved is_zero() || is_one() test out of the way => 28% faster
+   for "small" values (Calc and GMP)
+ * small change for overload::constant
+ * bfac(): do 0 or 1 check only if CALC cannot do _fac() (thus faster)
+ * removed a needless _copy in bmod() with megative arguments (slightly faster)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

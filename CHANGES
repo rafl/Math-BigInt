@@ -2,7 +2,7 @@ This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For what has changed in the latest version see NEW
 and for a complete list of changes see the file HISTORY.
 
-v1.65:
+v1.67:
 
  general:
   + It is subsequent faster than the original in many places
@@ -83,6 +83,7 @@ v1.65:
   + MBI: bsqrt()
   + bmodpow(), bmodinv() (Thanx John Borwick)
   + bfloor(), bceil(), broot()
+  + CORE cos()/sin()/exp()/atan2() now work when passed BigInt's or BigFloat's
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

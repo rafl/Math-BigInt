@@ -1,12 +1,7 @@
 See also various .pm files.
 
 General:
- * remove the broken _swap() stuff and inline it - plus the tests for it. It
-   just doesn't work and justify the extra call overhead...
  * Copy on write (helps for $x = -$x; cases etc) (seems to make it slower :/
- * try to cache UNIVERSAL::can results, since $CALC shouldn't change (or even
-   unset them when $CALC changes) (it could change for on-the-fly library
-   changed...)
  * run config() and die_on_nan() tests under Subclass.pm
  
 Math::BigFloat:
@@ -20,7 +15,8 @@ Math::BigFloat:
  * tests for frsft() and flsft() with $n != 2
  * blog() is still quite slow for numbers with lots of decimals (8 seconds vs.
    72 (or million years in v1.6 :) for log(123**123) is quite good, actually,
-   but still not good enough for me...)
+   but still not good enough for me...). blog() could use the blog() from
+   BigInt as a first try, and maybe even to compute float results faster
  * finish broot() by using different algorithmn
 
 Math::BigInt:
@@ -29,8 +25,8 @@ Math::BigInt:
    P and neither of bround(), bround(), accuracy() or precision() was called
  * bround() is only used by MBF for -$scale = -$len, anyway. POD is wrong for
    this, too
- * blog() needs implementing
- * broot() needs implementing
+ * overload of cos()/sin()/exp()/atan2() is too DWIM (should return BigInt or
+   BigFloat, not scalar) - also document it
  * +5 % 0 or -5 % 0 == NaN (should it be something else?)
  * certain shortcuts returning bzero(), bone() etc may not set the requested
    rounding parameters, so that $x->foo($y,$a,$p,$r) may return $x without a
@@ -54,9 +50,9 @@ Math::BigInt::Calc:
  * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * look at div() for more speed
  * alternative mul() method using shifts
- * find a way to let underlying lib calculate band(), bior(), bxor() for
-   negative inputs
- * make converting between bases faster
+ * implement in Calc (and GMP etc) to calculate band(), bior(), bxor() for
+   negative inputs (_signed_or() etc)
+ * _log_int() and _root() don't scale very well, make them O(log N) vs O(N)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

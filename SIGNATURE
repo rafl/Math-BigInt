@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.22.
+signed via the Module::Signature module, version 0.36.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,43 +14,46 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 
 SHA1 f6ef98e8f3f6a4f670d569f279ef5a3c05c16d0c BENCHMARK
-SHA1 8d18cc8f80b681a4ad4efa0e37e4a0d0cb850487 BUGS
-SHA1 3b7cf084900d287e193cc163a6611ce2a95b1e32 CHANGES
+SHA1 c5575b8fbeaaa1bd7b2077d905d23562a30cea7f BUGS
+SHA1 804e10f910419ea6fbda3494fabb711ed97ae9db CHANGES
 SHA1 d1f3d099ce1201df8dbeba4134e9c481ec058800 CREDITS
 SHA1 bc2db74538d3acd53f71b5512a144fe18c253ecd GOALS
-SHA1 0b62884b9b0d026bb8f1469bfe4aca51c71b4f43 HISTORY
+SHA1 5078958e0db314fa1258cbcc3535b5d991e56a0d HISTORY
 SHA1 c42565ad26cdf91502bacf19a4f7080e63c51fe2 INSTALL
 SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
-SHA1 e7c8405afb5cb30fdbf0c078a375f66f35e1be7a MANIFEST
+SHA1 640f13ea199eabb160dd6ecffe3242f1a0c43b5c MANIFEST
+SHA1 068f94c802cd5024671b870238dcfef0feac226d META.yml
 SHA1 6f91d1f9464f77b28f29e85501edbe8c52607e7c Makefile.PL
-SHA1 5a11aa5791c8c9ff4f0bbfc5164259ecf6980076 NEW
+SHA1 260f24f9fc25f99d69a6a31059840a87362f85ad NEW
 SHA1 481f5827752d2100914db1eaeb60bf0bbd13529e README
-SHA1 1f57b52778a5c330652c42a407a24198423f8c66 TODO
+SHA1 4d48265ac0cf86b82ec05b5e220be610bf8ef5ca TODO
 SHA1 c2bbe82659480de8710b9e64a62d47b64dddd2d2 examples/1000.txt
 SHA1 b88700764a8b78c904ed38e50db0286b76228132 examples/bigprimes.pl
 SHA1 b57b118469a1a16e54d61206c5bd9077dbb2231a examples/hailstone.pl
 SHA1 8ca42793d8769ec8d0928f11c30f38d96dd54efb examples/prime.pl
-SHA1 ecf0766db58a5ebf5dc49130e484f9722db0ae64 lib/Math/BigFloat.pm
-SHA1 2dfbda839b5185015a6aa5761784ab8061ef2e1f lib/Math/BigInt.pm
-SHA1 4523ad0908138760c2293f8efacbf292463b932b lib/Math/BigInt/Calc.pm
+SHA1 884e0284f591afa8509796610831e5d132688386 lib/Math/BigFloat.pm
+SHA1 1aee28c905519d4b4addcd266156fdd48db078a3 lib/Math/BigInt.pm
+SHA1 fe49f407da15f3174c8c55806a3a74e51e416463 lib/Math/BigInt/Calc.pm
 SHA1 b95b155899fdd87e89c9f328d934a9685048ae54 t/Math/BigFloat/Subclass.pm
 SHA1 985096b28aa5bb61d55b78395db5e3147a6e09da t/Math/BigInt/BareCalc.pm
 SHA1 acc29724a937598608555f61c059b06e1791e0fc t/Math/BigInt/Scalar.pm
 SHA1 3976f800de5362a313722619d0427c3ab7e749c8 t/Math/BigInt/Subclass.pm
-SHA1 d55381e01846ccb588afe52b173d40c13907606d t/bare_mbf.t
-SHA1 08d7d5f941bcab65fb9641e2a801727a411dd9ec t/bare_mbi.t
+SHA1 1f6c2b13277446a27cb21f108dfb459a93b718a1 t/bare_mbf.t
+SHA1 b2867ebeec205aa57559e6da59147a3c44a2855b t/bare_mbi.t
 SHA1 12da5e811355abca64b9c14416fe356110d6fb4e t/bare_mif.t
-SHA1 603f1f227925fb8721c8b8d0ccd30075442d42cf t/bigfltpm.inc
-SHA1 c4193edfb93da67d8edfaaa5b66a28adc64b633c t/bigfltpm.t
-SHA1 39c47211dddde8c80444a29b5503c0407f6118d6 t/bigintc.t
-SHA1 57de33cbc726e8ec51bd2d4406bb1d652595919d t/bigintpm.inc
-SHA1 c0a83d5eb612b4fa134a86ceab0f8803fa077675 t/bigintpm.t
-SHA1 fdd9d5ae836d61e18ff30a92053dc12e6b4ae26f t/bigints.t
-SHA1 9777219bc273821ebaef47e93ef6ee961b10a0a3 t/biglog.t
+SHA1 e615c8eb6b5c365b84441abf31f9b9fffa5624d0 t/bigfltpm.inc
+SHA1 aaecef0a81f03c33a0db951820542794e14e6501 t/bigfltpm.t
+SHA1 495a5aaf864eb322edd5000e0ef4674b31f3af8d t/bigintc.t
+SHA1 c0b239091f7d9e62805bbab3ffa4c12682f2d0b4 t/bigintpm.inc
+SHA1 5f33788fc9b111aed9036e0476bf6df6b479cca1 t/bigintpm.t
+SHA1 25ed492697dcc1e3db3c6674a43048d418e0ef28 t/bigints.t
+SHA1 b35fcf132ee62548b369994695a2bc977c3e8716 t/biglog.t
 SHA1 0abbba67014fa0490d73ba71dfa53e66255dca73 t/calling.t
 SHA1 f4c9f57b6565efb24e3b9e509eedeaa05e663727 t/config.t
-SHA1 89afac8e40767dfaefb63ac168dfc6d4a8fa62c3 t/constant.t
-SHA1 06a61b0960baf481dea5f3933976a2144fcddede t/downgrade.t
+SHA1 3e7480664be0d45ff3711b0c661f5793cd253e57 t/const_mbf.t
+SHA1 dbc04817a8352ca24f4fdb79d0e89c4f98e2553d t/constant.t
+SHA1 55f097b5ad7e5f1125ab04546b8fb3aaad9aa286 t/downgrade.t
+SHA1 b7bbce193dcff5795c4696af990c403bdb08b147 t/fallback.t
 SHA1 6ff1c0440baac5d1d5acceac3993fd8edc746568 t/inf_nan.t
 SHA1 a934776dbb5f9d283280ee3daf8266fca40ba883 t/isa.t
 SHA1 fbc7c5097d202d9bc6a0a02171369e9e90ec5e2e t/mbi_rand.t
@@ -63,8 +66,8 @@ SHA1 43cb24fd2d6deb26f0caf9bf059b4ba7a7913cec t/req_mbfi.t
 SHA1 2ba7ca978b42eab85be6d937f119d10c92cb7c36 t/req_mbfn.t
 SHA1 5213caedd519e90de47e1110b76c611234c58856 t/req_mbfw.t
 SHA1 df2253458d6ad0d6dd41dc5e4c580be281a97bfd t/require.t
-SHA1 143c25a3603ea82037537b8707f19c9dbd9891f9 t/sub_mbf.t
-SHA1 a687b79e83b127c23db3c6bd5b9fb1149b94d1a3 t/sub_mbi.t
+SHA1 4decf98f39d28b696cb795b7b80e7d4250176bec t/sub_mbf.t
+SHA1 2bafa51d5e6954e577fda22f80166fe5d3c5bbfd t/sub_mbi.t
 SHA1 6babed8db201933c83089118593fa85440ef9e66 t/sub_mif.t
 SHA1 e4601e56140543350cb6c39ac6817620659739c7 t/trap.t
 SHA1 30fa2ddc770e9e302c3476c4b429291ec8db498d t/upgrade.inc
@@ -76,16 +79,16 @@ SHA1 f26a6159fcfacc3f8790497fdbac617cb5251016 t/use_lib2.t
 SHA1 690d52cb871750588441dc8c01338aa4a99d14b9 t/use_lib3.t
 SHA1 f82f3ff530c0f4863475b6888863597ec656f960 t/use_lib4.t
 SHA1 451a0c2b3c374c0da68f47d8790117a6032968c8 t/use_mbfw.t
-SHA1 d11d4bf5520eb8dff1f9120ae37424a8e5ad16c5 t/with_sub.t
+SHA1 87e52f82af9f1a127a212b16d49448227fc42af0 t/with_sub.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2-rc1-SuSE (GNU/Linux)
 Comment: When cryptography is outlawed, bayl bhgynjf jvyy unir cevinpl.
 
-iQEVAwUBP3Cfs3cLPEOTuEwVAQH2EAf7BK5enGyk7Y/DmxPCLjg6VRsRQmUMvy3J
-ttTfN9BIWpoAxXb8DwdI2/h9B2DdCgE9xFvK+s3t+F/62qatyEyTdAqAh01h33v1
-0R0oX0ygo5oLsQWMzpaQoRn19LlrsS0UtZrxwd5spftpRafcEV9Vl6+zonF6o7rb
-AVeGCMbC/pjz7TK6A2RqDgzs5Jvj04QLwa98wX96WjqSJk8u4thFb99/doHPFs7I
-u5c0pdLWV9RQQhrfWGRY5xFKUMUIBQPqlgezKlt9nw2n8QH7mdjpuVYN43bw/PsV
-to/NPAPz0srZrAyyhTmynQGQ8pI/p+EDsjq8Tn+2JUc9ZatTh30wZw==
-=bIwn
+iQEVAwUBP9jEF3cLPEOTuEwVAQFBpwf9FhF5EPjO+T2gPmbK0u754QHCs4/guzug
+nFpEskmpfhP5iE3JSe4bSF1fByxVKVJ/8TQfXuZ8CG/cqQRA0o+/vCw5Xa+bSpl1
+gOsQo0CBEyIwRYcR+PbpjXR2RJ6iPUmbyZEf0Ljk1PiJu7mbEBJVehpjhaxehyYr
+QR2x9KmbHr52oXtcv4wkJ3gfRpN5o7QiWB0Z+4tE7FTjIxfc/3hxf/QtK2XTiq+e
+7S0qq4y9ITYjV8/tW1O3U6SVFSZOipWBttEg06jsl9F2CWZDjaQdD3qgQOvxyWLQ
+uIdzOSJyYLjcH7pHxiFzYUjlquNUDiIWY55exKotErdtgmwbS90scA==
+=+VRV
 -----END PGP SIGNATURE-----

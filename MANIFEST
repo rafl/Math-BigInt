@@ -22,6 +22,7 @@ lib/Math/BigFloat.pm
 t/mbimbf.inc			# test accuracy/precision settings in MBI/MBF
 t/mbimbf.t			# test A & P with MBI/MBF
 t/sub_mif.t			# test A & P with Subclasses
+t/fallback.t			# test fallback for cos/sin/exp/atan2
 t/bigintc.t			# pure perl implementation of uint math core
 t/bigints.t			# scalar implementation of uint math core
 t/bigfltpm.t			# shell for M::BF tests
@@ -52,6 +53,7 @@ t/upgrade.t			# see if upgrading in BigInt works
 t/upgradef.t			# see if upgrading in BigFloat works
 t/downgrade.t			# see if downgrading works
 t/constant.t			# test Math::BigInt/BigFloat ':constant'
+t/const_mbf.t			# test Math::BigFloat ':constant'
 t/config.t			# test Math::BigInt->config()
 t/trap.t			# test whether trap_nan and trap_inf works
 t/inf_nan.t			# inf and NaN handling
@@ -63,3 +65,4 @@ t/Math/BigInt/BareCalc.pm	# for testing BigInt's simulation of Calc
 t/Math/BigInt/Subclass.pm	# empty subclass
 t/Math/BigFloat/Subclass.pm	# empty subclass
 t/Math/BigInt/Scalar.pm		# to test replacements for Math::BigInt::Calc
+META.yml                                 Module meta-data (added by MakeMaker)
