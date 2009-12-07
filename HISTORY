@@ -84,6 +84,9 @@ Math::BigInt::Calc:
  * undef mul/div in case Calc.pm get's loaded twice
  * fix in _as_hex() and _as_bin() for older Perls
  * speedups in _pow() and _modpow()
+2002-08-13 v0.31 Tels
+ * _acmp() no longer calls _len() => tad faster
+ * some cleanup of old code, added some more comments
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -267,6 +270,13 @@ Math::BigFloat:
  * doc for accuracy()/precision()
  * $x->bmod() was not modifying $x in place when returning NaN/inf/-inf
  * avoid unecc. calls to objectify() for binary op's
+2002-08-13 v1.36 Tels
+ * as_hex() and as_bin() work now at least for inf, NaN and integers
+ * fixed bsstr() (and thus also numify()) for negative numbers - Ouch!
+ * $x->new("0.02"); $x->accuracy($a); $x->bdiv($y,$d) failed to round
+   when $d > $a
+ * numify() returned '+inf' instead of 'inf'
+ * (more) tests for bsstr(), numify(), as_hex(), as_bin
 
 ############################################################################## 
 Math::BigInt:
@@ -541,6 +551,12 @@ Math::BigInt:
  * some binary ops (band/bxor/bior/bpow) were not properly rounding the result
    to the requested A/P/R; the same ops also forgot to take $y into account
  * doc for accuracy()/precision()
+2002-08-13 v1.61 Tels
+ * tests for bsstr()/numify() with negative/special inputs
+ * bround() keeps $scale as scalar for speed and less problems
+ * fix for trailing newlines in input
+ * some doc fixes (especially return values of is_foo() methods)
+ * make testsuite so that it will pass under FastCalc easily
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

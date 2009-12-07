@@ -1,53 +1,24 @@
-This lists only the changes for the current release (v1.60) over the last
+This lists only the changes for the current release (v1.61) over the last
 version, since HISTORY is now quite big:
 
-MBI   : shortcuts to avoid calls to objectify for add/sub/mul/div/mod/pow etc
-        avoid calling round() when BigFloat requested 'no rounding please'
-        $x->accuracy() and $x->precision() returned undef, instead of 0 if
-         A/P of $x was 0 and global A/P was undef.
-        some binary ops (band,bior,bxor,bpow) were not taking $y into account,
-         or were missing to round when returning 0 or 1 or $x
-        bone(), bzero() did not take $y into account when called like
-	 $x->bzero($a,$p,$r,$y);
-	bsqrt() did not take into account additional rounding params
-	bone() was called wrongly to take over A/P
-	bone/bzero did not take over A/P when $self had no A/P
-	flog() had a missing $param[0] = undef, triggered by correcting bzero()
-        bmod() returning was returning inf,NaN,-inf, but not modifying $x
-	some fixes in bmod() broke Math::BigInt::Pari
-MBF   : shortcuts to avoid calls to objectify for add/sub/mul/div/mod/pow etc
-        bfround accidentily used BigInt's instead of scalar in internal calcs
-        bmod() returning was returning inf,NaN,-inf, but not modifying $x
-tests : some tests for really huge and big exponents
-        test some op's with two operands working w/ objects/scalars and mixes
-        test that bone()/bzero() honour global A/P
-	run rounding tests also under BareCalc, to catch simulation errors
-	run inf/nan tests through subclasses and include bmod tests, too
-
-Here are some timings and benchmarks:
-
-v1.59: Files=26, Tests=17419, 
-PIII       300Mhz:  122 wallclock secs ( 99.39 cusr +   1.16 csys = 100.55 CPU)
-iPAQ H3870 200Mhz:  594 wallclock secs (430.34 cusr + 151.10 csys = 581.44 CPU)
-AMD TBird    1Ghz:   43 wallclock secs ( 31.73 cusr +   1.09 csys =  32.82 CPU)
-
-v1.60: Files=27, Tests=20259 
-iPAQ H3870 200Mhz:  563 wallclock secs (404.77 cusr + 144.33 csys = 549.10 CPU)
-AMD TBird    1Ghz:   42 wallclock secs ( 31.21 cusr +   0.67 csys =  31.88 CPU)
-
-Benchmarks (ops/s on PIII 300 Mhz):
-
-                     v1.23   v1.36   v1.45   v1.59   v1.60
- ----------------------------------------------------------
- bdiv w/ bfround       n/a     n/a      32      39     126
- bdiv w/o bfround      218      92      64      97     102
- bfround               n/a      24      42      47     265
- badd float            283     242     204     375     442
- badd int             2170    1680    1290    1700    2160
- bmul float            547     462     310     496     630
- bmul int             1960    1560    1140    1620    2020
-
-Please google for the announcement on perl5-porters for more details.
+Calc  : _acmp() is a tad faster (no longer calling _len())
+        cleaned up a bit and added some comments
+MBI   : fixed the trailing "\n" bug (already in v1.60 in Perl v5.8.0)
+	some pod fixed (also already in v5.8.0)
+        bround() used (accidentily) internally Math::Big(Float|int) as scale
+        pod for is_foo() subs states more explicit that true/false will be
+         returned, but not the exact value (0,'',undef or 1/2/3 etc)
+MBF   : $x->new("0.02"); $x->accuracy($a); $x->bdiv($y,$d) failed to round
+	 when $d > $a
+	bsstr() was broken for negative numbers
+	numify() used bsstr() and was also broken for negative numbers
+	numify('+inf') returned '+inf' and not 'inf'
+	as_hex(), as_bin() now work at least for integers, +-inf and NaN
+tests : t/*.inc do now use strict;
+	MBF: more tests for bsstr/numify/stringify, tests for as_hex/as_bin
+	moved some objectify() tests to mbimbf.inc (to run them w/ bare/sub)
+        added a test tweak to for is_foo() to let them pass under FastCalc
+        added a lot of tests for Calc (_len(), _acmp() etc)
 
 ###############################################################################
 

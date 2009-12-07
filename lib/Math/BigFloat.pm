@@ -12,7 +12,7 @@ package Math::BigFloat;
 #   _p: precision
 #   _f: flags, used to signal MBI not to touch our private parts
 
-$VERSION = '1.35';
+$VERSION = '1.36';
 require 5.005;
 use Exporter;
 use File::Spec;
@@ -307,9 +307,10 @@ sub bsstr
     return $x->{sign} unless $x->{sign} eq '+inf';      # -inf, NaN
     return 'inf';                                       # +inf
     }
-  my $sign = $x->{_e}->{sign}; $sign = '' if $sign eq '-';
-  my $sep = 'e'.$sign;
-  $x->{_m}->bstr().$sep.$x->{_e}->bstr();
+  my $esign = $x->{_e}->{sign}; $esign = '' if $esign eq '-';
+  my $sep = 'e'.$esign;
+  my $sign = $x->{sign}; $sign = '' if $sign eq '+';
+  $sign . $x->{_m}->bstr() . $sep . $x->{_e}->bstr();
   }
     
 sub numify 
@@ -656,7 +657,7 @@ sub blog
   return $x->bone('+',@params) if $x->bcmp($base) == 0;
 
   # when user set globals, they would interfere with our calculation, so
-  # disable then and later re-enable them
+  # disable them and later re-enable them
   no strict 'refs';
   my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
   my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
@@ -915,7 +916,6 @@ sub bdiv
     # promote BigInts and it's subclasses (except when already a BigFloat)
     $y = $self->new($y) unless $y->isa('Math::BigFloat'); 
 
-    #print "bdiv $y ",ref($y),"\n";
     # need to disable $upgrade in BigInt, to avoid deep recursion
     local $Math::BigInt::upgrade = undef; 	# should be parent class vs MBI
 
@@ -931,10 +931,12 @@ sub bdiv
   # shortcut to not run trough _find_round_parameters again
   if (defined $params[1])
     {
+    $x->{_a} = undef; 				# clear before round
     $x->bround($params[1],$params[3]);		# then round accordingly
     }
   else
     {
+    $x->{_p} = undef; 				# clear before round
     $x->bfround($params[2],$params[3]);		# then round accordingly
     }
   if ($fallback)
@@ -1210,7 +1212,7 @@ sub _pow2
     }
 
   # when user set globals, they would interfere with our calculation, so
-  # disable then and later re-enable them
+  # disable them and later re-enable them
   no strict 'refs';
   my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
   my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
@@ -1320,7 +1322,7 @@ sub _pow
     }
 
   # when user set globals, they would interfere with our calculation, so
-  # disable then and later re-enable them
+  # disable them and later re-enable them
   no strict 'refs';
   my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
   my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
@@ -1752,7 +1754,6 @@ sub import
   my $lib = ''; my @a;
   for ( my $i = 0; $i < $l ; $i++)
     {
-#    print "at $_[$i] (",$_[$i+1]||'undef',")\n";
     if ( $_[$i] eq ':constant' )
       {
       # this rest causes overlord er load to step in
@@ -1852,7 +1853,44 @@ sub bnorm
   } 
  
 ##############################################################################
-# internal calculation routines
+
+sub as_hex
+  {
+  # return number as hexadecimal string (only for integers defined)
+  my ($self,$x) = ref($_[0]) ? (ref($_[0]),$_[0]) : objectify(1,@_);
+
+  return $x->bstr() if $x->{sign} !~ /^[+-]$/;  # inf, nan etc
+  return '0x0' if $x->is_zero();
+
+  return 'NaN' if $x->{_e}->{sign} ne '+';	# how to do 1e-1 in hex!?
+
+  my $z = $x->{_m}->copy();
+  if (!$x->{_e}->is_zero())		# > 0 
+    {
+    $z->blsft($x->{_e},10);
+    }
+  $z->{sign} = $x->{sign};
+  $z->as_hex();
+  }
+
+sub as_bin
+  {
+  # return number as binary digit string (only for integers defined)
+  my ($self,$x) = ref($_[0]) ? (ref($_[0]),$_[0]) : objectify(1,@_);
+
+  return $x->bstr() if $x->{sign} !~ /^[+-]$/;  # inf, nan etc
+  return '0b0' if $x->is_zero();
+
+  return 'NaN' if $x->{_e}->{sign} ne '+';	# how to do 1e-1 in hex!?
+
+  my $z = $x->{_m}->copy();
+  if (!$x->{_e}->is_zero())		# > 0 
+    {
+    $z->blsft($x->{_e},10);
+    }
+  $z->{sign} = $x->{sign};
+  $z->as_bin();
+  }
 
 sub as_number
   {
@@ -1992,7 +2030,7 @@ Math::BigFloat - Arbitrary size floating point math package
   $x->precision();		# return P of $x (or global, if P of $x undef)
   $x->precision($n);		# set P of $x to $n
   $x->accuracy();		# return A of $x (or global, if A of $x undef)
-  $x->accuracy($n);		# set P $x to $n
+  $x->accuracy($n);		# set A $x to $n
 
   Math::BigFloat->precision();	# get/set global P for all BigFloat objects
   Math::BigFloat->accuracy();	# get/set global A for all BigFloat objects

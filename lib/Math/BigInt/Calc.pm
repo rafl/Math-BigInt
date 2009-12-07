@@ -8,7 +8,7 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '0.30';
+$VERSION = '0.31';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -430,43 +430,6 @@ sub _sub
   __strip_zeros($sy);
   }                                                                             
 
-sub _square_use_mul
-  {
-  # compute $x ** 2 or $x * $x in-place and return $x
-  my ($c,$x) = @_;
-
-  # From: Handbook of Applied Cryptography by A. Menezes, P. van Oorschot and
-  #       S. Vanstone., Chapter 14
-
-  #14.16 Algorithm Multiple-precision squaring
-  #INPUT: positive integer x = (xt 1 xt 2 ... x1 x0)b.
-  #OUTPUT: x * x = x ** 2 in radix b representation. 
-  #1. For i from 0 to (2t - 1) do: wi <- 0. 
-  #2.  For i from 0 to (t - 1) do the following: 
-  # 2.1 (uv)b w2i + xi * xi, w2i v, c u. 
-  # 2.2 For j from (i + 1)to (t - 1) do the following: 
-  #      (uv)b <- wi+j + 2*xj * xi + c, wi+j <- v, c <- u. 
-  # 2.3 wi+t <- u. 
-  #3. Return((w2t-1 w2t-2 ... w1 w0)b).
-
-#  # Note: That description is crap. Half of the symbols are not explained or
-#  # used with out beeing set.
-#  my $t = scalar @$x;		# count
-#  my ($c,$i,$j);
-#  for ($i = 0; $i < $t; $i++)
-#    {
-#    $x->[$i] = $x->[$i*2] + $x[$i]*$x[$i];
-#    $x->[$i*2] = $x[$i]; $c = $x[$i];
-#    for ($j = $i+1; $j < $t; $j++)
-#      {
-#      $x->[$i] = $x->[$i+$j] + 2 * $x->[$i] * $x->[$j];
-#      $x->[$i+$j] = $x[$j]; $c = $x[$i];
-#      }
-#    $x->[$i+$t] = $x[$i];
-#    }
-  $x;
-  }
-
 sub _mul_use_mul
   {
   # (ref to int_num_array, ref to int_num_array)
@@ -494,10 +457,6 @@ sub _mul_use_mul
 
   # since multiplying $x with $x fails, make copy in this case
   $yv = [@$xv] if $xv == $yv;	# same references?
-#  $yv = [@$xv] if "$xv" eq "$yv";	# same references?
-
-  # since multiplying $x with $x would fail here, use the faster squaring
-#  return _square($c,$xv) if $xv == $yv;	# same reference?
 
   if ($LEN_CONVERT != 0)
     {
@@ -576,9 +535,6 @@ sub _mul_use_div
  
   # since multiplying $x with $x fails, make copy in this case
   $yv = [@$xv] if $xv == $yv;	# same references?
-#  $yv = [@$xv] if "$xv" eq "$yv";	# same references?
-  # since multiplying $x with $x would fail here, use the faster squaring
-#  return _square($c,$xv) if $xv == $yv;	# same reference?
 
   if ($LEN_CONVERT != 0)
     {
@@ -910,46 +866,33 @@ sub _acmp
   return 1 if $lxy > 0;					# ditto
   
   # now calculate length based on digits, not parts
-  $lxy = _len($c,$cx) - _len($c,$cy);			# difference
+  # we need only the length of the last element, since both array have the
+  # same number of parts
+  $lxy = length(int($cx->[-1])) - length(int($cy->[-1]));
   return -1 if $lxy < 0;
   return 1 if $lxy > 0;
 
-  # hm, same lengths,  but same contents?
-  my $i = 0; my $a;
-  # first way takes 5.49 sec instead of 4.87, but has the early out advantage
-  # so grep is slightly faster, but more inflexible. hm. $_ instead of $k
-  # yields 5.6 instead of 5.5 sec huh?
+  # hm, same lengths,  but same contents? So we need to check all parts:
+  my $a; my $j = scalar @$cx - 1;
   # manual way (abort if unequal, good for early ne)
-  my $j = scalar @$cx - 1;
   while ($j >= 0)
     {
     last if ($a = $cx->[$j] - $cy->[$j]); $j--;
     }
-#  my $j = scalar @$cx;
-#  while (--$j >= 0)
-#    {
-#    last if ($a = $cx->[$j] - $cy->[$j]);
-#    }
   return 1 if $a > 0;
   return -1 if $a < 0;
-  0;					# equal
-
-  # while it early aborts, it is even slower than the manual variant
-  #grep { return $a if ($a = $_ - $cy->[$i++]); } @$cx;
-  # grep way, go trough all (bad for early ne)
-  #grep { $a = $_ - $cy->[$i++]; } @$cx;
-  #return $a;
+  0;					# numbers are equal
   }
 
 sub _len
   {
-  # compute number of digits in bigint, minus the sign
+  # compute number of digits
 
   # int() because add/sub sometimes leaves strings (like '00005') instead of
   # '5' in this place, thus causing length() to report wrong length
   my $cx = $_[1];
 
-  return (@$cx-1)*$BASE_LEN+length(int($cx->[-1]));
+  (@$cx-1)*$BASE_LEN+length(int($cx->[-1]));
   }
 
 sub _digit
@@ -1294,17 +1237,22 @@ sub _sqrt
   {
   # square-root of $x
   # ref to array, return ref to array
+  # Compute a guess of the result (rule of thumb), then improve it via
+  # Newton's method.
+
   my ($c,$x) = @_;
 
   if (scalar @$x == 1)
     {
-    # fit's into one Perl scalar
+    # fit's into one Perl scalar, so result can be computed directly
     $x->[0] = int(sqrt($x->[0]));
     return $x;
-    } 
+    }
+
+  # now make a guess 
   my $y = _copy($c,$x);
   # hopefully _len/2 is < $BASE, the -1 is to always undershot the guess
-  # since our guess will "grow"
+  # since it will "grow"
   my $l = int((_len($c,$x)-1) / 2);	
 
   my $lastelem = $x->[-1];	# for guess
@@ -1330,10 +1278,9 @@ sub _sqrt
  
   # we make the first part of the guess not '1000...0' but int(sqrt($lastelem))
   # that gives us:
-  # 14400 00000 => sqrt(14400) => 120
-  # 144000 000000 => sqrt(144000) => 379
+  # 14400 00000 => sqrt(14400) => guess first digits to be 120
+  # 144000 000000 => sqrt(144000) => guess 379 
 
-  # $x->[$l--] = int('1' . '0' x $r);			# old way of guessing
   print "$lastelem (elems $elems) => " if DEBUG;
   $lastelem = $lastelem / 10 if ($elems & 1 == 1);		# odd or even?
   my $g = sqrt($lastelem); $g =~ s/\.//;			# 2.345 => 2345
@@ -1345,7 +1292,7 @@ sub _sqrt
   print " would have been ", int('1' . '0' x $r),"\n" if DEBUG;
   
   # If @$x > 1, we could compute the second elem of the guess, too, to create
-  # an even better guess. Not implemented yet.
+  # an even better guess. Not implemented yet. Does it improve performance?
   $x->[$l--] = 0 while ($l >= 0);	# all other digits of guess are zero
  
   print "start x= ",${_str($c,$x)},"\n" if DEBUG;
