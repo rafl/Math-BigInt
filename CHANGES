@@ -170,6 +170,9 @@ Math::BigInt::Calc:
  * speed up _mul() by "use integer;"
  * we do not need to remove zeros after mul()
  * implement an alternative algorithm for _fac()
+2007-05-30 v0.51 Tels
+ * use CORE::hex() instead of hex() to help bigint/bignum/bigrat
+ * use 9 digit parts on 64bit integer or long double systems
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -501,9 +504,14 @@ Math::BigFloat:
  * support "try" and "only" in import()
 2007-05-05 v1.57 Tels
  * add bnok() method (n over k)
-2007-05-05 v1.57 Tels
  * add all the missing modify() hooks
-
+2007-06-30 v1.58 Tels
+ * remove Exporer from @ISA
+ * support config('lib') as shortcut for config()->{lib}
+ * add bpi(), bcos(), bsin(), batan(), batan2() methods
+ * add bmuladd()
+ * streamline the is_xxx() and copy() methods
+ 
 ############################################################################## 
 Math::BigInt:
 
@@ -933,6 +941,16 @@ Math::BigInt:
  * add bnok() method (n over k)
 2007-05-05 v1.85 Tels
  * bump version
+2007-05-05 v1.86 Tels
+ * bump version
+2007-06-30 v1.87 Tels
+ * fix undef base in blog()
+ * support config('lib') as shortcut for config()->{lib}
+ * _find_round_parameters(): convert $a & $p to normal scalars, or bad
+   things will happen during rounding of BigFloats
+ * add bpi(), bcos(), bsin(), batan(), batan2() methods
+ * add bmuladd()
+ * streamline the is_xxx() and copy() methods
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

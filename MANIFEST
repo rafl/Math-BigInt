@@ -34,6 +34,7 @@ t/alias.inc			# core test for alias subroutines
 t/bare_mbf.t			# test Math::BigInt's sim of Calc via BigFloat
 t/bare_mbi.t			# test Math::BigInt's simulation of Calc
 t/bare_mif.t			# Rounding tests under BareCalc
+t/big_pi_e.t
 t/bigfltpm.inc			# contains actual tests for MBF
 t/bigfltpm.t			# shell for M::BF tests
 t/bigintc.t			# pure perl implementation of uint math core
@@ -47,7 +48,6 @@ t/config.t			# test Math::BigInt->config()
 t/const_mbf.t			# test Math::BigFloat ':constant'
 t/constant.t			# test Math::BigInt/BigFloat ':constant'
 t/downgrade.t			# see if downgrading works
-t/fallback.t			# test fallback for cos/sin/exp/atan2
 t/inf_nan.t			# inf and NaN handling
 t/isa.t				# isa() and new() w/ mixed classes tests
 t/lib_load.t			# test registered callbacks

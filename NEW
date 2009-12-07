@@ -1,12 +1,31 @@
 This lists only the changes for the current release over the last version,
 since HISTORY is now quite big:
 
-* fix the failing tests under 32-bit Perls (Thanx to Randal L. Schwartz and
-  Dominic Dunlop!)
+* Calc.pm supports now Perls with 64 bit integers by using parts with 9
+  (opposed to 7) digits. This makes the core math routines like mul, div,
+  etc. go faster for huge numbers, since there are less parts to deal with
+  and certain operations can use faster variants with only one part.
+* fix the warning when the second argument to blog() was a normal scalar
+* improve the speed of _log_int() (log integer results) for bases that
+  have more than BASE_LEN digits. Instead of incrementally trying until
+  we find the result, we compute a guess and use this as the starting
+  value
+* support config('lib') as an alias for config()->{lib}
+* remove outdated and incorrect doc in BigFloat, add some for bexp() and
+  bnok()
+* BigFloat: mention "common" as round mode
+* BigFloat.pm doesn't need to have "Exporter" in @ISA (caused problems with
+  the mro patches in blead perl)
+* added the bpi($N) method that calculates PI to $N digits
+* fix a small problem in BigFloat's import() method that became apparent when
+  trying to export the bpi() method
+* added the $x->bmuladd($y,$z) method
+* add bpi(), bcos(), bsin(), batan() and batan2() methods
+* fix overloading for cos/sin/atan2 to use the new methods
 
 ##############################################################################
 
-Please have Math::BigInt->bzero()->bpow('0.1')->bpow(-42) big amounts of fun.
+Please have Math::BigFloat->bone->bexp->bdiv(0) big amounts of fun.
 
 Tels <http://bloodgate.com/perl>
 
