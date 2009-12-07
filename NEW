@@ -1,13 +1,83 @@
-This lists only the changes for the current release (v1.72) over the last
+This lists only the changes for the current release (v1.73) over the last
 version, since HISTORY is now quite big:
 
-Calc : >= vs. > in _rsft() (triggered bug in FastCalc)
-MBI  : 
-MBF  : blog(10,10) ($x == $y) returned '1.000000...' instead of '1' 
-tests: more flog() tests
+Calc : fixed bug in _from_hex() that garbled numbers with longer parts than
+	BASE_LEN (Thanx Mark Lakata!)
+MBI  : overload <<= and >>= for more speed
+       fixed a lot of inf and NaN cases for bpow()
+       save one unnec. call to bnorm() in round()
+MBF  : streamlined new() to not have to call _zeros() and _is_zero(), that
+	helps a bit for small numbers, and a lot for large numbers stored when
+	not stored in decimal (like under GMP :)
+       shortcut in new() for "simple" numbers like "123" - much faster now
+       fixed a lot of inf and NaN cases for fpow()
+       simplify loading of MBI in import(): if require is good for 5.6.x, it
+	will suffice for 5.8.x
+misc : added PREREQ to Scalar::Util
+tests: tests for <<= and >>=
+       MBF more tests for inputs resulting in zero
 
 ##############################################################################
 
+Removing _zeros() from BigFloat's new really helps GMP for long string inputs:
+
+v1.72:
+# time perl -MMath::BigFloat=lib,GMP -wle 
+# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
+12e+1000000
+
+real    0m3.744s
+user    0m3.601s
+sys     0m0.093s
+
+v1.73:
+# time perl -Ilib -MMath::BigFloat=lib,GMP -wle 
+# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
+12e+1000000
+
+real    0m1.410s
+user    0m1.309s
+sys     0m0.073s
+
+Since GMP stores the number internally as hex, a O(N^2) operation
+(decimal => hex) is necessary. And since _zeros() looks at the number in
+decimal, too, two of these were necessary. Since these O(N^2) operations
+are dominating the time spent, saving _zeros() should therefore save about
+50% of the time for big numbers, what the benchmark confirms.
+
+Note: We could save even more by splitting the zeros up and only convert the
+non-zero part. 
+
+Note that with Calc, only O(N) operations are involved, and we only save a few
+percent. However, Calc is about 10 times faster since it stores the number in
+decimal anyway:
+
+# time perl -MMath::BigFloat -wle 
+# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
+12e+1000000
+
+real    0m0.455s
+user    0m0.324s
+sys     0m0.063s
+
+# time perl -Ilib -MMath::BigFloat -wle 
+# 'my $i = Math::BigFloat->new("12". "0" x 1000000); print $i->bsstr()'
+12e+1000000
+
+real    0m0.428s
+user    0m0.300s
+sys     0m0.062s
+
+##############################################################################
+
+Please have Math::BigInt->bzero()->bpow('0.1')->bpow(-42) big amounts of fun.
+
+Tels <http://bloodgate.com/perl>
+
+
+real    0m0.428s
+user    0m0.300s
+sys     0m0.062s
 ##############################################################################
 
 Please have Math::BigInt->bzero()->bpow('0.1')->bpow(-42) big amounts of fun.

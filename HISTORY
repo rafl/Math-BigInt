@@ -149,6 +149,9 @@ Math::BigInt::Calc:
  * from_hex() convert 28 bits (vs 16) at a time, faster (helps from_bin(), too)
  * potential bug in padding with '0' in _digit()
  * fixed undef warnings in fceil(0.222222222222...) (thanx kenny!)
+2004-10-10 v0.42 Tels
+ * fix critical bug in _from_hex() with parts that were to big for one part
+   (introduced in v1.72, thanx Mark Lakata for finding it!)
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -430,6 +433,11 @@ Math::BigFloat:
  * fixed undef warnings in bpow(0,$y) ($y non-integer) (thanx kenny!)
 2004-08-13 v1.46 Tels
  * blog(10,10) ($x == $y) returned '1.0000...' instead of '1'
+2004-10-10 v1.47 Tels
+ * inf/NaN fixes for bpow()
+ * eliminate the need for _zeros() in new() (speed-up for GMP et. al.)
+ * eliminate _is_zero() in new() (small speed up)
+ * added shortcut for simple numbers in new() (speed up)
 
 ############################################################################## 
 Math::BigInt:
@@ -795,6 +803,12 @@ Math::BigInt:
  * _scan_for_nonzero() reuses length/stringform of $x and is thus faster, this
    helps rounding if the number after the roundposition is '5'
 2004-07-13 v1.72 Tels
+ * no changes
+2004-10-10 v1.73 Tels
+ * overloading of <<= and >>= makes these ops about 10% faster and fixes the
+   problem that "$a <<= 2" would create a different object for $a to point to
+ * quite a lot of fixes for NaN/inf handling in bpow() (bmul already did it
+   right) - bug report by jeff at thekidders com and Hugo - Thank you!
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
