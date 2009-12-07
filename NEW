@@ -1,204 +1,95 @@
-This lists only the changes for the current release (v1.70) over the last
+This lists only the changes for the current release (v1.71) over the last
 version, since HISTORY is now quite big:
 
-Calc : _zeros(0) is 0, not 1
-       added: api_version(), _ten(), _two(), _is_ten(), _is_two()
-       added: _gcd()
-       streamlined: is_foo() methods
-       _new() takes scalar, not scalar ref
-       _str() returns scalar, not scalar ref
-       _and(): bugfix for [perl #26559]: negative arguments that are shorter
-	than the positive one caused an error due to cutting instead padding
-       _ior(): forgot to calculate the proper sing of result, making
-	30 | -4 go wrong
-Emu  : removed unnecc. emulation routines (all except _signed_foo)
-MBI  : -X ** Y was positive if Y was odd (instead of negative)
-       0 ** -Y => +inf (was NaN) due to 0 ** -Y => 1/0**Y => 1/0 => +inf
-       fixed bug in perl -Mbignum -le 'print 2 ** 46 * 3' under Bigint::Lite
-	leading to "Can't use an undefined value as an ARRAY reference at
-	/usr/local/lib/perl5/5.8.2/Math/BigInt/Calc.pm line 462."
-       fixed upgrading of blog() with base = undef (means: base e)
-       make the synopsis actually runnable (Thanx Paul McCarthy)
-       blcm(): handle a list of strings (instead one obj and some strings), too
-MBF  : -X ** Y was positive if Y was odd (instead of negative)
-       use Math::BigInt->config()->{lib} (aka Calc) for parts, not BigInt =>
-	this makes everything between 50% and factor 3 faster and saves a
-	lot of memory. See benchmark below.
-       bmod() did needlessly test for NaN arguments twice
-tests: tests for _zero(), and bpow(), more tests for bgcd()
-       added tests for _gcd() and _ten()
-       two tests for bfround() with large -P
+Calc : potential bug with padding elems in _digit()
+       much faster _from_hex() (and thus faster _from_bin())
+       long after-dot-part of $x in fceil() produced undef (Thanx kenny!)
+       combine two BEGIN blocks and remove dead integer detection code
+MBI  : bsub() failed when it was passed the same scalar twice e.g. $x -= $x
+	produced 2*$x instead of 0. Thanx Peter J. Acklam!
+       _scan_for_nonzero() re-uses length/stringform of $x and thus makes
+        rounding faster if the digit after the rounding pos is a '5'
+MBF  : bsub() is now simple inherited from BigInt (fixed also $x -= $x bug)
+       bdiv() fix for $x /= $x (same variable passed in)
+       0 ** $y (non-int $y) returns 0 and no longer warns (Thanx kenny!)
+       bfround()/bround() are 10% faster when going via Math::BigInt::bround()
+       bpow($x,$y) is slightly faster if $x is negative and $y an integer
+tests: tests for $x += $x, $x -= $x, $x /= $x etc
+       incorporate change to "undef" warning from core
+       tests for undef warnings from kenny's examples
 
 ##############################################################################
-# $y->bcmp(2) vs: is_two() and _is_zero():
 
-v1.69:
-froot(144,2):  6s (5.01 usr +  0.24 sys =  5.25 CPU) 1150/s (n=6042)
-froot(145,2):  5s (5.33 usr +  0.00 sys =  5.33 CPU) 272/s (n=1450)
+Benchmark for 120 (1), 1200 (2) and 12000 bit (3) numbers:
 
-v1.70 2004-02-19
-froot(144,2):  6s (5.24 usr +  0.00 sys =  5.24 CPU) 1952/s (n=10232)
-froot(145,2):  6s (5.32 usr +  0.00 sys =  5.32 CPU) 310/s (n=1654)
+Math::BigInt v1.70 Math::BigInt::Calc v0.40
+ from_bin1:  	   6s ( 5.31 usr +  0.02 sys =  5.33 CPU) @ 3244/s (n=17294)
+ from_bin2:  	   5s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  113/s (n=599)
+ from_bin3:  	   6s ( 5.65 usr +  0.02 sys =  5.67 CPU) @    1.41/s (n=8)
+ from_hex1:  	   5s ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 7006/s (n=36644)
+ from_hex2:  	   5s ( 5.18 usr +  0.02 sys =  5.20 CPU) @  368/s (n=1915)
+ from_hex3:  	   5s ( 5.06 usr +  0.02 sys =  5.08 CPU) @    5.51/s (n=28)
 
-v1.70 2004-03-12
-froot(144,2):  6s (5.35 usr +  0.00 sys =  5.35 CPU) 3623/s (n=19384)
-froot(145,2):  5s (5.29 usr +  0.00 sys =  5.29 CPU) 335/s (n=1776)
+Math::BigInt v1.71 Math::BigInt::Calc v0.41
+ from_bin1:  	   6s ( 5.27 usr +  0.03 sys =  5.30 CPU) @ 4481/s (n=23751)
+ from_bin2:  	   5s ( 5.22 usr +  0.02 sys =  5.24 CPU) @  209/s (n=1099)
+ from_bin3:  	   5s ( 4.99 usr +  0.01 sys =  5.00 CPU) @    2.80/s (n=14)
+ from_hex1:  	   6s ( 5.25 usr +  0.02 sys =  5.27 CPU) @ 7628/s (n=40201)
+ from_hex2:  	   5s ( 5.31 usr +  0.02 sys =  5.33 CPU) @  643/s (n=3431)
+ from_hex3:  	   5s ( 5.07 usr +  0.01 sys =  5.08 CPU) @   10.63/s (n=54)
+
+Math::BigInt v1.70 Math::BigInt::Calc v0.40
+ bround(45."0"x1000,1): 5s ( 5.31 usr +  0.01 sys =  5.32 CPU) @  2085/s (n=11094)
+ bround(45000000,1):    4s ( 5.28 usr +  0.01 sys =  5.29 CPU) @ 12823/s (n=67836)
+ bround(45000001,1):    5s ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 12301/s (n=65323)
+ ffround(0.00491,-4):   5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @  5633/s (n=29578)
+ fround(0.0045000001,1):6s ( 5.38 usr +  0.02 sys =  5.40 CPU) @  4880/s (n=26352)
+ fround(0.00491,2):     5s ( 5.23 usr +  0.02 sys =  5.25 CPU) @  5965/s (n=31321)
+ fround(0.00491,4):     6s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 26115/s (n=136843)
+
+Math::BigInt v1.71 Math::BigInt::Calc v0.41
+ bround(45."0"x1000,1): 5s ( 5.29 usr +  0.01 sys =  5.30 CPU) @  2954/s (n=15660)
+ bround(45000000,1):    4s ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 16403/s (n=87101)
+ bround(45000001,1):    5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 15603/s (n=81919)
+ ffround(0.00491,-4):   6s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  6550/s (n=34588)
+ fround(0.0045000001,1):5s ( 5.29 usr +  0.01 sys =  5.30 CPU) @  6698/s (n=35501)
+ fround(0.00491,2):     6s ( 5.22 usr +  0.01 sys =  5.23 CPU) @  7008/s (n=36654)
+ fround(0.00491,4):     5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @ 26015/s (n=136843)
+
+Math::BigInt v1.70 Math::BigInt::GMP v1.14
+ bround(45."0"x1000,1): 5s ( 5.33 usr +  0.01 sys =  5.34 CPU) @  2374/s (n=12679)
+ bround(45000000,1):    6s ( 5.31 usr +  0.01 sys =  5.32 CPU) @ 12236/s (n=65099)
+ bround(45000001,1):    5s ( 5.21 usr +  0.02 sys =  5.23 CPU) @ 11542/s (n=60365)
+ ffround(0.00491,-4):   6s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  5932/s (n=31321)
+ fround(0.0045000001,1):5s ( 5.22 usr +  0.02 sys =  5.24 CPU) @  5248/s (n=27504)
+ fround(0.00491,2):     6s ( 5.28 usr +  0.02 sys =  5.30 CPU) @  6277/s (n=33273)
+ fround(0.00491,4):     5s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 20997/s (n=110026)
+
+Math::BigInt v1.71 Math::BigInt::GMP v1.14
+ bround(45."0"x1000,1): 5s ( 5.21 usr +  0.00 sys =  5.21 CPU) @  3650/s (n=19018)
+ bround(45000000,1):    5s ( 5.19 usr +  0.01 sys =  5.20 CPU) @ 15507/s (n=80640)
+ bround(45000001,1):    6s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 14488/s (n=76065)
+ ffround(0.00491,-4):   5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @  6966/s (n=36644)
+ fround(0.0045000001,1):6s ( 5.23 usr +  0.02 sys =  5.25 CPU) @  6892/s (n=36184)
+ fround(0.00491,2):     5s ( 5.27 usr +  0.02 sys =  5.29 CPU) @  7461/s (n=39470)
+ fround(0.00491,4):     5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 20674/s (n=108543)
+
+Math::BigInt v1.70 Math::BigInt::Calc v0.40
+ fpow(-145,2): 5s ( 5.24 usr +  0.02 sys =  5.26 CPU) @  7229/s (n=38027)
+ bsub(3,1):    5s ( 5.24 usr +  0.00 sys =  5.24 CPU) @ 26113/s (n=136834)
+ fdiv(1,3):    5s ( 5.22 usr +  0.02 sys =  5.24 CPU) @  1966/s (n=10306)
+ fsub(3,1):    5s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 10880/s (n=57014)
+
+Math::BigInt v1.71 Math::BigInt::Calc v0.41
+ fpow(-145,2): 5s ( 5.17 usr +  0.01 sys =  5.18 CPU) @  7483/s (n=38765)
+ bsub(3,1):    5s ( 5.22 usr +  0.01 sys =  5.23 CPU) @ 25943/s (n=135682)
+ fdiv(1,3):    6s ( 5.24 usr +  0.01 sys =  5.25 CPU) @  2151/s (n=11297)
+ fsub(3,1):    5s ( 5.31 usr +  0.01 sys =  5.32 CPU) @ 10007/s (n=53242)
 
 ##############################################################################
-# bug in bnorm() leaving 2e-0 (instead of 2e0) on 1/0.5:
 
-v1.69:
-froot(144,0.5):  5s (5.35 usr +  0.00 sys =  5.35 CPU) 544/s (n=2911)
-froot(145,0.5):  6s (5.30 usr +  0.00 sys =  5.30 CPU) 549/s (n=2911)
-
-v1.70 2004-02-19
-froot(144,0.5):  5s (5.22 usr +  0.00 sys =  5.22 CPU)  3/s (n=18)
-froot(145,0.5):  5s (5.25 usr +  0.00 sys =  5.25 CPU)  3/s (n=18)
-
-v1.70 2004-03-12
-froot(144,0.5):  5s (5.25 usr +  0.00 sys =  5.25 CPU) 1309/s (n=6873)
-froot(145,0.5):  5s (5.28 usr +  0.00 sys =  5.28 CPU) 1301/s (n=6873)
-
-##############################################################################
-# (with $HALF instead of '0.5')
-
-v1.70 2004-02-19
-fpow(144,0.5):  5s (5.02 usr +  0.25 sys =  5.27 CPU) 1837/s (n=9684)
-fpow(145,0.5):  6s (5.29 usr +  0.00 sys =  5.29 CPU) 335/s (n=1776)
-
-v1.70 2004-03-12 
-fpow(144,0.5):  5s (5.31 usr +  0.00 sys =  5.31 CPU) 3929/s (n=20868)
-fpow(145,0.5):  5s (5.34 usr +  0.00 sys =  5.34 CPU) 365/s (n=1951)
-
-Memory consumption: on 2Ghz AMD XP 2400+ (kernel 2.4.20, Perl v5.8.2):
-v1.69: 767 bytes
-v1.70: 433 (respective 419) bytes
-
-Benchmark showing the new _gcd() routine really helping us:
-
-v1.69:
-gcd(144,60):  		5s (5.26 usr + 0.00 sys =  5.26 CPU)  7369/s (n=38765)
-gcd(144,60,4):  	6s (5.29 usr + 0.00 sys =  5.29 CPU)  5199/s (n=27504)
-gcd(fib(321),fib(320)): 5s (5.34 usr + 0.00 sys =  5.34 CPU)  2878/s (n=15369)
-
-v1.70:
-gcd(144,60):  		6s (5.21 usr + 0.10 sys =  5.31 CPU) 19851/s (n=105411)
-gcd(144,60,4): 		5s (5.22 usr + 0.00 sys =  5.22 CPU) 14303/s (n=74666)
-gcd(fib(321),fib(320)): 6s (5.40 usr + 0.00 sys =  5.40 CPU)  8374/s (n=45220)
-
-v1.69:
-# perl -Mbignum -le 'print 3->blog()'
-NaN
-# perl -Mbignum -le 'print 3.0->blog()'
-NaN
-
-v1.70:
-# perl -Ilib -Mbignum -le 'print 3->blog()'
-1.098612288668109691395245236922525704647
-# perl -Ilib -Mbignum -le 'print 3.0->blog()'
-1.098612288668109691395245236922525704647
-
-# Benchmarking Calc.pm:
-
-v1.69:
-_is_odd():	    5s (5.17 usr +  0.00 sys =  5.17 CPU) @ 705833/s (n=3649160)
- _is_one():  	    5s (5.20 usr +  0.00 sys =  5.20 CPU) @ 668021/s (n=3473712)
-_new("123"):	    5s (5.25 usr +  0.00 sys =  5.25 CPU) @ 481207/s (n=2526338)
- _new(123):	    6s (5.24 usr +  0.00 sys =  5.24 CPU) @ 473515/s (n=2481220)
-    _one():	    4s (5.16 usr +  0.00 sys =  5.16 CPU) @ 858002/s (n=4427294)
-_str(_new("123")):  6s (5.01 usr +  0.14 sys =  5.15 CPU) @ 180423/s (n=929181)
-
-v1.70: 
- _is_odd():	    6s (5.35 usr +  0.00 sys =  5.35 CPU) @ 794429/s (n=4250200)
- _is_one():	    5s (5.21 usr +  0.00 sys =  5.21 CPU) @ 713385/s (n=3716737)
-_new("123"):	    4s (5.07 usr +  0.09 sys =  5.16 CPU) @ 568286/s (n=2932359)
- _new(123):	    6s (5.23 usr +  0.00 sys =  5.23 CPU) @ 570874/s (n=2985674)
-    _one():	    5s (5.26 usr +  0.00 sys =  5.26 CPU) @ 863924/s (n=4544241)
-_str(_new("123")):  6s (5.33 usr +  0.00 sys =  5.33 CPU) @ 211812/s (n=1128959)
-
-#############################################################################
-# full benchmark:
-
-Method  / Version:        v1.69  v1.70.org  v1.70.org      v1.70      v1.70
-        / Library:         _gmp                  _gmp                  _gmp
-------------------------------------------------------------------------------
-123.2 % 3.2          |     104%       707%       906%       718%       899%  
-123.2 * 3.2          |      97%       196%       225%       199%       228%  
-123.2 ** 3.2         |     150%       150%       300%       150%       300%  
-123.2 + 3.2          |      93%       229%       236%       233%       237%  
-123.2 - 3.2          |     102%       221%       253%       227%       253%  
-123.2 / 3.2          |     119%       295%       370%       312%       370%  
-bsstr(123)           |     121%       175%       232%       176%       237%  
-bsstr(123.2)         |     116%       176%       228%       180%       231%  
-bstr(123)            |     101%       163%       179%       166%       183%  
-bstr(123.2)          |     100%       135%       139%       136%       141%  
-bstr(new(123))       |      97%       101%        97%       102%        96%  
-bstr(new(123.2))     |      97%       177%       172%       179%       173%  
-bstr(new(123.2e1))   |      94%       102%        94%       102%        95%  
-facmp(123,123.2)     |      98%       281%       300%       283%       307%  
-fadd(123,3)          |      95%       205%       211%       208%       213%  
-fadd(123.2,0)        |     100%       113%       114%       115%       114%  
-fadd(123.2,3)        |     105%       225%       268%       234%       268%  
-fadd(123.2,3.2)      |      93%       232%       236%       236%       238%  
-fceil(123)           |      98%       101%        99%       103%       104%  
-fceil(copy(123.2))   |     102%       225%       259%       230%       263%  
-fcmp(0.5,"0.5")      |      92%       176%       166%       179%       166%  
-fcmp(0.5,0.5)        |      89%       161%       137%       162%       140%  
-fcmp(123,-123.2)     |      97%        98%       102%       100%       101%  
-fcmp(123,123.2)      |      98%       270%       284%       273%       288%  
-fdiv(1,0.5)          |     110%       245%       338%       259%       337%  
-fdiv(123,3)          |     113%       261%       362%       281%       363%  
-ffloor(123)          |     100%       104%       101%       105%       105%  
-ffloor(copy(123.2))  |     100%       221%       244%       226%       252%  
-ffround(123,2)       |     103%       164%       182%       169%       183%  
-flog(100,"3")        |     137%       175%       287%       175%       287%  
-flog(1000,"3")       |     137%       162%       287%       175%       287%  
-flog(1000,3)         |     137%       175%       287%       175%       287%  
-flog(144)            |     130%       160%       280%       160%       280%  
-flog(2)              |     116%       191%       301%       199%       299%  
-fmod(123,3)          |      94%       215%       203%       219%       205%  
-fmod(123.2,3)        |     106%       416%       449%       424%       455%  
-fmod(123.2,3.2)      |     104%       726%       936%       741%       937%  
-fmul(123,123.2)      |      96%       193%       213%       196%       217%  
-fpow(123.2,0.5)      |     220%       120%       388%       133%       677%  
-fpow(144,0.5)        |     100%       174%       187%       394%       387%  
-fpow(144,2)          |     107%       165%       201%       173%       202%  
-fpow(144,3)          |     107%       162%       203%       171%       204%  
-fpow(145,0.5)        |     221%       114%       320%       125%       476%  
-fpow(145,2)          |     105%       151%       182%       158%       183%  
-fpow(145,3)          |     107%       149%       185%       156%       186%  
-froot(0.0049,2)      |     140%       159%       356%       207%       640%  
-froot(144,0.5)       |     109%         0%         1%       238%       368%  
-froot(144,2)         |      97%       172%       178%       323%       324%  
-froot(145,0.5)       |     108%         0%         1%       235%       364%  
-froot(145,2)         |     213%       114%       306%       124%       422%  
-froot(256,"3")       |     166%       166%       333%       166%       333%  
-froot(256,3)         |     166%       166%       333%       166%       333%  
-fround(123,2)        |     104%       158%       176%       161%       177%  
-fround(123,3)        |      91%       192%       165%       198%       168%  
-fsqrt(0.0049)        |     184%       189%       636%       189%       635%  
-fsqrt(0.00491)       |     303%       104%       743%       104%       732%  
-fsub(123.2,"3")      |     109%       224%       271%       240%       271%  
-fsub(123.2,3)        |     106%       213%       261%       219%       262%  
-fsub(123.2,3.2)      |     102%       217%       251%       227%       253%  
-is_even(123)         |      95%       151%       156%       153%       161%  
-is_int(123)          |      98%       106%       108%       106%       108%  
-is_odd(123)          |      98%       176%       195%       184%       201%  
-is_zero(123)         |     102%       164%       180%       166%       180%  
-is_zero(123.2)       |     101%       160%       180%       165%       174%  
-length(0.0049)       |      91%       207%       184%       215%       183%  
-length(123)          |      93%       964%       817%       999%       825%  
-new(123)             |      80%       101%        79%        99%        80%  
-new(123.0)           |      93%       180%       193%       179%       193%  
-new(123.2)           |      93%       188%       178%       188%       176%  
-new(123.2e1)         |      89%       102%        89%       101%        90%  
-parts(0.0049)        |      80%        84%        67%        85%        68%  
-
-#############################################################################
-
-Please have Math::BigInt->bzero()->bpow(-42) big amounts of fun.
+Please have Math::BigInt->bzero()->bpow('0.1')->bpow(-42) big amounts of fun.
 
 Tels <http://bloodgate.com/perl>
-
 
 

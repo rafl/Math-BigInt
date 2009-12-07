@@ -132,8 +132,23 @@ Math::BigInt::Calc:
  * _root() was wrong for numbers like 9 (0b1001) because they start with
    the pattern /^0b1(0+)/ (missing '$' in regexp) and after fixing this
    it was dead slow for large numbers.
-2004-01-25 v0.39 Tels
+2004-01-25 v0.39 Tels (not released)
  * _zeros(0) is 0, not 1
+2004-03-12 v0.40 Tels
+ * added: api_version(), _ten(), _two(), _is_ten(), _is_two(), _gcd()
+ * streamlined: is_foo() methods
+ * _new() takes scalar, not scalar ref
+ * _str() returns scalar, not scalar ref
+ * _and(): bugfix for [perl #26559]: negative arguments that are shorter
+    than the positive one caused an error due to cutting instead padding
+ * _ior(): forgot to calculate the proper sing of result, making, for
+    instance, 30 | -4 go wrong
+2004-04-05 v0.41a Tels (not released)
+ * removed the unused integer-detection code and combined the two BEGIN blocks
+2004-07-30 v0.41 Tels
+ * from_hex() convert 28 bits (vs 16) at a time, faster (helps from_bin(), too)
+ * potential bug in padding with '0' in _digit()
+ * fixed undef warnings in fceil(0.222222222222...) (thanx kenny!)
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -144,6 +159,8 @@ Math::BigInt::CalcEmu:
  * the code in Calc::_root() uses now sprintf(), but the one in Emu was not
 2004-01-13 v0.03 Tels
  * $VERSION was overriding the $VERSION from MBI (Thanx Gisle Aas!)
+2004-03-12 v0.04 Tels
+ * removed unnecc. emulation routines (all except _signed_foo)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -404,7 +421,14 @@ Math::BigFloat:
  * use Calc instead of BigInt for parts, that makes it roughly 2x faster
    it also saves memory (419 vs. 767 bytes per (small number) object)
  * bmod() did needlessly test for NaN arguments twice
- 
+2004-07-30 v1.45 Tels
+ * simple inherit bsub() from BigInt, also fixes bsub() failing under
+   $x -= $x - Thanx Peter J. Acklam!
+ * bdiv() failed when passed a variable twice (thanx Peter J. Acklam!)
+ * bfround() and bround() are about 10% faster when going via Math::BigInt's
+   bround() due to constructing a fake BigInt instead of going via ->new()
+ * fixed undef warnings in bpow(0,$y) ($y non-integer) (thanx kenny!)
+
 ############################################################################## 
 Math::BigInt:
 
@@ -764,6 +788,10 @@ Math::BigInt:
  * fixed upgrading of blog() with base = undef (means: base e)
  * make the synopsis actually runnable (Thanx Paul McCarthy)
  * blcm(): handle a list of strings (instead one obj and some strings), too
+2004-07-08 v1.71 Tels
+ * fixed bsub() failing under $x -= $x; Thanx Peter J. Acklam!
+ * _scan_for_nonzero() reuses length/stringform of $x and is thus faster, this
+   helps rounding if the number after the roundposition is '5'
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

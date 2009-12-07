@@ -46,7 +46,6 @@ Given the fact that we are be able to plug-in a much faster core-lib, the
 following are pretty much ultra-low-priority:
 
 Math::BigInt::Calc:
- * bpow() could be faster by not using div() (pre-shift only last array elem?)
  * look at div() for more speed
  * alternative mul() method using shifts
  * implement in Calc (and GMP etc) to calculate band(), bior(), bxor() for

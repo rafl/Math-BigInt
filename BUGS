@@ -3,7 +3,6 @@ Known bugs:
 
 * TODO BUGS:
   + implement test for the upgrading bug in bsub()
-  + negative operands in &, ^ and | are borken [perl #26559]
 
 * General:
   + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
