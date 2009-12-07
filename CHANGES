@@ -892,6 +892,8 @@ Math::BigInt:
  * fix bug #13866: NaN (in bignum queue)
  * fix bug #21586: Incorrect result when comparing with NaN
  * fix bug #15896: "==" overloading is broken for "NaN"
+2007-03-16 v1.81 Tels
+ * no code change, just a package update
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
