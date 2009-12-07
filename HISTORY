@@ -2,7 +2,7 @@ This file contains all the changes and bugfixes from the original version of
 BigInt/BigFloat to the rewritten one. For what has changed in the latest
 version see NEW and for a complete list of changes see the file CHANGES.
 
-v1.78:
+v1.82:
 
  general:
   + It is subsequent faster than the original in many places
@@ -78,6 +78,7 @@ v1.78:
   + mantissa(), exponent(), parts(), sign()
   + bgcd() accepts now lists, blcm() (also accepts lists)
   + flog()/blog() for overloading of log()
+  + fexp()/bexp() for overloading of exp()
   + round(accuracy,precision,mode) round to accuracy/precision using mode
   + MBF: fpow(), fmod(), fdiv() in list context (Thanx J. Peacock)
   + fpow() can now handle non-integer arguments, like in fpow(2.1 ** 0.2)

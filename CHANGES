@@ -476,6 +476,18 @@ Math::BigFloat:
  * fix bug #13866: NaN (in bignum queue)
  * fix bug #21586: Incorrect result when comparing with NaN
  * fix bug #15896: "==" overloading is broken for "NaN"
+2007-04-09 v1.54 Tels
+ * fix bug #21747: Re: wierdity in bignum... (powers and high precision):
+   infinite loops for blog() (and consequently bpow()) if you requested
+   an accuracy greater than 67 digits (uses _log() now, and not blog())
+   Thanx to darconc!
+ * cache the result of _log(2) and _log(10) so that subsequent calculations
+   can re-use the already done work
+ * instead of computing _log(10), compute _log(1.25) and _log(2) and then do:
+    _log(1.25 * 2 * 2 * 2) = _log(1.25) + _log(2) + _log(2) + _log(2)
+   This makes computing _log(10) much faster, so that computing blog(N) is
+   about a factor of 5 faster when N >= 10 or N <= 0.1
+ * add bexp()
 
 ############################################################################## 
 Math::BigInt:
@@ -894,6 +906,11 @@ Math::BigInt:
  * fix bug #15896: "==" overloading is broken for "NaN"
 2007-03-16 v1.81 Tels
  * no code change, just a package update
+2007-04-09 v1.82 Tels
+ * use $CALC->_zeros() directly (instead _trailing_zeros()) to speed up
+   exponent() and mantissa()
+ * fix documentation that blsft() and brsft() default to base 2 (not 10)
+ * add bexp() and fix overloading for exp()
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

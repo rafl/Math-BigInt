@@ -41,7 +41,7 @@ recommends	'bignum'		=> 0.19;
 
 build_requires	'Test::More'	=> 0.42;
 
-makemaker_args	INSTALLDIRS => 'perl';
+install_as_core();
 
 license		'perl';
 
