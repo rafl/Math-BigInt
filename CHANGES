@@ -1,7 +1,7 @@
 This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For a complete list of changes see HISTORY:
 
-v1.57:
+v1.58:
 
  general:
   + It is subsequent faster than the original in many places
@@ -79,7 +79,8 @@ v1.57:
   + round(accuracy,precision,mode) round to accuracy/precision using mode
   + MBF: fpow(), fmod(), fdiv() in list context (Thanx J. Peacock)
   + fpow() can now handle non-integer arguments, like in fpow(2.1 ** 0.2)
-  + MBI: bsqrt()
+  + MBI: bsqrt(),
+  + bmodpow(), bmodinv() (Thanx John Borwick)
   + bfloor(), bceil()
 
 Please send me test-reports, your experiences with this and your ideas - I love

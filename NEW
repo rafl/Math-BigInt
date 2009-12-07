@@ -1,10 +1,130 @@
-This lists only the changes for the current release (v1.57) over the last
+This lists only the changes for the current release (v1.58) over the last
 version, since HISTORY is now quite big:
 
-Calc  :
-MBI   : fix in objectify() to make "perl -Mbigrat -le 'print 1+2/3'" work
-MBF   : upgrade used badd() instead of bmul() inside bmul()
-tests :
+Calc  : finished _modpow()
+	BASE_LEN is at most 5 for older Perls
+MBI   : "1..2", "1.2.3", "1.2.3e1" and others were considered valid input
+	bmodpow() and bmodinv() work now, and have hooks for Calc
+	fixed bug in bmod:
+	 #!/usr/bin/perl -w
+	 use Math::BigInt;
+	 my $u = Math::BigInt->new(-629); my $z = Math::BigInt->new(5033);
+	 $u %= $z; print "$u\n";
+	 $u = Math::BigInt->new(-629); $z = Math::BigInt->new(5033);
+	 $u->bmod($z); print "$u\n";
+	This would print -629 in the second case. Found due to the bmodinv()
+	function by John Borwick, which used $u %= $mod and I changed this to
+        (the should-be equivalent) $u->bmod($mod), and thus it failed.
+MBF   : fixed import() for older Perls
+tests : tests for invalid input with two dots
+	skip t/constant.t and t/calling.t on older Perls
+	some more tests to make sure that op's don't destroy their arguments
+
+###############################################################################
+
+Benchmark run on a 1Ghz Athlon, three HUGE numbers is the testcase from John
+Borwick in bigintpm.inc. BareCalc is the original code (streamlined a bit),
+and the other one is the Calc.pm hook (still pure Perl):
+
+BigBench v0.08  (c) Copyright by Tels 2001.  Have fun!
+
+Sun Jun  9 22:24:36 2002 Reading templates from 'mod/'...done.
+ Got 2 templates.
+Sun Jun  9 22:24:36 2002 Reading definitions from def/modpow.def...done.
+ Got 8 ops in 1 group.
+
+Each op will run for at least 2 seconds.
+Results are scaled by factor 1 and rounded to 3 digits.
+Results will be rounded to integer.
+The benchmark will run for approximately 96 seconds.
+
+Running 'v1.58':
+ Benchmarking group 1 ('bmodpow'):
+      1  1 ** 1 % 1                        9010 ops/s (empty: 33700, both: 7110)      2  10 ** 10 % 13                     3800 ops/s (empty: 34000, both: 3420)      3  100 ** 100 % 13                   2920 ops/s (empty: 33000, both: 2680)      4  1000 ** 1000 % 13                 2230 ops/s (empty: 33900, both: 2090)      5  10 ** 10000 % 13                  1870 ops/s (empty: 33500, both: 1770)      6  10 ** 10000 % 123456789123         304 ops/s (empty: 33900, both: 301)
+      7  8,-1,5033                          572 ops/s (empty: 34000, both: 562)
+      8  three HUGE numbers                  12 ops/s (empty: 28600, both: 11.6) Average:                                  2590 ops/s
+
+Running 'v1.58_BareCalc':
+ Benchmarking group 1 ('bmodpow'):
+      1  1 ** 1 % 1                        8010 ops/s (empty: 34200, both: 6490)      2  10 ** 10 % 13                      200 ops/s (empty: 34000, both: 199)
+      3  100 ** 100 % 13                    124 ops/s (empty: 34200, both: 123)
+      4  1000 ** 1000 % 13                   85 ops/s (empty: 34100, both: 84.5)      5  10 ** 10000 % 13                    65 ops/s (empty: 34300, both: 65.0)      6  10 ** 10000 % 123456789123          55 ops/s (empty: 34100, both: 54.5)      7  8,-1,5033                          250 ops/s (empty: 34000, both: 248)
+      8  three HUGE numbers                   4 ops/s (empty: 28300, both: 3.50) Average:                                  1100 ops/s
+
+Sun Jun  9 22:26:15 2002 Numbers are absolute ops/s, scaled by factor 1.
+
+                             |  v1.58     v1.58
+                             |         BareCalc
+ ----------------------------+------------------
+  1 ** 1 % 1                 |   9010      8010
+  10 ** 10 % 13              |   3800       200
+  100 ** 100 % 13            |   2920       124
+  1000 ** 1000 % 13          |   2230      85.0
+  10 ** 10000 % 13           |   1870      65.0
+  10 ** 10000 % 123456789123 |    304      55.0
+  8,-1,5033                  |    572       250
+  three HUGE numbers         |   12.0      4.00
+ bmodpow:                    |   2590      1100
+ ............................|..................
+
+###############################################################################
+
+Here is a testrun at my iPAQ (ARM@200Mhz) w/ Perl 5.005_3. The failing test is
+
+and I believe it is due to arm and/or old Perl problems, not BigInt's. Maybe.
+
+not ok 2206
+# Test 2206 got: '0x12345691de23456789' (bigintpm.inc at line 193 fail #1210)
+#      Expected: '0x123456789123456789'
+# Tried: '$x = Math::BigInt->new("0x123456789123456789");$x->as_hex();'
+
+(It fails 3 times, since it is executed 3 times, but with different classes)
+
+bash-2.03# time make test
+PERL_DL_NONLAZY=1 /usr/bin/perl -Iblib/arch -Iblib/lib -I/usr/lib/perl5/5.00503/armv4l-linux -I/usr/lib/perl5/5.00503 -e 'use Test::Harness qw(&runtests $verbose); $verbose=0; runtests @ARGV;' t/*.t
+t/bare_mbf..........ok
+t/bare_mbi..........FAILED test 2206
+        Failed 1/2324 tests, 99.96% okay
+t/bigfltpm..........ok
+t/bigintc...........ok
+t/bigintpm..........FAILED test 2206
+        Failed 1/2324 tests, 99.96% okay
+t/bigints...........ok
+t/calling...........ok, 141/141 subtests skipped
+t/config............ok
+t/constant..........ok, 7/7 subtests skipped
+t/downgrade.........ok
+t/inf_nan...........ok
+t/isa...............ok
+t/mbi_rand..........ok
+t/mbimbf............ok
+t/require...........ok
+t/sub_mbf...........ok
+t/sub_mbi...........FAILED test 2206
+        Failed 1/2329 tests, 99.96% okay
+t/sub_mif...........ok
+t/upgrade...........FAILED test 2058
+        Failed 1/2070 tests, 99.95% okay
+t/use...............ok
+t/use_lib1..........ok
+t/use_lib2..........ok
+t/use_lib3..........ok
+t/use_lib4..........ok
+t/with_sub..........ok
+Failed Test  Status Wstat Total Fail  Failed  List of failed
+-------------------------------------------------------------------------------
+t/bare_mbi.t               2324    1   0.04%  2206
+t/bigintpm.t               2324    1   0.04%  2206
+t/sub_mbi.t                2329    1   0.04%  2206
+t/upgrade.t                2070    1   0.05%  2058
+148 subtests skipped.
+Failed 4/25 test scripts, 84.00% okay. 4/17281 subtests failed, 99.98% okay.
+make: *** [test_dynamic] Error 29
+
+real    10m5.162s
+user    7m24.380s
+sys     2m40.150s
+bash-2.03#
 
 Please have Math::BigInt->new('inf')->bmul('inf') big amounts of fun.
 

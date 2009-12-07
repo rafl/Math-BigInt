@@ -78,6 +78,8 @@ Math::BigInt::Calc:
  * a fix in _sub(): early out made -1 + 100000000001 == 0 (if length($y) > 8)
 2002-05-30 v0.28 Tels
  * added _modinv(), _modpow() (not yet implemented)
+2002-06-10 v0.29 Tels
+ * filled in _modpow()
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -505,6 +507,9 @@ Math::BigInt:
  * changed some isa->($upgrade) => !$isa->($self); 
 2002-05-30 v1.57 Tels
  * fixed objectify() to make "perl -Mbigrat -le 'print 1+2/3'" work
+ * added bmodpow() and bmodinv() as (not-working yet) stubs
+2002-06-09 v1.58 Tels
+ * invalid inputs with two dot's (1.2.3 or 1..2 etc) are now really invalid
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
