@@ -76,6 +76,8 @@ Math::BigInt::Calc:
 2002-03-17 v0.26 Tels
  * a fix in _rsft() that left empty array instead of (0)
  * a fix in _sub(): early out made -1 + 100000000001 == 0 (if length($y) > 8)
+2002-05-30 v0.28 Tels
+ * added _modinv(), _modpow() (not yet implemented)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -245,7 +247,10 @@ Math::BigFloat:
 2002-03-03 v1.31 Tels
  * bpow() can handle second arguments beeing non-integer (f.i. 2 ** 0.2)
  * $x->bpow(0.5) optimized to $x->bsqrt(); 
- 
+2002-05-19 v1.32 Tels
+ * upgrade used badd() instead of bmul() inside bmul()
+ * bpow() now uses slower, but more correct way for fractions (this needs work)
+
 ############################################################################## 
 Math::BigInt:
 
@@ -494,6 +499,12 @@ Math::BigInt:
 2002-03-17 v1.55 Tels
  * :constant picks up binary/hexadecimal constants
  * Math::BigInt->digit(123) works now
+2002-03-17 v1.56 Tels
+ * documented config()
+ * simplified import() logic a bit
+ * changed some isa->($upgrade) => !$isa->($self); 
+2002-05-30 v1.57 Tels
+ * fixed objectify() to make "perl -Mbigrat -le 'print 1+2/3'" work
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

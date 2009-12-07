@@ -29,6 +29,8 @@ Known bugs:
     ok ($x,123.456);
 
   + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
+  + use Math::BigFloat with => 'Math::BigInt::Lite' doesn't work
+    (probably bug in Lite)
   
 * BigInt:
   + blog() is not finished yet
@@ -42,6 +44,7 @@ Known bugs:
     This is likely an Exporter bug, and causes Math::BigInt to eval require on
     earlier Perls when loading the core math lib. Thus the loading can fail on
     filesystems that can not cope with 'Math/BigInt/Calc.pm' style filenames.
+  + bmodpow() and bmodinv() are not done yet.
 
 ###############################################################################
 
