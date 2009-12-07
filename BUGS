@@ -8,7 +8,7 @@ Known bugs:
 
 * General:
   + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
-    you need it, please bug the autor(s) about it.
+    you need it, please bug the author(s) about it.
 
 * BigFloat:
   + comparing (<=> or == or !=) a BigFloat to a BigInt don't work yet

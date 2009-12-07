@@ -9,10 +9,12 @@ sub MY::metafile {
     return $self->SUPER::metafile_target(@_);
   };
 
+  require YAML::Node;
   my $node = new YAML::Node {};
 
   $node->{name}                 = $self->{DISTNAME};
   $node->{version}              = $self->{VERSION};
+  $node->{author}               = 'Tels',
   $node->{version_from}         = $self->{VERSION_FROM};
   $node->{license}              = 'perl';
   $node->{distribution_type}    = 'module';
@@ -30,11 +32,10 @@ sub MY::metafile {
 
 WriteMakefile(
     'NAME'		=> 'Math-BigInt',
-    'VERSION_FROM'	=> 'lib/Math/BigInt.pm', # finds $VERSION
-    'PREREQ_PM'		=> {
-     }, # e.g., Module::Name => 1.1
-    'LIBS'		=> [''], # e.g., '-lm'
-    'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
-    'INC'		=> '', # e.g., '-I/usr/include/other'
+    'VERSION_FROM'	=> 'lib/Math/BigInt.pm',
+    'PREREQ_PM'		=> { },
+    'LIBS'		=> [''],
+    'DEFINE'		=> '',
+    'INC'		=> '',
     'INSTALLDIRS'	=> 'perl',
 );

@@ -16,7 +16,7 @@ sub api_version () { 1; }
 
 # uses Calc, but only features the strictly necc. methods.
 
-use Math::BigInt::Calc '0.40';
+use Math::BigInt::Calc '0.48';
 
 BEGIN
   {
@@ -27,7 +27,7 @@ BEGIN
 	rsft lsft
 	fac pow gcd log_int sqrt root
 	is_zero is_one is_odd is_even is_one is_two is_ten check
-	as_hex as_bin from_hex from_bin	
+	as_hex as_bin as_oct from_hex from_bin from_oct
 	modpow modinv
 	and xor or
 	/)

@@ -1,10 +1,20 @@
-This lists only the changes for the current release (v1.77) over the last
+This lists only the changes for the current release (v1.78) over the last
 version, since HISTORY is now quite big:
 
-Calc : remove shortcut in div(), since it doesn't work
-MBI  : bump version
-MBF  : fix new() to work correctly with Math::BigInt::Pari
-tests: tests for div ((2**100)-1)/2**100
+* fix bug #21412 - as_int() and as_number() are supposed to do the same
+* fix bug #21413 - blsft()/brsft() in list context, as well as left shift
+* fix bug #21446 - Docs/code inconsistency for bnorm() method
+* fix bug #21964 - A patch to include a rounding mode of 'common'
+* fix bug #21445 - Documentation error for exponent() method
+* fix bug perl #41050 - NaN returned when raising integer value to negative power
+* "lib" now warns when falling back to Calc/Fastcalc
+* add 'try' (do not warn like 'lib') and 'only' (die on fallback)
+* bare_mb.f needs a "#" in front of comments
+* add from_oct(), from_bin(), from_hex() and as_oct() methods
+* add some octal tests
+* replace \d with [0-9] to reject stray Unicode digits
+* Bigfloat::bpow(): handle negative X and negative Y
+* add POD tests
 
 ##############################################################################
 

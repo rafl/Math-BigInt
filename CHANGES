@@ -161,6 +161,8 @@ Math::BigInt::Calc:
  * avoid crash in FastCalc by making $BASE and $BASE_LEN use vars qw//;
 2005-05-17 v0.47 Tels
  * remove shortcut in div(), it wasn't working properly
+2007-01-27 v0.48 Tels
+ * support for octal numbers
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -463,6 +465,11 @@ Math::BigFloat:
  * set FastCalc as default (we still use whatever MBI uses)
 2005-04-10 v1.51 Tels
  * fix new() to work with Math::BigInt::Pari
+2007-01-27 v1.52 Tels
+ * fix brsft() and bpow() in list context only return on number (bug #21413)
+ * make as_int() return a BigInt, too (not just as_number()) (bug #21412)
+ * add as_oct()
+ * bpow(): handle negative X and negative Y (instead of returning NaN)
 
 ############################################################################## 
 Math::BigInt:
@@ -861,6 +868,16 @@ Math::BigInt:
  * load FastCalc as default
 2005-05-17 v1.77 Tels
  * bump version
+2007-01-27 v1.78 Tels
+ * implement "try" and "only" as replacements for "lib"
+ * make 'use Math::BigInt lib => "foo"' warn if foo cannot be loaded and a
+   fallback occurs
+ * fix bug #21446 - Docs/code inconsistency for bnorm() method
+ * fix bug #21964 - A patch to include a rounding mode of 'common'
+ * fix bug #21445 - Documentation error for exponent() method
+ * fix bug perl #41050 - NaN returned when raising integer value to negative power
+ * add from_hex(), from_oct(), and from_bin()
+ * add as_oct()
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

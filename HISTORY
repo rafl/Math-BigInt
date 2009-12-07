@@ -1,8 +1,8 @@
-This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
-to the rewritten one. For what has changed in the latest version see NEW
-and for a complete list of changes see the file HISTORY.
+This file contains all the changes and bugfixes from the original version of
+BigInt/BigFloat to the rewritten one. For what has changed in the latest
+version see NEW and for a complete list of changes see the file CHANGES.
 
-v1.74:
+v1.78:
 
  general:
   + It is subsequent faster than the original in many places
@@ -31,8 +31,9 @@ v1.74:
   + integers of the form 1E2, 1.23E2, 2.00 etc now valid for BigInt.pm, too
   + hexadecimal numbers of the form 0xabcdefABCDEF0123456789
   + binary numbers of the form 0b01010101101000001000100101
+  + octal numbers can be input via from_oct()
  output:
-  + as_hex() and as_bin() for easier conversation between bases
+  + as_hex(), as_bin() and as_oct() for easier conversation between bases
  bugs and buglets fixed over Mark's original:
   + 0**0 gave NaN instead of 1
   + -1**y gave -1 instead of +1 for even y

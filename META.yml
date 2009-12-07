@@ -1,9 +1,10 @@
---- #YAML:1.0
+---
 name: Math-BigInt
-version: 1.77
+version: 1.78
+author: Tels
 version_from: lib/Math/BigInt.pm
 license: perl
 distribution_type: module
-generated_by: Math-BigInt version 1.77
+generated_by: Math-BigInt version 1.78
 installdirs: perl
 requires: {}
