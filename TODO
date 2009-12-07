@@ -1,12 +1,12 @@
 See also various .pm files.
 
-Doc:
-  * document that config() can now set certain parameters
-
 General:
+ * remove the broken _swap() stuff and inline it - plus the tests for it. It
+   just doesn't work and justify the extra call overhead...
  * Copy on write (helps for $x = -$x; cases etc) (seems to make it slower :/
- * try to cash UNIVERSAL::can results, since $CALC shouldn't change (or even
-   unset them when $CALC changes)
+ * try to cache UNIVERSAL::can results, since $CALC shouldn't change (or even
+   unset them when $CALC changes) (it could change for on-the-fly library
+   changed...)
  * run config() and die_on_nan() tests under Subclass.pm
  
 Math::BigFloat:
@@ -16,16 +16,12 @@ Math::BigFloat:
  * do not reduce numbers in new(), rather do it in anything that outputs it
    like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
    number after each op is slow with a binary core math lib like BitVect.
- * add $x->bint(), that returns only the integer part truncated
- * also add bfract() that returns just the fractional part
+ * add bfract() that returns just the fractional part?
  * tests for frsft() and flsft() with $n != 2
  * blog() is still quite slow for numbers with lots of decimals (8 seconds vs.
    72 (or million years in v1.6 :) for log(123**123) is quite good, actually,
    but still not good enough for me...)
  * finish broot() by using different algorithmn
-
-Math::BigFloat::Constant:
- * really needed by someone out there?
 
 Math::BigInt:
  * finish 'upgrade'

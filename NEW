@@ -1,105 +1,99 @@
-This lists only the changes for the current release (v1.65) over the last
+This lists only the changes for the current release (v1.66) over the last
 version, since HISTORY is now quite big:
 
-Calc : fixed a bug in _floor() which caused ffloor(0.1234567) to fail.
-       (Thanx to cpan@ali.as for finding it and sending a fix/testcases)
-       make _as_hex() and _as_bin() handle 0, and make them faster for very
-	short numbers (less than BASE_LEN digits) 
-MBI  : replace die() with Carp::croak()
-       remove needless is_zero() check in as_bin() and as_hex(), making them
-	faster, especially when under a diff. lib like GMP. See below.
-       Fixed the infinite recursion in bignum. See http://xrl.us/k6y
-       Fix the broken handling of 0e999, 0e-999 etc
-MBF  : replace die() with Carp::croak()
-       fixed bug in blog() that failed if $base was a Math::BigInt
-Misc : fix the testscript bug complaining about a missing Scalar.pm
-       document in BigInt that config() can set some values
-       document in Bigint's Synopsis that lib => 'GMP' is a jolly good idea
-tests: tests for floor()
-       tests for _as_hex() and _as_bin() in bigintc.t
+Calc : fixed a bug in _div_use_div() where the remainder was computed as X,
+	instead of 0, when X == Y and both X and Y were very big
+        (Thanx to the rand testing in a loop (thanx Paul Green!) we found it)
+       fixed bug in div that computed result off by one when one of the scratch
+	values overflowed
+       _div_use_div() hat a shortcurt for X beeing bigger than/equal to Y, but
+	_div_use_mul() didn't - so let's C&P the shortcut code over
+       _root(): warn if result cannot yet be computed
+       _root(): compute proper result if $n is a power of 2	
+MBI  : increased version
+       better doc for accepted inputs (thanx and sorry abigail!)
+       removed section about "Canonical Form" from doc - it was unclear why
+	this was in the doc, where it is used or important at all
+       fixed parameter handling in broot() regarding undefined $Y (see below)
+       broot(): w/o _root() in lib: 
+	compute proper result if $n is a power of 2
+	compute proper result if $x is small (len < 6)
+        warn if proper result cannot be computed
+       removed the needless _one() (which was just a wrapper around bone()) -
+	this makes binc() about 3% faster...
+       inlined the code from _swap() into the overload section, improving
+	speed of overloaded math a trifle (or more, in case of GMP)
+MBF  : simplified logic in bsrt() and cut out unnecc. BigInt math -> speedup
+       replaced lone call to $self->_one() by $self->bone()
+Misc : 
+tests: tests for bmod(X,X) with large X
+       the mbi_rand test now uses a larger seed, giving more different tests
+       the mbi_rand test also prints the seed for each failure, so that I get
+       it from failure reports.
+       added tests for the fixed bugs
+       tests for broot() (upgrading, and proper results)
 
-###############################################################################
+##############################################################################
 
-Benchmarked under Linux 2.4.20, Athlon XP 2400+ (2 Ghz), 512 MB DDR (1 DIMM)
-with FSS 266:
+Benchmark: running 0, 0.123456789, 0.5, 100, 100.123456789, 123.123456789 for at least 5 CPU seconds...
 
-As you can see, the special case 0 has become a bit slower, but smaller numbers
-are way faster. Bigger numbers benefit less and less, the law of dimishing
-returns striking here. However, for GMP, the numbers need to get much bigger
-for the effect becomming unnoticable, meaning you benefit more :)
+v1.66:
+            0:  4s (5.27 usr +  0.00 sys =  5.27 CPU) 91547/s (n=482454)
+  0.123456789:  6s (5.23 usr +  0.00 sys =  5.23 CPU) 28034/s (n=146618)
+          0.5:  5s (5.23 usr +  0.00 sys =  5.23 CPU) 29090/s (n=152141)
+          100:  6s (5.23 usr +  0.00 sys =  5.23 CPU) 29090/s (n=152141)
+100.123456789:  5s (5.16 usr +  0.00 sys =  5.16 CPU) 27011/s (n=139377)
+123.123456789:  6s (5.24 usr +  0.00 sys =  5.24 CPU) 27100/s (n=142007)
 
-Fri Jul  4 19:43:11 2003 Numbers are absolute ops/s, scaled by factor 1.
+v1.65:
+            0:  6s (5.31 usr +  0.00 sys =  5.31 CPU) 80228/s (n=426012)
+  0.123456789:  5s (5.30 usr +  0.00 sys =  5.30 CPU)  3023/s  (n=16026)
+          0.5:  6s (5.27 usr +  0.00 sys =  5.27 CPU)  3040/s  (n=16026)
+          100:  5s (5.26 usr +  0.00 sys =  5.26 CPU)  7503/s  (n=39470)
+100.123456789:  5s (5.28 usr +  0.00 sys =  5.28 CPU)  9376/s  (n=49506)
+123.123456789:  6s (5.29 usr +  0.00 sys =  5.29 CPU)  9358/s  (n=49506)
 
-                 |   v1.45   v1.59   v1.60   v1.64   v1.64  v1.65
-                 |                                   fixed
- ................|................................................
-  0x0            |  131000  136000  132000  134000  133000  84300
-  0x1            |    6020   28200   27600   27900   27900  84300
-  0x10           |    6020   28200   27700   28100   27900  84400
-  0xFFFF         |    1900   28100   27800   27900   27800  83500
-  0xFFFFFF       |    1130   16500   16400   16400   16400  18200
-  0xFFFFFFFF     |     833   16400   16400   16400   16400  18100
-  0xFFFFFFFFFF   |     640   12200   12200   12300   12300  13100
-  0xFFFFFFFFFFFF |     528   11700   11600   11700   11700  12400
-  2 ** 64        |     376    8720    8630    8660    8670   9050
-  2 ** 128       |     179    4380    4380    4340    4340   4460
-  2 ** 256       |    84.0    1890    1890    1880    1890   1910
-  2 ** 512       |    36.0     703     703     703     700    700
- as_hex:         |   12400   24400   23900   24200   24100  34500
- ................|................................................
-  0x0            |   40200   41900   41800   41400   41600  35200
-  0x1            |    5450   18600   18500   18500   18400  35000
-  0x10           |    5430   18600   18500   18400   18400  35000
-  0xFFFF         |    1840   18500   18700   18500   18500  34900
-  0xFFFFFF       |    1130   12600   12600   12500   12600  13700
-  0xFFFFFFFF     |     806   12600   12600   12600   12600  13800
-  0xFFFFFFFFFF   |     639    9930    9860    9980    9980  10500
-  0xFFFFFFFFFFFF |     521    9440    9480    9530    9530  10100
-  2 ** 64        |     376    8580    8530    8540    8560   9010
-  2 ** 128       |     180    4340    4300    4300    4320   4420
-  2 ** 256       |    84.0    1890    1880    1880    1880   1900
-  2 ** 512       |    36.0     696     696     683     696    700
- as_bin:         |    4730   13100   13100   13100   13100  17000
- ................|................................................
+##############################################################################
 
+Benchmark: and for at least 5 CPU seconds...
+(Similiar numbers for other operations like *, /, % etc)
 
+v1.65:
+      Calc and: 5s (5.32 usr +  0.00 sys =  5.32 CPU)   3922/s (n=20868)
+       GMP and: 5s (5.23 usr +  0.00 sys =  5.23 CPU)  13576/s (n=71003)
 
-Fri Jul  4 20:30:11 2003 Numbers are absolute ops/s, scaled by factor 1.
+v1.66:
+      Calc and: 5s (5.29 usr +  0.00 sys =  5.29 CPU)   3967/s (n=20990)
+       GMP and: 6s (5.09 usr +  0.20 sys =  5.29 CPU)  14380/s (n=76075)
 
-                 |   v1.64  v1.65
-                 |     GMP    GMP
-                 |   v1.12  v1.12
- ................|................
-  0x0            |  119000  92500
-  0x1            |   58500  91100
-  0x10           |   58800  92000
-  0xFFFF         |   58800  91100
-  0xFFFFFF       |   58200  90700
-  0xFFFFFFFF     |   58100  90600
-  0xFFFFFFFFFF   |   58100  92000
-  0xFFFFFFFFFFFF |   58400  91600
-  2 ** 64        |   57500  89800
-  2 ** 128       |   57200  88900
-  2 ** 256       |   55900  87200
-  2 ** 512       |   54500  82500
- as_hex:         |   62700  90000
- ................|................
-  0x0            |   33900  31800
-  0x1            |   25800  31500
-  0x10           |   25700  31400
-  0xFFFF         |   25700  31400
-  0xFFFFFF       |   25700  31400
-  0xFFFFFFFF     |   25600  31400
-  0xFFFFFFFFFF   |   25600  31400
-  0xFFFFFFFFFFFF |   25500  31400
-  2 ** 64        |   55700  85500
-  2 ** 128       |   54100  81900
-  2 ** 256       |   51200  76300
-  2 ** 512       |   46200  65500
- as_bin:         |   35100  46700
- ................|................
+##############################################################################
 
-###############################################################################
+ v1.65: perl -Mbigint -le 'print 123->broot()'
+ Can't call method "is_zero" on an undefined value at BigInt.pm line 2161.
+ v1.66: perl -Mbigint -le 'print 123->broot()'
+ 11
+
+ v1.65: perl -Mbignum -le 'print 123->broot(2)'
+ NaN
+ v1.66: perl -Mbignum -le 'print 123->broot(2)'
+ 11.09053650640941716205160010260993291846
+
+ v1.65: perl -Mbignum -le 'print 123->broot()'
+ Can't call method "is_zero" on an undefined value at BigInt.pm line 2161.
+ v1.66: perl -Mbignum -le 'print 123->broot()'
+ 11.09053650640941716205160010260993291846
+
+ v1.65: perl -Mbignum -le 'print +(2 ** 64)->broot(8)'
+ NaN
+ v1.66: perl -Mbignum -le 'print +(2 ** 64)->broot(8)'
+ 256
+
+ v1.65: perl -Mbigint -le 'print +(2 ** 64)->broot(8)'
+ 18446744073709551616
+ v1.66: perl -Mbigint -le 'print +(2 ** 64)->broot(8)'
+ 256
+
+##############################################################################
 
 Please have Math::BigInt->new('inf')->bmul('inf') big amounts of fun.
 

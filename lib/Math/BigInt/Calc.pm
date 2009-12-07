@@ -8,7 +8,7 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '0.35';
+$VERSION = '0.36';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -125,30 +125,35 @@ BEGIN
   # determine how many digits fit into an integer and can be safely added 
   # together plus carry w/o causing an overflow
 
-  # this below detects 15 on a 64 bit system, because after that it becomes
-  # 1e16  and not 1000000 :/ I can make it detect 18, but then I get a lot of
-  # test failures. Ugh! (Tomake detect 18: uncomment lines marked with *)
   use integer;
-  my $bi = 5;			# approx. 16 bit
-  $num = int('9' x $bi);
-  # $num = 99999; # *
-  # while ( ($num+$num+1) eq '1' . '9' x $bi)	# *
-  while ( int($num+$num+1) eq '1' . '9' x $bi)
-    {
-    $bi++; $num = int('9' x $bi);
-    # $bi++; $num *= 10; $num += 9;	# *
-    }
-  $bi--;				# back off one step
+
+  ############################################################################
+  # the next block is no longer important
+
+  ## this below detects 15 on a 64 bit system, because after that it becomes
+  ## 1e16  and not 1000000 :/ I can make it detect 18, but then I get a lot of
+  ## test failures. Ugh! (Tomake detect 18: uncomment lines marked with *)
+
+  #my $bi = 5;			# approx. 16 bit
+  #$num = int('9' x $bi);
+  ## $num = 99999; # *
+  ## while ( ($num+$num+1) eq '1' . '9' x $bi)	# *
+  #while ( int($num+$num+1) eq '1' . '9' x $bi)
+  #  {
+  #  $bi++; $num = int('9' x $bi);
+  #  # $bi++; $num *= 10; $num += 9;	# *
+  #  }
+  #$bi--;				# back off one step
   # by setting them equal, we ignore the findings and use the default
   # one-size-fits-all approach from former versions
-  $bi = $e;				# XXX, this should work always
+  my $bi = $e;				# XXX, this should work always
 
   __PACKAGE__->_base_len($e,$bi);	# set and store
 
   # find out how many bits _and, _or and _xor can take (old default = 16)
   # I don't think anybody has yet 128 bit scalars, so let's play safe.
   local $^W = 0;	# don't warn about 'nonportable number'
-  $AND_BITS = 15; $XOR_BITS = 15; $OR_BITS  = 15;
+  $AND_BITS = 15; $XOR_BITS = 15; $OR_BITS = 15;
 
   # find max bits, we will not go higher than numberofbits that fit into $BASE
   # to make _and etc simpler (and faster for smaller, slower for large numbers)
@@ -513,8 +518,18 @@ sub _div_use_mul
   {
   # ref to array, ref to array, modify first array and return remainder if 
   # in list context
-  my ($c,$x,$yorg) = @_;
 
+  # see comments in _div_use_div() for more explanations
+
+  my ($c,$x,$yorg) = @_;
+  
+  # the general div algorithmn here is about O(N*N) and thus quite slow, so
+  # we first check for some special cases and use shortcuts to handle them.
+
+  # This works, because we store the numbers in a chunked format where each
+  # element contains 5..7 digits (depending on system).
+
+  # if both numbers have only one element:
   if (@$x == 1 && @$yorg == 1)
     {
     # shortcut, $yorg and $x are two small numbers
@@ -530,6 +545,8 @@ sub _div_use_mul
       return $x; 
       }
     }
+
+  # if x has more than one, but y has only one element:
   if (@$yorg == 1)
     {
     my $rem;
@@ -548,6 +565,69 @@ sub _div_use_mul
     return ($x,$rem) if wantarray;
     return $x;
     }
+
+  # now x and y have more than one element
+
+  # check whether y has more elements than x, if yet, the result will be 0
+  if (@$yorg > @$x)
+    {
+    my $rem;
+    $rem = [@$x] if wantarray;                  # make copy
+    splice (@$x,1);                             # keep ref to original array
+    $x->[0] = 0;                                # set to 0
+    return ($x,$rem) if wantarray;              # including remainder?
+    return $x;					# only x, which is [0] now
+    }
+  # check whether the numbers have the same number of elements, in that case
+  # the result will fit into one element and can be computed efficiently
+  if (@$yorg == @$x)
+    {
+    my $rem;
+    # if $yorg has more digits than $x (it's leading element is longer than
+    # the one from $x), the result will also be 0:
+    if (length(int($yorg->[-1])) > length(int($x->[-1])))
+      {
+      $rem = [@$x] if wantarray;		# make copy
+      splice (@$x,1);				# keep ref to org array
+      $x->[0] = 0;				# set to 0
+      return ($x,$rem) if wantarray;		# including remainder?
+      return $x;
+      }
+    # now calculate $x / $yorg
+    if (length(int($yorg->[-1])) == length(int($x->[-1])))
+      {
+      # same length, so make full compare, and if equal, return 1
+      # hm, same lengths, but same contents? So we need to check all parts:
+      my $a = 0; my $j = scalar @$x - 1;
+      # manual way (abort if unequal, good for early ne)
+      while ($j >= 0)
+        {
+        last if ($a = $x->[$j] - $yorg->[$j]); $j--;
+        }
+      # $a contains the result of the compare between X and Y
+      # a < 0: x < y, a == 0 => x == y, a > 0: x > y
+      if ($a <= 0)
+        {
+        if (wantarray)
+	  {
+          $rem = [ 0 ];			# a = 0 => x == y => rem 1
+          $rem = [@$x] if $a != 0;	# a < 0 => x < y => rem = x
+	  }
+        splice(@$x,1);			# keep single element
+        $x->[0] = 0;			# if $a < 0
+        if ($a == 0)
+          {
+          # $x == $y
+          $x->[0] = 1;
+          }
+        return ($x,$rem) if wantarray;
+        return $x;
+        }
+      # $x >= $y, proceed normally
+      }
+    }
+
+  # all other cases:
 
   my $y = [ @$yorg ];				# always make copy to preserve
 
@@ -580,7 +660,7 @@ sub _div_use_mul
     $u2 = 0 unless $u2;
     #warn "oups v1 is 0, u0: $u0 $y->[-2] $y->[-1] l ",scalar @$y,"\n"
     # if $v1 == 0;
-     $q = (($u0 == $v1) ? $MAX_VAL : int(($u0*$MBASE+$u1)/$v1));
+    $q = (($u0 == $v1) ? $MAX_VAL : int(($u0*$MBASE+$u1)/$v1));
     --$q while ($v2*$q > ($u0*$MBASE+$u1-$q*$v1)*$MBASE+$u2);
     if ($q)
       {
@@ -597,11 +677,12 @@ sub _div_use_mul
 	for ($yi = 0, $xi = $#$x-$#$y-1; $yi <= $#$y; ++$yi,++$xi) 
           {
 	  $x->[$xi] -= $MBASE
-	   if ($car = (($x->[$xi] += $y->[$yi] + $car) > $MBASE));
+	   if ($car = (($x->[$xi] += $y->[$yi] + $car) >= $MBASE));
 	  }
 	}   
       }
-      pop(@$x); unshift(@q, $q);
+    pop(@$x);
+    unshift(@q, $q);
     }
   if (wantarray) 
     {
@@ -688,7 +769,7 @@ sub _div_use_div
     splice (@$x,1);				# keep ref to original array
     $x->[0] = 0;				# set to 0
     return ($x,$rem) if wantarray;		# including remainder?
-    return $x;
+    return $x;					# only x, which is [0] now
     }
   # check whether the numbers have the same number of elements, in that case
   # the result will fit into one element and can be computed efficiently
@@ -709,18 +790,23 @@ sub _div_use_div
     if (length(int($yorg->[-1])) == length(int($x->[-1])))
       {
       # same length, so make full compare, and if equal, return 1
-      # hm, same lengths,  but same contents? So we need to check all parts:
+      # hm, same lengths, but same contents? So we need to check all parts:
       my $a = 0; my $j = scalar @$x - 1;
       # manual way (abort if unequal, good for early ne)
       while ($j >= 0)
         {
         last if ($a = $x->[$j] - $yorg->[$j]); $j--;
         }
+      # $a contains the result of the compare between X and Y
       # a < 0: x < y, a == 0 => x == y, a > 0: x > y
       if ($a <= 0)
         {
-        $rem = [@$x] if wantarray;
-        splice(@$x,1);
+        if (wantarray)
+	  {
+          $rem = [ 0 ];			# a = 0 => x == y => rem 1
+          $rem = [@$x] if $a != 0;	# a < 0 => x < y => rem = x
+	  }
+        splice(@$x,1);			# keep single element
         $x->[0] = 0;			# if $a < 0
         if ($a == 0)
           {
@@ -730,9 +816,8 @@ sub _div_use_div
         return ($x,$rem) if wantarray;
         return $x;
         }
-      # $x >= $y, proceed normally
+      # $x >= $y, so proceed normally
       }
-
     }
 
   # all other cases:
@@ -760,6 +845,10 @@ sub _div_use_div
     {
     push(@$x, 0);
     }
+
+  # @q will accumulate the final result, $q contains the current computed
+  # part of the final result
+
   @q = (); ($v2,$v1) = @$y[-2,-1];
   $v2 = 0 unless $v2;
   while ($#$x > $#$y) 
@@ -768,7 +857,7 @@ sub _div_use_div
     $u2 = 0 unless $u2;
     #warn "oups v1 is 0, u0: $u0 $y->[-2] $y->[-1] l ",scalar @$y,"\n"
     # if $v1 == 0;
-     $q = (($u0 == $v1) ? $MAX_VAL : int(($u0*$MBASE+$u1)/$v1));
+    $q = (($u0 == $v1) ? $MAX_VAL : int(($u0*$MBASE+$u1)/$v1));
     --$q while ($v2*$q > ($u0*$MBASE+$u1-$q*$v1)*$MBASE+$u2);
     if ($q)
       {
@@ -785,7 +874,7 @@ sub _div_use_div
 	for ($yi = 0, $xi = $#$x-$#$y-1; $yi <= $#$y; ++$yi,++$xi) 
           {
 	  $x->[$xi] -= $MBASE
-	   if ($car = (($x->[$xi] += $y->[$yi] + $car) > $MBASE));
+	   if ($car = (($x->[$xi] += $y->[$yi] + $car) >= $MBASE));
 	  }
 	}   
       }
@@ -1013,6 +1102,7 @@ sub _mod
     my ($xo,$rem) = _div($c,$x,$yo);
     return $rem;
     }
+
   my $y = $yo->[0];
   # both are single element arrays
   if (scalar @$x == 1)
@@ -1021,7 +1111,7 @@ sub _mod
     return $x;
     }
 
-  # @y is single element, but @x has more than one
+  # @y is a single element, but @x has more than one element
   my $b = $BASE % $y;
   if ($b == 0)
     {
@@ -1321,8 +1411,6 @@ sub _sqrt
 sub _root
   {
   # take n'th root of $x in place (n >= 3)
-  # Compute a guess of the result (by rule of thumb), then improve it via
-  # Newton's method.
   my ($c,$x,$n) = @_;
  
   if (scalar @$x == 1)
@@ -1340,8 +1428,36 @@ sub _root
     return $x;
     } 
 
-  # XXX TODO
-
+  # X is more than one element
+  # if $n is a power of two, we can repeatedly take sqrt($X) and find the
+  # proper result, because sqrt(sqrt($x)) == root($x,4)
+  my $b = _as_bin($c,$n);
+  if ($$b =~ /0b1(0+)/)
+    {
+    my $count = CORE::length($1);	# 0b100 => len('00') => 2
+    my $cnt = $count;			# counter for loop
+    unshift (@$x, 0);			# add one element, together with one
+					# more below in the loop this makes 2
+    while ($cnt-- > 0)
+      {
+      # 'inflate' $X by adding one element, basically computing
+      # $x * $BASE * $BASE. This gives us more $BASE_LEN digits for result
+      # since len(sqrt($X)) approx == len($x) / 2.
+      unshift (@$x, 0);
+      # calculate sqrt($x), $x is now one element to big, again. In the next
+      # round we make that two, again.
+      _sqrt($c,$x);
+      }
+    # $x is now one element to big, so truncate result by removing it
+    splice (@$x,0,1);
+    } 
+  else
+    {
+    # Should compute a guess of the result (by rule of thumb), then improve it
+    # via Newton's method or something similiar.
+    # XXX TODO
+    warn ('_root() not fully implemented in Calc.');
+    }
   $x; 
   }
 

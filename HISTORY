@@ -105,6 +105,11 @@ Math::BigInt::Calc:
    (Thanx to cpan@ali.as for finding it and sending a fix/testcases)
  * make _as_hex() and _as_bin() handle 0, and make them faster for very
    short numbers (less than BASE_LEN digits)
+2003-08-31 v0.36 Tels
+ * fixed a bug in div_use_div() that computed remainder wrong if X == X and
+   X was very large
+ * fixed a off-by-one error discovered with mbi_rand.t in _div_use_XXX()
+   (one internal in $x overflowed, thus the wrong computation)
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -334,6 +339,9 @@ Math::BigFloat:
 2003-07-06 v1.39 Tels
  * $x->blog($base) can handle a $base which is a Math::Bigint
  * replace die() with Carp::croak
+2003-09-22 v1.40 Tels
+ * bstr(): removed unnecc. BigInt math and inlined is_zero() => great speedup
+   (10% to factor 6.5 depending on input)
 
 ############################################################################## 
 Math::BigInt:
@@ -643,6 +651,12 @@ Math::BigInt:
    faster, especially when under a different lib like GMP.
  * Fixed the infinite recursion in bignum. See http://xrl.us/k6y
  * fix handling of 0e999, 0e-999 etc
+2003-09-01 v1.66 Tels
+ * document accepted inputs better
+ * fix wrong upgrade and undef-parameter handling in broot()
+ * implement broot() if lib doesn't have a _root() routine for $y that are
+   powers of two and for small $x
+ * warn if broot() cannot yet compute proper result
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
