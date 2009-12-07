@@ -1,32 +1,26 @@
-This lists only the changes for the current release (v1.62) over the last
+This lists only the changes for the current release (v1.63) over the last
 version, since HISTORY is now quite big:
 
-Calc  : fixed a bug in _rsft that forgot to set the result to 0 if you
-	 shifted only a few more digits right than $x had
-        _modinv() now works thanx to the all-positive algorithmn in MBI. It
-         speeds bmodinv() up by more than a factor of 4
-MBI   : bmodinv() now keeps internals positive, speeding it up by about 5-8%
-	bcmp()/bacmp() upgrade if neccessary
-MBF   : bcmp()/bacmp() upgrade if neccessary
-tests : tests for the _rsft bug-fix
-	more tests for bmodinv()
-	tests for bcmp()/bacmp()'s upgrading
-	more tests for _num()/_inc()/_dec()/_copy() etc in bigintc.t
+MBI   : bsqrt() simulation would not modify $x but return a new object instead
+MBF   : bsqrt() would hang on certain inputs (limit was calculated wrong). So
+         we switch it to a completely different algorithmn using MBI bsqrt() 
+         to calculate the necc. digits based on the observation that
+         sqrt(x*y) == sqrt(x) * sqrt(y) and we can set y == 100. This makes it
+         also much faster (about factor 10).
+        bsqrt(0) would warn and round wrongly to 4 digits. Ditto for bpow,
+         blog and bdiv. It is now equivalent to bsqrt(undef).
+        removed needless "use File::Spec;"
+tests : some more tests for bsqrt() and fsqrt()
+        tests for $x->bsqrt(0)/$x->bpow(0) beeing equivalent to $x->bXXX(undef)
+	constant.t "no warnings 'portable'" instead of "local $^W = 0;"
 
-v1.61 Calc v0.31:
-Benchmark: running modinv_1, modinv_2 for at least 3 CPU seconds...
-  modinv_1:  4s (3.23 usr +  0.00 sys =  3.23 CPU) @ 248/s (n=801)
-  modinv_2:  4s (3.17 usr +  0.00 sys =  3.17 CPU) @  25/s (n=80)
+Despite the new added tests the testsuite runs now about 15% faster due to the
+much improved bsqrt() algorithmn:
 
-v1.62 Calc v0.30:
-Benchmark: running modinv_1, modinv_2 for at least 3 CPU seconds...
-  modinv_1:  4s (3.12 usr +  0.00 sys =  3.12 CPU) @ 262/s (n=818)      1.056
-  modinv_2:  4s (3.18 usr +  0.00 sys =  3.18 CPU) @  27/s (n=85)       1.08
+AMD Athlon TBird 1Ghz: 
 
-v1.62 Calc v0.32:
-Benchmark: running modinv_1, modinv_2 for at least 3 CPU seconds...
-  modinv_1:  4s (3.00 usr +  0.00 sys =  3.00 CPU) @ 1163/s (n=3488)    4.68
-  modinv_2:  4s (3.00 usr +  0.00 sys =  3.00 CPU) @  106/s (n=317)     4.24
+v1.62 Files 27, tests 21053 45 secs (30.25 cusr +  0.60 csys = 30.85 CPU)
+v1.63 Files 27, Tests 21077 40 secs (26.05 cusr +  0.61 csys = 26.66 CPU)
 
 ###############################################################################
 

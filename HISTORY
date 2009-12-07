@@ -283,6 +283,15 @@ Math::BigFloat:
  * (more) tests for bsstr(), numify(), as_hex(), as_bin
 2002-08-20 v1.37 Tels
  * bcmp()/bacmp() upgrade now if requested
+2002-09-08 v1.38 Tels
+ * fix that bsqrt() would hang for certain inputs. Instead of using Newton's,
+   we now rely on the fact that sqrt(x*y) = sqrt(x) * sqrt(y) by setting y to
+   100. This removes the while loop entirely and makes it much faster while
+   fixing the bug at the same time.
+ * $x->bsqrt(0) did needless warn about undef values, and round to 4 digits
+   instead of beeing equivalent to $x->bsqrt(undef)
+ * ditto for $x->bpow($y,0), $x->blog($base,0) and $x->bdiv($y,0)
+ * use File::Spec was needless, since it was required later on again
 
 ############################################################################## 
 Math::BigInt:
@@ -567,6 +576,10 @@ Math::BigInt:
  * bcmp()/bacmp() upgrade now if requested
  * bmodinv() uses an all-positive algorithmn, speeding it up by about 5-8%
    and allowing to implement the same algorithmn in Calc for factor 4 speedup
+2002-09-08 v1.63 Tels
+ * bsqrt() did not modify $x but returned new object when lib does not have
+   a _sqrt() routine (BareCalc, BitVect and Pari are affected, Calc, FastCalc
+   and GMP were not)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
