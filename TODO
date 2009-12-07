@@ -13,11 +13,10 @@ Math::BigFloat:
    number after each op is slow with a binary core math lib like BitVect.
  * add bfract() that returns just the fractional part?
  * tests for frsft() and flsft() with $n != 2
- * blog() is still quite slow for numbers with lots of decimals (8 seconds vs.
-   72 (or million years in v1.6 :) for log(123**123) is quite good, actually,
-   but still not good enough for me...). blog() could use the blog() from
-   BigInt as a first try, and maybe even to compute float results faster
+ * blog() is still quite slow for non-integer results. See if we can reuse the
+   integer calculation somehow
  * finish broot() by using different algorithmn
+ * hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
 
 Math::BigInt:
  * finish 'upgrade'
@@ -52,7 +51,7 @@ Math::BigInt::Calc:
  * alternative mul() method using shifts
  * implement in Calc (and GMP etc) to calculate band(), bior(), bxor() for
    negative inputs (_signed_or() etc)
- * _log_int() and _root() don't scale very well, make them O(log N) vs O(N)
+ * _root() doesn't scale too well
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

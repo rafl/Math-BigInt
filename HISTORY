@@ -125,6 +125,21 @@ Math::BigInt::Calc:
  * _as_bin() used %b, which was not known to v5.5.3 - workaround that
  * implemented _log_int(), which is simple and very fast
  * implemented the missing pieces for _root() (which is quite fast)
+2003-12-30 v0.38 Tels
+ * guess _log_int() result based on $base if $base < $BASE
+ * _pow() handle cases 0 ** Y, 1 ** Y, X ** 0 and X ** 1
+ * _new(): shortcut for short numbers, makes MBI->new() about 20% faster
+ * _root() was wrong for numbers like 9 (0b1001) because they start with
+   the pattern /^0b1(0+)/ (missing '$' in regexp) and after fixing this
+   it was dead slow for large numbers.
+
+############################################################################## 
+Math::BigInt::CalcEmu:
+
+2003-12-26 v0.01 Tels
+ * first version, taken over all the code from BigInt
+2003-12-30 v0.02 Tels
+ * the code in Calc::_root() uses now sprintf(), but the one in Emu was not
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -236,7 +251,8 @@ Math::BigFloat:
 2001-10-03 v1.22 Tels
  * Quite a lot of rounding fixes
  * $x->bnorm() is 4 times faster if $x == 0
- * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op) 
+ * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op)
+ * added as_number()
 2001-10-05 v1.23 Tels
  * fixed facmp() (was broken the same way as fcmp())
  * more rounding fixes from John P.
@@ -369,6 +385,12 @@ Math::BigFloat:
    2, 10 and 0.1 slightly faster. This also helps log($x,2) and log($x,10).
  * bfac() slightly faster for small arguments
  * downgrading to bigint failed for .2e2 (produced 200 vs. 20)
+2003-12-30 v1.42 Tels
+ * ffac(inf) is inf, not NaN
+ * flog() calculate integer result first, and if it fits, return it
+   this makes it much faster in case the result is a perfect integer
+ * require (instead of use) Exporter
+ * froot() calculates an integer result first, and it if fits, returns it
 
 ############################################################################## 
 Math::BigInt:
@@ -703,6 +725,18 @@ Math::BigInt:
  * small change for overload::constant
  * bfac(): do 0 or 1 check only if CALC cannot do _fac() (thus faster)
  * removed a needless _copy in bmod() with megative arguments (slightly faster)
+2003-12-26 v1.68 Tels
+ * bfac(inf) is inf, not NaN 
+ * added alias names: as_int() (as_number()), is_pos(), is_neg() and doc
+ * factored out all the emulation code and moved it to Math::BigInt::CalcEmu
+ * binary/hexadecimal input was twice as slow as v1.66 due to a typo in v1.67
+ * streamlined overload for bolean context (20% faster "... if $x;")
+ * round() was missing a croak() in path testing for wrong roundmode
+ * badd(): optimize away setting of sign if it is already right
+ * bdec() is about 10% faster for negative numbers
+ * bpow(): removed some now needless tests for 0 and 1: about 30% faster
+   for small numbers
+ * streamlined exponent() (parts() benefits from this, too)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

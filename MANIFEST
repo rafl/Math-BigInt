@@ -8,7 +8,7 @@ README
 LICENSE
 MANIFEST
 SIGNATURE
-NEW
+NEW				# what's new in this version
 CREDITS
 TODO
 Makefile.PL
@@ -18,6 +18,7 @@ examples/bigprimes.pl
 examples/1000.txt
 lib/Math/BigInt.pm
 lib/Math/BigInt/Calc.pm
+lib/Math/BigInt/CalcEmu.pm	# emulate missing low-level math routines
 lib/Math/BigFloat.pm
 t/mbimbf.inc			# test accuracy/precision settings in MBI/MBF
 t/mbimbf.t			# test A & P with MBI/MBF
@@ -32,7 +33,8 @@ t/bigintpm.inc			# contains actual tests for MBI
 t/calling.t			# ensure that Class->method('string') works
 t/sub_mbi.t			# empty subclass test for M::BI
 t/sub_mbf.t			# empty subclass test for M::BF
-t/biglog.t			# test the log function
+t/biglog.t			# test the blog function w/ large numbers
+t/bigroot.t			# test the broot function w/ large numbers
 t/bare_mbi.t			# test Math::BigInt's simulation of Calc
 t/bare_mbf.t			# test Math::BigInt's sim of Calc via BigFloat
 t/bare_mif.t			# Rounding tests under BareCalc
@@ -61,8 +63,12 @@ t/isa.t				# isa() and new() w/ mixed classes tests
 t/upgrade.inc			# actual tests for upgrading
 t/mbi_rand.t			# do some testing w/ random inputs/outputs
 t/with_sub.t			# test Math::BigFloat with => 'package'
+t/sub_ali.t			# test alias subroutines w/ alias.inc
+t/mbi_ali.t			# test alias subrotuines w/ alias.inc
+t/mbf_ali.t			# test alias subroutines w/ alias.inc
+t/alias.inc			# core test for alias subroutines 
 t/Math/BigInt/BareCalc.pm	# for testing BigInt's simulation of Calc
 t/Math/BigInt/Subclass.pm	# empty subclass
 t/Math/BigFloat/Subclass.pm	# empty subclass
 t/Math/BigInt/Scalar.pm		# to test replacements for Math::BigInt::Calc
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml			# Module meta-data (added by MakeMaker)

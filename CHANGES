@@ -2,7 +2,7 @@ This file contains all the CHANGES and bugfixes from original BigInt/BigFloat
 to the rewritten one. For what has changed in the latest version see NEW
 and for a complete list of changes see the file HISTORY.
 
-v1.67:
+v1.68:
 
  general:
   + It is subsequent faster than the original in many places
@@ -72,8 +72,8 @@ v1.67:
   + binc(), bdec(), bfac()
   + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf(), is_int()
   + digit(), length(), copy()
-  + as_number(), as_hex(), as_bin()
-  + is_positive(), is_negative()
+  + as_number() (alias: as_int()), as_hex(), as_bin()
+  + is_positive(), is_negative() (alias: is_pos() and is_neg())
   + mantissa(), exponent(), parts(), sign()
   + bgcd() accepts now lists, blcm() (also accepts lists)
   + flog()/blog() for overloading of log()
@@ -83,7 +83,7 @@ v1.67:
   + MBI: bsqrt()
   + bmodpow(), bmodinv() (Thanx John Borwick)
   + bfloor(), bceil(), broot()
-  + CORE cos()/sin()/exp()/atan2() now work when passed BigInt's or BigFloat's
+  + CORE cos()/sin()/exp()/atan2() now work when passed BigInts or BigFloats
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

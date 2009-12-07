@@ -4,11 +4,9 @@ use 5.005;
 use strict;
 # use warnings;	# dont use warnings for older Perls
 
-require Exporter;
-use vars qw/@ISA $VERSION/;
-@ISA = qw(Exporter);
+use vars qw/$VERSION/;
 
-$VERSION = '0.37';
+$VERSION = '0.38';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -194,6 +192,10 @@ sub _new
   # 1ex format. Assumes normalized value as input.
   my $d = $_[1];
   my $il = length($$d)-1;
+
+  # < BASE_LEN due len-1 above
+  return [ int($$d) ] if $il < $BASE_LEN;	# shortcut for short numbers
+
   # this leaves '00000' instead of int 0 and will be corrected after any op
   [ reverse(unpack("a" . ($il % $BASE_LEN+1) 
     . ("a$BASE_LEN" x ($il / $BASE_LEN)), $$d)) ];
@@ -1050,7 +1052,7 @@ sub __strip_zeros
   }                                                                             
 
 ###############################################################################
-# check routine to test internal state of corruptions
+# check routine to test internal state for corruptions
 
 sub _check
   {
@@ -1079,7 +1081,7 @@ sub _check
     $i++;
     }
   return "Illegal part '$e' at pos $i (tested: $try)" if $i < $j;
-  return 0;
+  0;
   }
 
 
@@ -1118,7 +1120,7 @@ sub _mod
     }
   elsif ($b == 1)
     {
-    # else need to go trough all elements: O(N), but loop is a bit simplified
+    # else need to go through all elements: O(N), but loop is a bit simplified
     my $r = 0;
     foreach (@$x)
       {
@@ -1130,7 +1132,7 @@ sub _mod
     }
   else
     {
-    # else need to go trough all elements: O(N)
+    # else need to go through all elements: O(N)
     my $r = 0; my $bm = 1;
     foreach (@$x)
       {
@@ -1240,6 +1242,22 @@ sub _pow
   # ref to array, ref to array, return ref to array
   my ($c,$cx,$cy) = @_;
 
+  if (scalar @$cy == 1 && $cy->[0] == 0)
+    {
+    splice (@$cx,1); $cx->[0] = 1;		# y == 0 => x => 1
+    return $cx;
+    }
+  if ((scalar @$cx == 1 && $cx->[0] == 1) ||	#    x == 1
+      (scalar @$cy == 1 && $cy->[0] == 1))	# or y == 1
+    {
+    return $cx;
+    }
+  if (scalar @$cx == 1 && $cx->[0] == 0)
+    {
+    splice (@$cx,1); $cx->[0] = 0;		# 0 ** y => 0 (if not y <= 0)
+    return $cx;
+    }
+
   my $pow2 = _one();
 
   my $y_bin = ${_as_bin($c,$cy)}; $y_bin =~ s/^0b//;
@@ -1346,8 +1364,7 @@ sub _log_int
   return if (scalar @$x == 1 && $x->[0] == 0);
   # BASE 0 or 1 => NaN
   return if (scalar @$base == 1 && $base->[0] < 2);
-  my $cmp = _acmp($c,$x,$base);
-  # X == BASE => 1
+  my $cmp = _acmp($c,$x,$base); # X == BASE => 1
   if ($cmp == 0)
     {
     splice (@$x,1); $x->[0] = 1;
@@ -1366,11 +1383,43 @@ sub _log_int
   my $x_org = _copy($c,$x);		# preserve x
   splice(@$x,1); $x->[0] = 1;		# keep ref to $x
 
+  my $trial = _copy($c,$base);
+
+  # XXX TODO this only works if $base has only one element
+  if (scalar @$base == 1)
+    {
+    # compute int ( length_in_base_10(X) / ( log(base) / log(10) ) )
+    my $len = _len($c,$x_org);
+    my $res = int($len / (log($base->[0]) / log(10))) || 1; # avoid $res == 0
+
+    $x->[0] = $res;
+    $trial = _pow ($c, _copy($c, $base), $x);
+    my $a = _acmp($x,$trial,$x_org);
+    return ($x,1) if $a == 0;
+    # we now know that $res is too small
+    if ($res < 0)
+      {
+      _mul($c,$trial,$base); _add($c, $x, [1]);
+      }
+    else
+      {
+      # or too big
+      _div($c,$trial,$base); _sub($c, $x, [1]);
+      }
+    # did we now get the right result?
+    $a = _acmp($x,$trial,$x_org);
+    return ($x,1) if $a == 0;		# yes, exactly
+    # still too big
+    if ($a > 0)
+      {
+      _div($c,$trial,$base); _sub($c, $x, [1]);
+      }
+    } 
+  
   # simple loop that increments $x by two in each step, possible overstepping
   # the real result by one
 
-  # use a loop that keeps $x as scalar as long as possible (this is faster)
-  my $trial = _copy($c,$base); my $a;
+  my $a;
   my $base_mul = _mul($c, _copy($c,$base), $base);
 
   while (($a = _acmp($x,$trial,$x_org)) < 0)
@@ -1502,11 +1551,12 @@ sub _root
     return $x;
     } 
 
-  # X is more than one element
+  # we know now that X is more than one element long
+
   # if $n is a power of two, we can repeatedly take sqrt($X) and find the
   # proper result, because sqrt(sqrt($x)) == root($x,4)
   my $b = _as_bin($c,$n);
-  if ($$b =~ /0b1(0+)/)
+  if ($$b =~ /0b1(0+)$/)
     {
     my $count = CORE::length($1);	# 0b100 => len('00') => 2
     my $cnt = $count;			# counter for loop
@@ -1528,42 +1578,54 @@ sub _root
   else
     {
     # trial computation by starting with 2,4,8,16 etc until we overstep
-
-    my $step = _two();
+    my $step;
     my $trial = _two();
 
-    _mul($c, $trial, $step) 
-      while (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) < 0);
-
-    # hit exactly?
-    if (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) == 0)
+    # while still to do more than X steps
+    do
       {
-      @$x = @$trial;			# make copy while preserving ref to $x
-      return $x;
-      }
-    # overstepped, so go back on step
-    _div($c, $trial, $step);
+      $step = _two();
+      while (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) < 0)
+        {
+        _mul ($c, $step, [2]);
+        _add ($c, $trial, $step);
+        }
 
+      # hit exactly?
+      if (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) == 0)
+        {
+        @$x = @$trial;			# make copy while preserving ref to $x
+        return $x;
+        }
+      # overstepped, so go back on step
+      _sub($c, $trial, $step);
+      } while (scalar @$step > 1 || $step->[0] > 128);
+
+    # reset step to 2
+    $step = _two();
     # add two, because $trial cannot be exactly the result (otherwise we would
     # alrady have found it)
     _add($c, $trial, $step);
  
-    # and now add more and more (2,4,6,8, etc)
-    _add($c, $trial, $step) 
-      while (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) < 0);
+    # and now add more and more (2,4,6,8,10 etc)
+    while (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) < 0)
+      {
+      _add ($c, $trial, $step);
+      }
+
+    # hit not exactly? (overstepped)
+    if (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) > 0)
+      {
+      _dec($c,$trial);
+      }
 
     # hit not exactly? (overstepped)
     # 80 too small, 81 slightly too big, 82 too big
     if (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) > 0)
       {
-      _dec($c,$trial);
+      _dec ($c, $trial); 
       }
-    # 80 too small, 81 slightly too big
-    if (_acmp($c, _pow($c, _copy($c, $trial), $n), $x) > 0)
-      {
-      _dec($c,$trial);
-      }
-    
+
     @$x = @$trial;			# make copy while preserving ref to $x
     return $x;
     }
@@ -1981,6 +2043,7 @@ slow) fallback routines to emulate these:
 	_root(obj)	return the n'th (n >= 3) root of obj (truncated to int)
 	_fac(obj)	return factorial of object 1 (1*2*3*4..)
 	_pow(obj,obj)	return object 1 to the power of object 2
+			return undef for NaN
 	_gcd(obj,obj)	return Greatest Common Divisor of two objects
 	
 	_zeros(obj)	return number of trailing decimal zeros

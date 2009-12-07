@@ -2,7 +2,6 @@
 Known bugs:
 
 * General:
-  + divide by zero throws no exception
   + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
     you need it, please bug the autor(s) about it.
 
@@ -17,24 +16,12 @@ Known bugs:
   + fdiv() using F (fallback) mode does not work properly in all cases of
     local (aka $x's or $y's) A or P settings. Not definite test case yet, but
     it might calculate not enough digits to satisfy the rounding needs.
-  + MBF uses internally MBI for calculating. This can make problems if MBI has
-    set global accuracy settings, and thus rounds unexpectedly the mantissa.
-    My attempt to fix it stops the following from breaking, but it might not
-    catch every occurance:
-   
-    use Math::BigInt; 
-    use Math::BigFloat; 
-    $Math::BigInt::accuracy = 4;	
-    $x = Math::BigFloat->new(123.456);
-    ok ($x,123.456);
-
-  + hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
   
 * BigInt:
   + exponent on input is limited to a Perl int (bigger numbers won't fit
     into your memory, anyway - use BigFloat)
   + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
-    (this is solved by use bigint;)
+    (this is solved partially by use bigint ;)
   + Handling of undef arguments is somewhat broken (no proper warnings)
   + eval('use...') and use Math::BigInt qw/:constant/ fail on Perl prior 5.6.0
     This is likely an Exporter bug, and causes Math::BigInt to eval require on
@@ -44,49 +31,8 @@ Known bugs:
 
 ###############################################################################
 
-Mixing of classes does not always work like here:
-
-(upgrade helps, but is not fully implemented)
-
-	use Math::BigInt;
-	use Math::BigFloat;
-
-	$x = Math::BigFloat->new(2.5);
-	$y = Math::BigInt->new(2);
-
-	$z = $x + $y;
-
-What should $z become? Certainly not a BigFloat with value 4. But a BigFloat
-with value 4.5? Ora BigInt with value 4? And should
-
-	$z = $y + $x;	# reversed order
-
-influence the result? Overload works this way with scalars, the first object
-gives the class to that the result is set and the second argument is converted:
-
-	$z = $x + 2;	# 4.5
-	$z = 2 + $x:	# 4.5
-	$z = $y + 2.5;	# 4 !!
-
-One problem is that, in normal Perl, floating point is prefered when in doubt.
-But this assumes that MBI knows about MBF and that MBF is considered more
-"powerfull", so that MBI objects promote themselfe to MBFs upon contact:
-
-	$z = $x + $y;	# 4.5
-	$z = $y + $x;	# 4.5, too
-
-While this could be made to work somehow, the assumption that MBI must know
-anything about MBF (a subclass of it) is somewhat ugly. (Of course having a
-routine in both packages, that return 1 for MBI, and 2 for MBF, thus denoting
-the more powerfull would work, and even with subclasses of MBI, which inherit
-than the 1, or override it (maybe even with 3 for complex numbers)).
-
-The old code (v0.01 etc) breaks in various, mysterious and strange ways when
-confronted with mixed arguments, but for others it works by suprise.
-
-My new code is only partially better, I am afraid.
-
-Update: use bignum; use bigint; and use bigrat; should solve this problem.
+Mixing of classes does not always work like expected. "use bignum;",
+"use bigint;" and "use bigrat;" should solve this problem for most cases.
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

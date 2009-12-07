@@ -1,55 +1,150 @@
-This lists only the changes for the current release (v1.67) over the last
+This lists only the changes for the current release (v1.68) over the last
 version, since HISTORY is now quite big:
 
-Calc : fixed bug in _root(): int() rounds sometimes wrong, so use sprintf()
-       _as_bin() and _as_hex() are faster (for small values) due to inlining
-	is_zero()
-       _acmp() is about 26% faster for very small numbers or numbers that
-	differ in length, and slightly faster for bigger numbers. This helps
-	both bacmp() and bcmp()
-       _fac() did:
-	+ not modify $x in place for small arguments
-	+ something strange for large arguments
-	+ not handle 0..2 optimal (code now simplified)
-       _as_bin() used %b, which was not known to v5.5.3 - workaround that
-       implemented _log_int(), which is simple and very fast
-       implemented the missing pieces for _root() (which is quite fast)
-MBI  : reorder is_zero() check for band(), bior() and bxor() to speed up the
-	case for when the underlying lib has _and(), _ior() and _xor()
-       implement a new way of emulating AND, OR and XOR, this tremendously
-	helps if band() et. al. are called with negative arguments
-       try to call _signed_or(), _signed_and() and _signed_xor() in lib
-       is_foobar() methods are slightly faster
-       bnot() is about 12% faster
-       bsqrt(): moved is_zero() || is_one() test out of the way => 28% faster
-	for "small" values (Calc and GMP)
-       small change for overload::constant
-       bfac(): do 0 or 1 check only if CALC cannot do _fac() (thus faster)
-       cache $CALC->can() results in global %CAN hash for more speed
-       overload for cos()/sin() to make cos(Math::BigInt->new(...)) work
-       implemented an all-integer version of blog(), which is simple and fast
-       removed a needless _copy() in bmod() with negative arguments
-MBF  : flog(): 0.5, 0.25, 0.125, 2, 4 and 8 were not scaled properly back to
-	1, instead they remained 0.5 and 2, respectively. This was a '<' vs.
-	'>=' respective '<' vs. '<=' issue. No other values are affected
-	(neither getting slower nor faster), but the ones in question (incl.
-	their multiples like 20, 80, 0.0125 etc) are now tremendously faster -
-	about a factor of 30 to 60! :-)
-       removed some crufty logic from _log_10() and made the special cases of
-	2, 10 and 0.1 slightly faster. This also helps log($x,2) & log($x,10).
-       bfac() slightly faster for small arguments
-       downgrading to bigint failed for .2e2 (produced 200 vs. 20)
-Misc : warn if blog() fails to compute result 
-tests: more tests for _pow(), _root(), _acmp() and _fac() in bigintc.t
-       added const_mbf.t: test for BigFloat constant w/o BigInt, also make
-	these constant tests better when running in core
-       added t/fallback.t
-       fixed bigintc.t tests for BASE_LEN < 7 (e.g. obscure archs :)
-       added tests for _log_int() 
-       more tests for downgrading
-       tests for MBI blog()
+Calc : guess _log_int() result based on $base if $base < $BASE
+       _pow() handle cases 0 ** Y, 1 ** Y, X ** 0 and X ** 1
+       _new(): shortcut for short numbers, makes MBI->new() about 20% faster
+       _root() was wrong for numbers like 9 (0b1001) because they start with
+	the pattern /^0b1(0+)/ (missing '$' in regexp) and after fixing this
+	it was dead slow for large numbers.
+Emu:   the code in Calc::_root() uses now sprintf(), but the one in Emu was not
+MBI  : bfac(inf) is inf, not NaN
+       round() was missing a croak() in path testing for wrong roundmode
+       badd(): optimize away setting of sign if it is already right
+       bdec() is about 10% faster for negative numbers
+       bpow(): removed some now needless tests for 0 and 1: about 30% faster
+	for small numbers
+       streamlined exponent() (parts() benefits from this, too)
+       binary/hexadecimal input was twice as slow due to type in v1.67 in %CAN
+       factored out all the emulation code, moved it to Math::BigInt::CalcEmu
+       streamlined overload for bolean context (20% faster "... if $x;")
+MBF  : ffac(inf) is inf, not NaN 
+       flog() calculate integer result first, and if it fits, return it
+	this makes it much faster in case the result is a perfect integer
+       require (instead of use) Exporter
+       froot() calculates an integer result first, and it if fits, returns it
+Misc : relocated emulation code to Math/BigInt/Emu.pm and load it on demand
+	MBI shrunk from 142Kbyte to 128Kbyte (56 Kbyte of MBI are POD!)
+       added alias names: as_int() (as_number()), is_pos(), is_neg() and doc
+tests: tests for _pow()
+       tests for big roots (like (2 ** 240)->broot(9)) 
+       fixed tests for bfac(inf)
 
 ##############################################################################
+Memory savings due to not loading the code from Emu.pm (Perl v5.8.1, 32 bit):
+
+       | v1.67  v1.68          Savings
+ ------|-------------------------------
+  GMP  |  3072   2940   132 Kbyte 4.2%
+  Calc |  3192   3112    80 Kbyte 2.5%
+
+##############################################################################
+Benchmarking blog() and flog():
+
+v1.67:
+
+blog(123**123,123):     5.17 CPU) @   543/s (n=2809)
+blog(123**123,2):       5.42 CPU) @   547/s (n=2965)
+blog(2**12,12):         5.28 CPU) @ 13196/s (n=69679)
+blog(2**12,2):          5.35 CPU) @  9048/s (n=48408)
+blog(2**120,120):       5.16 CPU) @  5062/s (n=26123)
+blog(2**120,2):         5.25 CPU) @  1183/s (n=6212)
+blog(2**1234,2):        5.37 CPU) @    52/s (n=282)
+blog(2**960,2):         5.33 CPU) @    77/s (n=413)
+blog(2**960,960):       5.25 CPU) @   653/s (n=3431)
+blog(3**123,123):       5.31 CPU) @  3407/s (n=18092)
+blog(3**123,3):         5.28 CPU) @  1082/s (n=5718)
+
+flog(123**123,123):     5.54 CPU) @     0/s (n=2)
+flog(123**123,2):       5.60 CPU) @     0/s (n=2)
+flog(2**12,12):         5.19 CPU) @     7/s (n=38)
+flog(2**12,2):          5.28 CPU) @    17/s (n=95)
+flog(2**120,120):       5.20 CPU) @     2/s (n=15)
+flog(2**120,2):         5.02 CPU) @     3/s (n=19)
+flog(2**1234,2):        5.18 CPU) @     5/s (n=30)
+flog(2**960,2):         5.19 CPU) @     7/s (n=40)
+flog(2**960,960):       5.10 CPU) @     4/s (n=23)
+flog(3**123,123):       5.09 CPU) @     4/s (n=24)
+flog(3**123,3):         5.30 CPU) @     3/s (n=21)
+
+v1.68:
+
+blog(123**123,123):     5.22 CPU) @   877/s (n=4581)
+blog(123**123,2):       5.33 CPU) @   876/s (n=4670)
+blog(2**12,12):         5.29 CPU) @  9326/s (n=49339)
+blog(2**12,2):          5.25 CPU) @ 11498/s (n=60365)
+blog(2**120,120):       5.29 CPU) @  5130/s (n=27138)
+blog(2**120,2):         5.23 CPU) @  4731/s (n=24748)
+blog(2**1234,2):        5.27 CPU) @   470/s (n=2482)
+blog(2**960,2):         5.31 CPU) @   722/s (n=3839)
+blog(2**960,960):       5.34 CPU) @   939/s (n=5016)
+blog(3**123,123):       5.24 CPU) @  3509/s (n=18392)
+blog(3**123,3):         5.25 CPU) @  4524/s (n=23751)
+
+flog(123**123,123):     5.28 CPU) @   253/s (n=1336)
+flog(123**123,2):       5.24 CPU) @   253/s (n=1326)
+flog(2**12,12):         5.16 CPU) @     7/s (n=38)
+flog(2**12,2):          5.23 CPU) @   556/s (n=2911)
+flog(2**120,120):       5.10 CPU) @     2/s (n=15)
+flog(2**120,2):         5.40 CPU) @   306/s (n=1654)
+flog(2**1234,2):        5.31 CPU) @   160/s (n=854)
+flog(2**960,2):         5.36 CPU) @   171/s (n=921)
+flog(2**960,960):       5.01 CPU) @     4/s (n=22)
+flog(3**123,123):       5.19 CPU) @     4/s (n=24)
+flog(3**123,3):         5.28 CPU) @   475/s (n=2508)
+
+##############################################################################
+# benchmarking BigInt exponent/mantissa/parts:
+
+v1.67:
+   expo(0):   5.20 CPU) @ 32307/s (n=168000)
+  expo(10):   5.31 CPU) @ 10026/s (n=53242)
+ expo(100):   5.41 CPU) @ 10032/s (n=54276)
+  expo(11):   5.26 CPU) @  9203/s (n=48408)
+   mant(0):   5.25 CPU) @ 51690/s (n=271374)
+  mant(10):   5.24 CPU) @  8466/s (n=44367)
+ mant(100):   5.25 CPU) @  8452/s (n=44377)
+  mant(11):   5.01 CPU) @ 42768/s (n=214270)
+  parts(0):   5.20 CPU) @ 18274/s (n=95025)
+ parts(10):   5.34 CPU) @  4447/s (n=23751)
+parts(100):   5.26 CPU) @  4433/s (n=23319)
+ parts(11):   5.30 CPU) @  7174/s (n=38027)
+
+v1.68:
+   expo(0):   5.21 CPU) @ 65366/s (n=340560)
+  expo(10):   5.23 CPU) @ 24417/s (n=127706)
+ expo(100):   5.26 CPU) @ 24278/s (n=127706)
+  expo(11):   5.20 CPU) @ 18618/s (n=96817)
+   mant(0):   5.36 CPU) @ 50629/s (n=271374)
+  mant(10):   5.25 CPU) @  8726/s (n=45815)
+ mant(100):   5.24 CPU) @  8743/s (n=45815)
+  mant(11):   5.29 CPU) @ 41843/s (n=221354)
+  parts(0):   5.15 CPU) @ 27061/s (n=139368)
+ parts(10):   5.42 CPU) @  6256/s (n=33912)
+parts(100):   5.24 CPU) @  6232/s (n=32656)
+ parts(11):   5.28 CPU) @ 12373/s (n=65333)
+
+##############################################################################
+# benchmarking new()
+
+v1.67:
+    new2e0:  3s ( 3.17 usr +  0.00 sys =  3.17 CPU) @ 61636/s (n=195388)
+    new2e1:  3s ( 3.05 usr +  0.00 sys =  3.05 CPU) @ 62120/s (n=189467)
+    new2e2:  4s ( 3.10 usr +  0.00 sys =  3.10 CPU) @ 61118/s (n=189467)
+    new2e3:  2s ( 3.08 usr +  0.00 sys =  3.08 CPU) @ 61515/s (n=189467)
+    new2e4:  3s ( 3.17 usr +  0.00 sys =  3.17 CPU) @ 61636/s (n=195388)
+    new2e5:  3s ( 3.19 usr +  0.00 sys =  3.19 CPU) @ 61250/s (n=195388)
+    new2e6:  3s ( 3.08 usr +  0.00 sys =  3.08 CPU) @ 61515/s (n=189467)
+    new2e7:  4s ( 3.15 usr +  0.00 sys =  3.15 CPU) @ 59454/s (n=187282)
+v1.68:
+    new2e0:  4s ( 3.15 usr +  0.00 sys =  3.15 CPU) @ 73306/s (n=230914)
+    new2e1:  2s ( 3.17 usr +  0.00 sys =  3.17 CPU) @ 72843/s (n=230914)
+    new2e2:  3s ( 3.20 usr +  0.00 sys =  3.20 CPU) @ 72160/s (n=230914)
+    new2e3:  3s ( 3.09 usr +  0.00 sys =  3.09 CPU) @ 72465/s (n=223917)
+    new2e4:  4s ( 3.19 usr +  0.00 sys =  3.19 CPU) @ 72386/s (n=230914)
+    new2e5:  3s ( 3.19 usr +  0.00 sys =  3.19 CPU) @ 72386/s (n=230914)
+    new2e6:  3s ( 3.21 usr +  0.00 sys =  3.21 CPU) @ 71935/s (n=230914)
+    new2e7:  3s ( 3.11 usr +  0.00 sys =  3.11 CPU) @ 58337/s (n=181430)
 
 Please have Math::BigInt->new('inf')->bmul('inf') big amounts of fun.
 
