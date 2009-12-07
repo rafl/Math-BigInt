@@ -78,8 +78,12 @@ Math::BigInt::Calc:
  * a fix in _sub(): early out made -1 + 100000000001 == 0 (if length($y) > 8)
 2002-05-30 v0.28 Tels
  * added _modinv(), _modpow() (not yet implemented)
-2002-06-10 v0.29 Tels
+2002-06-09 v0.29 Tels
  * filled in _modpow()
+2002-06-10 v0.30 Tels
+ * undef mul/div in case Calc.pm get's loaded twice
+ * fix in _as_hex() and _as_bin() for older Perls
+ * speedups in _pow() and _modpow()
 
 ############################################################################## 
 Math::BigInt::Scalar:
@@ -252,6 +256,10 @@ Math::BigFloat:
 2002-05-19 v1.32 Tels
  * upgrade used badd() instead of bmul() inside bmul()
  * bpow() now uses slower, but more correct way for fractions (this needs work)
+2002-06-09 v1.33 Tels
+ * import() fixed for older Perls
+2002-06-10 v1.34 Tels
+ * upgrade used badd() instead of bmul() inside bmul() (again! arg!)
 
 ############################################################################## 
 Math::BigInt:
@@ -510,6 +518,10 @@ Math::BigInt:
  * added bmodpow() and bmodinv() as (not-working yet) stubs
 2002-06-09 v1.58 Tels
  * invalid inputs with two dot's (1.2.3 or 1..2 etc) are now really invalid
+2002-06-10 v1.59 Tels
+ * pod fixes for bmodpow()/bmodinv()
+ * fix in as_hex() and as_bin() for older Perls
+ * speedups in bpow(), bmodin() and bmodpow()
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

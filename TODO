@@ -53,6 +53,7 @@ Math::BigInt::Calc:
  * find a way to let underlying lib calculate band(), bior(), bxor() for
    negative inputs
  * make converting between bases faster
+ * add _modinv() for more speed
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

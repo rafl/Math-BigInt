@@ -39,7 +39,8 @@ t/use_lib1.t			# test various use combos of MBI and MBF w/ lib
 t/use_lib2.t			# test various use combos of MBI and MBF w/ lib
 t/use_lib3.t			# test various use combos of MBI and MBF w/ lib
 t/use_lib4.t			# test various use combos of MBI and MBF w/ lib
-t/upgrade.t			# see if upgrading works
+t/upgrade.t			# see if upgrading in BigInt works
+t/upgradef.t			# see if upgrading in BigFloat works
 t/downgrade.t			# see if downgrading works
 t/constant.t			# test Math::BigInt/BigFloat ':constant'
 t/config.t			# test Math::BigInt->config()

@@ -12,7 +12,7 @@ package Math::BigFloat;
 #   _p: precision
 #   _f: flags, used to signal MBI not to touch our private parts
 
-$VERSION = '1.33';
+$VERSION = '1.34';
 require 5.005;
 use Exporter;
 use File::Spec;
@@ -805,7 +805,7 @@ sub bmul
   # handle result = 0
   return $x->bzero() if $x->is_zero() || $y->is_zero();
   
-  return $upgrade->badd($x,$y,$a,$p,$r) if defined $upgrade &&
+  return $upgrade->bmul($x,$y,$a,$p,$r) if defined $upgrade &&
    ((!$x->isa($self)) || (!$y->isa($self)));
 
   # aEb * cEd = (a*c)E(b+d)
