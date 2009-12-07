@@ -16,9 +16,9 @@ package Math::BigInt;
 # underlying lib might change the reference!
 
 my $class = "Math::BigInt";
-use 5.006002;
+use 5.006;
 
-$VERSION = '1.87';
+$VERSION = '1.88';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(objectify bgcd blcm); 
@@ -291,11 +291,12 @@ sub accuracy
       if (!$a || $a <= 0)
         {
         require Carp;
-        Carp::croak ('Argument to accuracy must be greater than zero');
+	Carp::croak ('Argument to accuracy must be greater than zero');
         }
       if (int($a) != $a)
         {
-        require Carp; Carp::croak ('Argument to accuracy must be an integer');
+        require Carp;
+	Carp::croak ('Argument to accuracy must be an integer');
         }
       }
     if (ref($x))
@@ -449,6 +450,12 @@ sub _scale_a
   $scale = ${ $class . '::accuracy' } unless defined $scale;
   $mode = ${ $class . '::round_mode' } unless defined $mode;
 
+  if (defined $scale)
+    {
+    $scale = $scale->can('numify') ? $scale->numify() : "$scale" if ref($scale);
+    $scale = int($scale);
+    }
+
   ($scale,$mode);
   }
 
@@ -465,6 +472,12 @@ sub _scale_p
 
   $scale = ${ $class . '::precision' } unless defined $scale;
   $mode = ${ $class . '::round_mode' } unless defined $mode;
+
+  if (defined $scale)
+    {
+    $scale = $scale->can('numify') ? $scale->numify() : "$scale" if ref($scale);
+    $scale = int($scale);
+    }
 
   ($scale,$mode);
   }
@@ -907,6 +920,9 @@ sub _find_round_parameters
     require Carp; Carp::croak ("Unknown round mode '$r'");
     }
 
+  $a = int($a) if defined $a;
+  $p = int($p) if defined $p;
+
   ($self,$a,$p,$r);
   }
 
@@ -967,11 +983,11 @@ sub round
   # now round, by calling either fround or ffround:
   if (defined $a)
     {
-    $self->bround($a,$r) if !defined $self->{_a} || $self->{_a} >= $a;
+    $self->bround(int($a),$r) if !defined $self->{_a} || $self->{_a} >= $a;
     }
   else # both can't be undefined due to early out
     {
-    $self->bfround($p,$r) if !defined $self->{_p} || $self->{_p} <= $p;
+    $self->bfround(int($p),$r) if !defined $self->{_p} || $self->{_p} <= $p;
     }
   # bround() or bfround() already callled bnorm() if nec.
   $self;
@@ -2741,7 +2757,7 @@ sub from_hex
   # create a bigint from a hexadecimal string
   my ($self, $hs) = @_;
 
-  my $rc = $self->__from_hex($hs);
+  my $rc = __from_hex($hs);
 
   return $self->bnan() unless defined $rc;
 
@@ -2753,7 +2769,7 @@ sub from_bin
   # create a bigint from a hexadecimal string
   my ($self, $bs) = @_;
 
-  my $rc = $self->__from_bin($bs);
+  my $rc = __from_bin($bs);
 
   return $self->bnan() unless defined $rc;
 
@@ -2768,10 +2784,10 @@ sub from_oct
   my $x = $self->bzero();
   
   # strip underscores
-  $os =~ s/([0-9a-fA-F])_([0-9a-fA-F])/$1$2/g;	
-  $os =~ s/([0-9a-fA-F])_([0-9a-fA-F])/$1$2/g;	
+  $os =~ s/([0-7])_([0-7])/$1$2/g;	
+  $os =~ s/([0-7])_([0-7])/$1$2/g;	
   
-  return $x->bnan() if $os !~ /^[\-\+]?0[0-9]+$/;
+  return $x->bnan() if $os !~ /^[\-\+]?0[0-7]+\z/;
 
   my $sign = '+'; $sign = '-' if $os =~ /^-/;
 
@@ -3147,7 +3163,9 @@ Math::BigInt - Arbitrary size integer/float math package
   
   $x->round($A,$P,$mode);  # round to accuracy or precision using mode $mode
   $x->bround($n);	   # accuracy: preserve $n digits
-  $x->bfround($n);	   # round to $nth digit, no-op for BigInts
+  $x->bfround($n);	   # $n > 0: round $nth digits,
+			   # $n < 0: round to the $nth digit after the
+			   # dot, no-op for BigInts
 
   # The following do not modify their arguments in BigInt (are no-ops),
   # but do so in BigFloat:
@@ -3443,15 +3461,15 @@ See L<Input> for more info on accepted input formats.
 
 =head2 from_oct()
 
-	$x = Math::BigIn->from_oct("0775");	# input is octal
+	$x = Math::BigInt->from_oct("0775");	# input is octal
 
 =head2 from_hex()
 
-	$x = Math::BigIn->from_hex("0xcafe");	# input is hexadecimal
+	$x = Math::BigInt->from_hex("0xcafe");	# input is hexadecimal
 
 =head2 from_bin()
 
-	$x = Math::BigIn->from_oct("0x10011");	# input is binary
+	$x = Math::BigInt->from_oct("0x10011");	# input is binary
 
 =head2 bnan()
 
@@ -3796,6 +3814,12 @@ This method was added in v1.87 of Math::BigInt (June 2007).
 
 	$x->bsqrt();			# calculate square-root
 
+=head2 broot()
+
+	$x->broot($N);
+
+Calculates the N'th root of C<$x>.
+
 =head2 bfac()
 
 	$x->bfac();			# factorial of $x (1*2*3*4*..$x)
@@ -3813,7 +3837,20 @@ C<$round_mode>.
 
 =head2 bfround()
 
-	$x->bfround($N);              # round to $Nth digit, no-op for BigInts
+	$x->bfround($N);
+
+If N is > 0, rounds to the Nth digit from the left. If N < 0, rounds to
+the Nth digit after the dot. Since BigInts are integers, the case N < 0
+is a no-op for them.
+
+Examples:
+
+	Input		N		Result
+	===================================================
+	123456.123456	3		123500
+	123456.123456	2		123450
+	123456.123456	-2		123456.12
+	123456.123456	-3		123456.123
 
 =head2 bfloor()
 
@@ -4660,31 +4697,6 @@ C<Math::BigInt> exports nothing by default, but can export the following methods
 
 	bgcd
 	blcm
-
-=head1 BUGS
-
-=over 2
-
-=item broot() does not work
-
-The broot() function in BigInt may only work for small values. This will be
-fixed in a later version.
-
-=item Out of Memory!
-
-Under Perl prior to 5.6.0 having an C<use Math::BigInt ':constant';> and 
-C<eval()> in your code will crash with "Out of memory". This is probably an
-overload/exporter bug. You can workaround by not having C<eval()> 
-and ':constant' at the same time or upgrade your Perl to a newer version.
-
-=item Fails to load Calc on Perl prior 5.6.0
-
-Since eval(' use ...') can not be used in conjunction with ':constant', BigInt
-will fall back to eval { require ... } when loading the math lib on Perls
-prior to 5.6.0. This simple replaces '::' with '/' and thus might fail on
-filesystems using a different seperator.  
-
-=back
 
 =head1 CAVEATS
 

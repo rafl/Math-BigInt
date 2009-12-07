@@ -1,6 +1,6 @@
 package Math::BigInt::CalcEmu;
 
-use 5.006002;
+use 5.006;
 use strict;
 # use warnings;	# dont use warnings for older Perls
 use vars qw/$VERSION/;

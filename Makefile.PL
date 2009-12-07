@@ -1,6 +1,6 @@
 
-# We need at least Perl 5.6.2
-require 5.6.2;
+# We need at least Perl 5.6
+require 5.006;
 use strict;
 
 # Load the Module::Install bundled in ./inc/
@@ -12,7 +12,7 @@ name		'Math-BigInt';
 # Get most of the details from the primary module
 all_from	'lib/Math/BigInt.pm';
 
-requires	'perl'		=> 5.006002;
+requires	'perl'		=> 5.006;
 
 # see if old versions are installed, and if so, force
 # and upgrade:
@@ -22,12 +22,12 @@ my @checks;
 check_minimum_version ('Math::BigInt::FastCalc' => 0.14);
 check_minimum_version ('Math::BigInt::GMP'	=> 1.21);
 check_minimum_version ('Math::BigInt::Pari'	=> 1.12);
-check_minimum_version ('Math::BigRat'		=> 0.19);
+check_minimum_version ('Math::BigRat'		=> 0.20);
 check_minimum_version ('bignum' 		=> 0.21);
 
 if (@checks > 0)
   {
-  print ("\n" . '*' x 70 . "\n Attention: After installing this package, you also need to update:\n\n");
+  print ("\n" . '*' x 70 . "\n Attention: After installing this package, you should also update:\n\n");
   for my $need (@checks)
     {
     my $name = $need->[0]; while (length($name) < 24) { $name .= ' '; }

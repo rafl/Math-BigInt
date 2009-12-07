@@ -71,6 +71,7 @@ t/req_mbfi.t			# test: require Math::BigFloat; ->binf();
 t/req_mbfn.t			# test: require Math::BigFloat; ->new();
 t/req_mbfw.t			# require Math::BigFloat; import ( with => );
 t/require.t			# test: require Math::BigInt;
+t/round.t
 t/sub_ali.t			# test alias subroutines w/ alias.inc
 t/sub_mbf.t			# empty subclass test for M::BF
 t/sub_mbi.t			# empty subclass test for M::BI

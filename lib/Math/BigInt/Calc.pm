@@ -1,10 +1,10 @@
 package Math::BigInt::Calc;
 
-use 5.006002;
+use 5.006;
 use strict;
 # use warnings;	# dont use warnings for older Perls
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -52,7 +52,7 @@ sub _base_len
     undef &_mul;
     undef &_div;
 
-    if ($] > 5.008 && $int && $b > 7)
+    if ($] >= 5.008 && $int && $b > 7)
       {
       $BASE_LEN = $b;
       *_mul = \&_mul_use_div_64;

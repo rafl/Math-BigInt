@@ -32,11 +32,6 @@ BEGIN
   print "# INC = @INC\n";
   my $tests = 160;
   plan tests => $tests;
-  if ($] < 5.006)
-    {
-    for (1..$tests) { skip (1,'Not supported on older Perls'); }
-    exit;
-    }
   }
 
 package Math::BigInt::Test;
@@ -69,7 +64,7 @@ my $version = '1.76';	# adjust manually to match latest release
 my ($func,@args,$ans,$rc,$class,$try);
 while (<DATA>)
   {
-  chomp;
+  $_ =~ s/[\n\r]//g;	# remove newlines
   next if /^#/; # skip comments
   if (s/^&//)
     {
