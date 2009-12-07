@@ -157,6 +157,8 @@ Math::BigInt::Calc:
  * shortcut for numbers of same length in _div, where X > Y
 2005-03-20 v0.45 Tels
  * fix the div() shortcut for short numbers to actually work
+2005-03-29 v0.46 Tels
+ * avoid crash in FastCalc by making $BASE and $BASE_LEN use vars qw//;
 
 ############################################################################## 
 Math::BigInt::CalcEmu:
@@ -454,6 +456,9 @@ Math::BigFloat:
  * remove dependecy on Scalar::Util in bdiv()
  * bdiv() cache result of "!$y->is_one()" for wantarray case to make
    ($res,$rem) = $x->bdiv($y); about 10% faster
+2005-03-29 v1.50 Tels
+ * fix rounding doc, add notes about prevision vs. accuracy
+ * set FastCalc as default (we still use whatever MBI uses)
 
 ############################################################################## 
 Math::BigInt:
@@ -846,6 +851,10 @@ Math::BigInt:
  * use a trick to remove the dependency on Scalar::Util in bsub()
  * fix atan2(), it did not preserve the order of arguments
    (Thanx to Ambros & Zaxo for report and patch!)
+2005-04-10 v1.76 Tels
+ * fix rounding doc, add notes about prevision vs. accuracy
+ * trap inf and -inf in new()
+ * load FastCalc as default
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

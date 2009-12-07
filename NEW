@@ -1,40 +1,15 @@
-This lists only the changes for the current release (v1.75) over the last
+This lists only the changes for the current release (v1.76) over the last
 version, since HISTORY is now quite big:
 
-Calc : fix the shortcut for div() to always work properly 
-MBI  : use a trick to remove the dependency on Scalar::Util in bsub()
-       fix atan2(), it did not preserve the order of arguments
-	(Thanx to Ambros & Zaxo for report and patch!)
-       fix documentation about rounding
-MBF  : likewise remove dependecy on Scalar::Util in bdiv()
-       bdiv() cache result of "!$y->is_one()" for wantarray case to make
-	($res,$rem) = $x->bdiv($y); about 10% faster
-misc : 
-tests: for atan2() 
-
-##############################################################################
-
-Math::BigInt v1.74
-$ $f->bdiv($f2):  5s ( 5.24 usr +  0.02 sys =  5.26 CPU) @  4354/s (n=22903)
-@ $f->bdiv($f2):  5s ( 5.25 usr +  0.01 sys =  5.26 CPU) @  2529/s (n=13303)
-$f->bsub($f2):    5s ( 5.32 usr +  0.00 sys =  5.32 CPU) @ 11775/s (n=62643)
-$x->bsub($xi):    6s ( 5.28 usr +  0.01 sys =  5.29 CPU) @ 24141/s (n=127706)
-
-Math::BigInt v1.75
-$ $f->bdiv($f2):  5s ( 5.26 usr +  0.02 sys =  5.28 CPU) @  4498/s (n=23751)
-@ $f->bdiv($f2):  6s ( 5.32 usr +  0.02 sys =  5.34 CPU) @  2826/s (n=15091)
-$f->bsub($f2):    5s ( 5.26 usr +  0.01 sys =  5.27 CPU) @ 11886/s (n=62643)
-$x->bsub($xi):    5s ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 24371/s (n=127706)
-
-Special cases (we dont care about speed for them):
-
-Math::BigInt v1.74
-$f->bsub($f):     6s ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 30457/s (n=160815)
-$x->bsub($x):     5s ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 42162/s (n=221354)
-
-Math::BigInt v1.75
-$f->bsub($f):     6s ( 5.30 usr + -0.00 sys =  5.30 CPU) @ 30342/s (n=160815)
-$x->bsub($x):     5s ( 5.19 usr +  0.01 sys =  5.20 CPU) @ 41751/s (n=217107)
+Calc : return $BASE from _base_len(), too
+MBI  : fix rounding doc and add notes about precision() and accuracy
+       new('inf')/new('-inf') will now croak() when trap_inf is true
+       load FastCalc as default, then fallback to Calc
+MBF  : fix back fdiv() in list context
+       fix fmod() with -1
+	fix rounding doc, add precision() vs. accuracy
+       new('inf')/new('-inf') will now croak() when trap_inf is true
+tests: add tests for new() with inf, and for fmod()
 
 ##############################################################################
 
