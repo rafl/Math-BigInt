@@ -10,11 +10,6 @@ BEGIN
   $| = 1;
   # to locate the testing files
   my $location = $0; $location =~ s/req_mbfa.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    # testing with the core distribution
-    @INC = qw(../t/lib);
-    }
   unshift @INC, qw(../lib);     # to locate the modules
   if (-d 't')
     {

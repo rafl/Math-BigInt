@@ -8,11 +8,6 @@ BEGIN
   $| = 1;
   # to locate the testing files
   my $location = $0; $location =~ s/bare_mbi.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    # testing with the core distribution
-    @INC = qw(../t/lib);
-    }
   unshift @INC, qw(../lib);	# to locate the modules
   if (-d 't')
     {
@@ -26,7 +21,7 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 3273;
+  plan tests => 3279;
   }
 
 use Math::BigInt lib => 'BareCalc';

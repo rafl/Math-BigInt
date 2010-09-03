@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 # use warnings;	# dont use warnings for older Perls
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 # Package to store unsigned big integers in decimal and do math with them
 
@@ -1264,7 +1264,7 @@ sub _is_even
 
 sub _is_odd
   {
-  # return true if arg is even
+  # return true if arg is odd
   (($_[1]->[0] & 1)) <=> 0; 
   }
 
@@ -1536,22 +1536,20 @@ sub _nok
   # ref to array, return ref to array
   my ($c,$n,$k) = @_;
 
-  # ( 7 )    7!          7*6*5 * 4*3*2*1   7 * 6 * 5
-  # ( - ) = --------- =  --------------- = ---------
-  # ( 3 )   3! (7-3)!    3*2*1 * 4*3*2*1   3 * 2 * 1 
+  # ( 7 )       7!       1*2*3*4 * 5*6*7   5 * 6 * 7       6   7
+  # ( - ) = --------- =  --------------- = --------- = 5 * - * -
+  # ( 3 )   (7-3)! 3!    1*2*3*4 * 1*2*3   1 * 2 * 3       2   3
 
-  # compute n - k + 2 (so we start with 5 in the example above)
-  my $x = _copy($c,$n);
-
-  _sub($c,$n,$k);
-  if (!_is_one($c,$n))
+  if (!_is_zero($c,$k))
     {
+  my $x = _copy($c,$n);
+  _sub($c,$n,$k);
     _inc($c,$n);
     my $f = _copy($c,$n); _inc($c,$f);		# n = 5, f = 6, d = 2
     my $d = _two($c);
-    while (_acmp($c,$f,$x) <= 0)		# f < n ?
+    while (_acmp($c,$f,$x) <= 0)		# f <= n ?
       {
-      # n = (n * f / d) == 5 * 6 / 2 => n == 3
+      # n = (n * f / d) == 5 * 6 / 2
       $n = _mul($c,$n,$f); $n = _div($c,$n,$d);
       # f = 7, d = 3
       _inc($c,$f); _inc($c,$d);

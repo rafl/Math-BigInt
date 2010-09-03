@@ -10,15 +10,7 @@ BEGIN
   $| = 1;
   # to locate the testing files
   my $location = $0; $location =~ s/calling.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    # testing with the core distribution
-    @INC = qw(../lib lib);
-    }
-  else
-    {
     unshift @INC, '../lib';
-    }
   if (-d 't')
     {
     chdir 't';

@@ -8,11 +8,6 @@ BEGIN
   $| = 1;
   # to locate the testing files
   my $location = $0; $location =~ s/bigfltpm.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    # testing with the core distribution
-    @INC = qw(../lib);
-    }
   unshift @INC, '../lib';
   if (-d 't')
     {
@@ -26,7 +21,7 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 2308
+  plan tests => 2316
 	+ 5;		# own tests
   }
 

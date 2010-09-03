@@ -11,14 +11,7 @@ BEGIN
   $| = 1;
   # to locate the testing files
   my $location = $0; $location =~ s/mbimbf.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    @INC = qw(../lib); 		# testing with the core distribution
-    }
-  else
-    {
     unshift @INC, '../lib';	# for testing manually
-    }
   if (-d 't')
     {
     chdir 't';

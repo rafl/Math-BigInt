@@ -11,10 +11,6 @@ BEGIN
   $| = 1;
   # to locate the testing files
   my $location = $0; $location =~ s/bare_mif.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    @INC = qw(../t/lib); 		# testing with the core distribution
-    }
   unshift @INC, '../lib';	# for testing manually
   if (-d 't')
     {
