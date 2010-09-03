@@ -964,6 +964,8 @@ Math::BigInt:
  * fix from_oct(), from_bin() and from_hex()
 2008-04-20 v1.89 Tels
  * fix #35238: batan2() handles inf/+inf wrong
+2010-09-03 v1.90 rafl
+ * fix bnok() for k==0 and k==n-1
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
