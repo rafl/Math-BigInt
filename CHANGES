@@ -968,6 +968,8 @@ Math::BigInt:
  * fix bnok() for k==0 and k==n-1
 2010-09-10 v1.91 rafl
  * fix various documentation bugs
+2010-09-10 v1.92 rafl
+ * re-upload v1.91 with a fixed SIGNATURE
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
