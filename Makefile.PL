@@ -47,6 +47,8 @@ author		'Tels <nospam-abuse@bloodgate.com>';
 # Do not index these
 no_index	directory	=> 'examples';
 
+sign;
+
 # Generate the Makefile
 WriteAll;
 
