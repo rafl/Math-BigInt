@@ -1,6 +1,6 @@
 
 # We need at least Perl 5.6
-require 5.006;
+require 5.006002;
 use strict;
 
 # Load the Module::Install bundled in ./inc/
@@ -12,7 +12,7 @@ name		'Math-BigInt';
 # Get most of the details from the primary module
 all_from	'lib/Math/BigInt.pm';
 
-requires	'perl'		=> 5.006;
+requires	'perl'		=> 5.006002;
 
 # See if old versions are installed, and if so, tell the user that
 # upgrading them would make little fluffy kittens much happier:
@@ -66,6 +66,5 @@ sub check_minimum_version
   if (defined $v && $v < $version)
     {
     push @checks, [ $module, $version, $v ];
-    } 
+    }
   }
-
