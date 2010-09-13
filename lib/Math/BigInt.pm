@@ -1260,7 +1260,7 @@ sub blog
   # objectify is costly, so avoid it
   if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
     {
-    ($self,$x,$base,@r) = objectify(1,ref($x),@_);
+    ($self,$x,$base,@r) = objectify(2,@_);
     }
 
   return $x if $x->modify('blog');
