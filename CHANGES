@@ -976,6 +976,8 @@ Math::BigInt:
  * Convert from Test to Test::More
 2010-09-13 v1.94 rafl DEVELOPMENT RELEASE
  * Attempt to fix Math::BigInt::Lite failures
+2010-09-14 v1.95 rafl
+ * Re-upload v1.94 as a stable release
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
