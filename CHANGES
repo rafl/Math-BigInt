@@ -974,6 +974,8 @@ Math::BigInt:
  * Depend on perl >= 5.6.2
  * Remove obsolete core test directory boilerplate
  * Convert from Test to Test::More
+2010-09-13 v1.94 rafl DEVELOPMENT RELEASE
+ * Attempt to fix Math::BigInt::Lite failures
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
