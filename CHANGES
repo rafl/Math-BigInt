@@ -970,6 +970,10 @@ Math::BigInt:
  * fix various documentation bugs
 2010-09-10 v1.92 rafl
  * re-upload v1.91 with a fixed SIGNATURE
+2010-09-13 v1.93 rafl
+ * Depend on perl >= 5.6.2
+ * Remove obsolete core test directory boilerplate
+ * Convert from Test to Test::More
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
