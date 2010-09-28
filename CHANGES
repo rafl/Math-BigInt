@@ -978,6 +978,8 @@ Math::BigInt:
  * Attempt to fix Math::BigInt::Lite failures
 2010-09-14 v1.95 rafl
  * Re-upload v1.94 as a stable release
+2010-09-28 v1.96 rafl
+ * Various documentation fixes provided by gregor herrmann
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
