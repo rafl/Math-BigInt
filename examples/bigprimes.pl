@@ -22,7 +22,7 @@ my ($x,$y,$z);
 my $two = Math::BigInt->new(2);
 
 # some new() are to make stop Perl from calculating things like 1234 ** 4321
-# at compile time. (we want to see run-time behaviuor)
+# at compile time. (we want to see run-time behaviour)
 # Also there is len(), since the old BigInt has not got length() and we want
 # this script to be comparable between old and new version.
 
@@ -63,7 +63,7 @@ ok (len($q[2]),'1031');
 ok (len($q[3]),'1031');
 
 ##############################################################################
-# some real wierd primes:
+# some real weird primes:
 
 # (2^3833-1)/(14193959303*340789152474053904109001)
 $x = Math::BigInt->new('340789152474053904109001');

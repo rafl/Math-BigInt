@@ -15,7 +15,7 @@ Math::BigFloat:
  * tests for frsft() and flsft() with $n != 2
  * blog() is still quite slow for non-integer results. See if we can reuse the
    integer calculation somehow
- * finish broot() by using different algorithmn
+ * finish broot() by using different algorithm
  * hexadecimal integers work, but what about '0xABC.DEF'? Really needed?
 
 Math::BigInt:
@@ -38,7 +38,7 @@ Math::BigInt:
 	$x->bsqrt(3,0,'odd');		# $x = 0, but _a is not 3!
 	ok ($x + '12345','12300');	# fails (12346 instead of 12300)
 
-   The shortcuts in code that return $x->bzero() or similiar things need to
+   The shortcuts in code that return $x->bzero() or similar things need to
    do $x->bzero($a,$p); and this needs tests.
    Update: Should now work for most things. Check for completeness.
 
