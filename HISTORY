@@ -46,7 +46,7 @@ v1.82:
   + Math::BigInt->new(10) / Math::BigFloat->new(2) returned NaN (ditto for
     other subclasses of Math::BigInt)
   + $a = new Math::BigInt; creates now a +0, while "" still gives a NaN
-    This supresses all warnings on undef arguments. Wether this is better...	
+    This suppresses all warnings on undef arguments. Wether this is better...
   + import() would always use "Math::BigInt" and clash with Exporter
   + use Math::BigInt qw(bneg); $a = bneg('1234'); etc did not work at all
   + $x->xxx() now modifies $x in all cases of modifiers and actually returns
