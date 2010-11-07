@@ -980,6 +980,10 @@ Math::BigInt:
  * Re-upload v1.94 as a stable release
 2010-09-28 v1.96 rafl
  * Various documentation fixes provided by gregor herrmann
+2010-11-07 v1.97 rafl
+ * Reorder the list return of Math::BigInt::Calc::_base_len() (Nicholas Clark)
+   This change requires an update of Math::BigInt::FastCalc to version 0.24.
+ * Fix segfault when upgrading irrational numbers (Father Chrysostomos)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
