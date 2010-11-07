@@ -18,7 +18,7 @@ requires	'perl'		=> 5.006002;
 # upgrading them would make little fluffy kittens much happier:
 
 my @checks;
-check_minimum_version ('Math::BigInt::FastCalc' => 0.19);
+check_minimum_version ('Math::BigInt::FastCalc' => 0.24);
 check_minimum_version ('Math::BigInt::GMP'	=> 1.24);
 check_minimum_version ('Math::BigInt::Pari'	=> 1.13);
 check_minimum_version ('Math::BigRat'		=> 0.22);
