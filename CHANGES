@@ -6,7 +6,7 @@ Math::* in the Perl core, see HISTORY.
 
 The file NEW lists only the changes for the latest version.
 
-############################################################################## 
+##############################################################################
 Math::BigInt::Calc:
 
 2001-07-09 v0.06 Tels
@@ -47,7 +47,7 @@ Math::BigInt::Calc:
  * added _and, _or, and _xor and let them use more than 16 bits
  * find out how many bits _and, _or and _xor can safely use (cap at 23)
  * div() might leave empty array, so __strip_zeros fixes these
- * streamlined _acmp() 
+ * streamlined _acmp()
  * cap of 5 for BASE for UTS and UNICOS/Cray
  * better test to find out what BASE should be (use +0.0 to force floats)
 2001-12-20 v0.18 Tels
@@ -176,7 +176,7 @@ Math::BigInt::Calc:
 2007-09-16 v0.52 Tels
  * fix 64bit ints on Perl v5.8.0 (thanx zefram)
 
-############################################################################## 
+##############################################################################
 Math::BigInt::CalcEmu:
 
 2003-12-26 v0.01 Tels
@@ -188,7 +188,7 @@ Math::BigInt::CalcEmu:
 2004-03-12 v0.04 Tels
  * removed unnec. emulation routines (all except _signed_foo)
 
-############################################################################## 
+##############################################################################
 Math::BigInt::Scalar:
 
 2001-07-09 v0.04 Tels
@@ -204,7 +204,7 @@ Math::BigInt::Scalar:
  * added DESCRIPTION section to stop pod2man complaining
  * added _dec, _inc
 
-############################################################################## 
+##############################################################################
 Math::BigFloat:
 
 2001-02-18 1.00: started work
@@ -264,7 +264,7 @@ Math::BigFloat:
  * as_number() was wrong for negative numbers and had no tests
  * added is_even(), is_odd(), _set(), the inherited ones were broken
  * fixed is_zero() for NaN
- * $x->bpow($y) for negative $y was unfinished 
+ * $x->bpow($y) for negative $y was unfinished
  * added is_inf(), binf() and some support for +-inf in new(), bsstr() etc
  * added tests for is_odd(), is_even(), _set() and is_zero(), is_inf(), bsstr()
 2001-06-15 v1.15 Tels
@@ -275,7 +275,7 @@ Math::BigFloat:
  * removed internal _set() and the tests for it
  * infinity support for fcmp(), fpow()
  * nailed the bug in fdiv() that caused fsqrt() to fail. fsqr() works now, too.
- * more tests 
+ * more tests
 2001-07-15 v1.17 Tels
  * applied Philip Newtons spelling and doc patch(s)
  * added bone()
@@ -322,7 +322,7 @@ Math::BigFloat:
  * fqsrt() uses now BigInt::bsqrt() as guess: greatly improved performance
  * make fsqrt() subclass proof by using $self instead of Math::BigFloat
  * bzero(), bone(): take additional A and P and store 'em
- * bnan(), binf(): clear A and P 
+ * bnan(), binf(): clear A and P
 2002-01-06 v1.27 Tels
  * overload for log() and flog()/blog()
  * bzero()/bone() handling of A & P was broken
@@ -356,7 +356,7 @@ Math::BigFloat:
  * downgrade and upgrade are valid methods for inheritance
 2002-03-03 v1.31 Tels
  * bpow() can handle second arguments beeing non-integer (f.i. 2 ** 0.2)
- * $x->bpow(0.5) optimized to $x->bsqrt(); 
+ * $x->bpow(0.5) optimized to $x->bsqrt();
 2002-05-19 v1.32 Tels
  * upgrade used badd() instead of bmul() inside bmul()
  * bpow() now uses slower, but more correct way for fractions (this needs work)
@@ -517,8 +517,8 @@ Math::BigFloat:
  * fix #34459: bsqrt() breaks on floats with enough digits (Thanx Niko Tyni!)
  * fix #35238: batan2() handles inf/+inf wrong
  * fix #35162: MBI segfault (as_number(Math::BigRat()) was wrong)
- 
-############################################################################## 
+
+##############################################################################
 Math::BigInt:
 
 2000-11-13 v1.02 Tels
@@ -615,7 +615,7 @@ Math::BigInt:
 2001-04-23 v1.3 Tels
  * added (compatible to MBF) mantissa(), exponent() & parts() as well as tests
  * _trailing_zeros()
- * fixed as_number() to return copy of BigInt 
+ * fixed as_number() to return copy of BigInt
  * added bround(), bfround() and support for round_mode() as well as $rnd_mode
  * fixed bug in bdiv() wich left reminder "-0", causing further op's to die()
  * added is_valid to testsuite to see whether invalid objects are created
@@ -661,7 +661,7 @@ Math::BigInt:
 2001-07-15 v1.37 Tels
  * applied Philip Newtons spelling and doc patch(s)
  * Benjamin Trott: _split() is faster for numbers that need no splitting
- * Benjamin Trott: don't take shortcut in badd(), or Pari won't work 
+ * Benjamin Trott: don't take shortcut in badd(), or Pari won't work
  * allow use Math::BigInt lib => 'Pari,BitVect,Foo,Bar';
  * delegate shifting to CALC if possible, otherwise fallback
  * test for self-pow, to see if lib's fail (since BitVect failed for self-pow)
@@ -697,16 +697,16 @@ Math::BigInt:
 2001-10-05 v1.43 Tels
  * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op)
  * Heaploads of rounding fixes (and tests)
- * Test for 99999-bug in Calc 
+ * Test for 99999-bug in Calc
 2001-11-04 v1.45 Tels
- * tests run now in subclass, too 
+ * tests run now in subclass, too
  * bmod() can use _mod in lib
  * lots of tests fixed (assumed wrong base etc) and added
  * bpow() about 10-15% faster for small numbers (like 2 ** 150, 3 * 200 etc)
 2001-11-11 v1.46 Tels
  * binc(),bdec() use lib (via _inc(),_dec()) => faster (see BENCHMARK)
  * avoid the unnec. rounding bsub()/binc()/bdec() (badd() already took care)
- * made bsub() faster by removing the bneg() overhead from it 
+ * made bsub() faster by removing the bneg() overhead from it
 2001-11-18 v1.47 Tels
  * added $rnd_mode support for compatibility
  * two 'my $t = ... if ..;' cases to 'my $t; $t = ... if ...;'
@@ -722,7 +722,7 @@ Math::BigInt:
  * streamlined copy(), _find_round_parameters()
  * removed the EXPORT_OK except for objectify, _swap and bgcd/blcm
  * bzero(), bone(): take additional A and P and store 'em
- * bnan(), binf(): clear A and P 
+ * bnan(), binf(): clear A and P
 2002-01-07 v1.49 Tels
  * as_hex() and as_bin() use 16 instead of 8 bits per iteration
  * overload for log() and blog()
@@ -754,11 +754,11 @@ Math::BigInt:
 2002-02-27 v1.53 Tels
  * precisision typo
  * fixed overlong pod =item
- * added downgrade() 
+ * added downgrade()
 2002-03-03 v1.54 Tels
  * really fixed overlong pod =item
  * downgrade() and upgrade() with undef as argument didn't clear the variable
- * bmul() upgrades if second argument is non-integer 
+ * bmul() upgrades if second argument is non-integer
  * bdiv() upgrades if $x > $y
  * bpow() upgrades if second argument is non-integer
  * objectify disable downgrade (for MBF)
@@ -769,7 +769,7 @@ Math::BigInt:
 2002-03-17 v1.56 Tels
  * documented config()
  * simplified import() logic a bit
- * changed some isa->($upgrade) => !$isa->($self); 
+ * changed some isa->($upgrade) => !$isa->($self);
 2002-05-30 v1.57 Tels
  * fixed objectify() to make "perl -Mbigrat -le 'print 1+2/3'" work
  * added bmodpow() and bmodinv() as (not-working yet) stubs
@@ -852,7 +852,7 @@ Math::BigInt:
  * bfac(): do 0 or 1 check only if CALC cannot do _fac() (thus faster)
  * removed a needless _copy in bmod() with negative arguments (slightly faster)
 2003-12-26 v1.68 Tels
- * bfac(inf) is inf, not NaN 
+ * bfac(inf) is inf, not NaN
  * added alias names: as_int() (as_number()), is_pos(), is_neg() and doc
  * factored out all the emulation code and moved it to Math::BigInt::CalcEmu
  * binary/hexadecimal input was twice as slow as v1.66 due to a typo in v1.67
@@ -984,6 +984,13 @@ Math::BigInt:
  * Reorder the list return of Math::BigInt::Calc::_base_len() (Nicholas Clark)
    This change requires an update of Math::BigInt::FastCalc to version 0.24.
  * Fix segfault when upgrading irrational numbers (Father Chrysostomos)
+2010-11-08 v1.98 rafl
+ * Fix from_bin() documentation error (Peter John Acklam) (Closes: RT#61845).
+ * Make as_int($inf) return inf, not NaN (Peter John Acklam) (Closes RT#62101).
+ * Fix various typos in documentation and tests (Peter John Acklam)
+   (Closes RT#62643).
+ * Make digit($n) return 0 for "out of range"-digits (Peter John Acklam)
+   (Closes RT#61812).
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
