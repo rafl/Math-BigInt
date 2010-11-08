@@ -992,7 +992,7 @@ Math::BigInt:
  * Make digit($n) return 0 for "out of range"-digits (Peter John Acklam)
    (Closes RT#61812).
 
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!
+Please send us test-reports, your experiences with this and your ideas - we love
+to hear about our work!
 
-Tels <http://bloodgate.com/>
+The Math-BigInt developers <bignum@lists.scsys.co.uk>
