@@ -4,7 +4,7 @@ Known bugs:
 * TODO BUGS:
   + implement test for the upgrading bug in bsub()
 
-* NaN handling in comparisations slightly broken. See also [perl #33106].
+* NaN handling in comparisons slightly broken. See also [perl #33106].
 
 * General:
   + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
@@ -13,7 +13,7 @@ Known bugs:
 * BigFloat:
   + comparing (<=> or == or !=) a BigFloat to a BigInt don't work yet
   + new is first running the entire number trough _split, then again the parts
-    to construct BigInts. Could be a bit more optimzed.
+    to construct BigInts. Could be a bit more optimized.
   + fdiv() using F (fallback) mode does not work properly in all cases of
     local (aka $x's or $y's) A or P settings. Not definite test case yet, but
     it might calculate not enough digits to satisfy the rounding needs.

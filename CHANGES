@@ -12,8 +12,8 @@ Math::BigInt::Calc:
 2001-07-09 v0.06 Tels
  * first release
 2001-07-15 v0.07 Tels
- * applied Philip Newtons speling and doc patch(s) 
- * accidentily had the old, slow mul() code in. Oups.
+ * applied Philip Newtons spelling and doc patch(s)
+ * accidentally had the old, slow mul() code in. Oups.
  * fixed also a bug in that new code
  * also the speedup in mul() occurs with $x having lots of zeros, not $y.
  * first argument is always classname, so removed checks and shift
@@ -89,7 +89,7 @@ Math::BigInt::Calc:
  * some cleanup of old code, added some more comments
 2002-08-21 v0.32 Tels
  * fixed bug in _rsft() that did not set result to 0 in some cases
- * _modinv() now works, thanx to the all-positive algorithmn
+ * _modinv() now works, thanx to the all-positive algorithm
  * much more tests in bigintc.t (taken over from FastCalc)
 2002-09-09 v0.33 Tels
  * _fac() keep $n as scalar if possible
@@ -271,13 +271,13 @@ Math::BigFloat:
  * added bfloor(), bceil()
 2001-07-09 v1.16 Tels
  * is_positive(), is_negative()
- * various pod fixes (overlong =item, speling erorrs etc)
+ * various pod fixes (overlong =item, spelling erorrs etc)
  * removed internal _set() and the tests for it
  * infinity support for fcmp(), fpow()
  * nailed the bug in fdiv() that caused fsqrt() to fail. fsqr() works now, too.
  * more tests 
 2001-07-15 v1.17 Tels
- * applied Philip Newtons speling and doc patch(s) 
+ * applied Philip Newtons spelling and doc patch(s)
  * added bone()
  * tests for bnan() and bone()
 2001-08-02 v1.19 Tels
@@ -365,7 +365,7 @@ Math::BigFloat:
 2002-06-10 v1.34 Tels
  * upgrade used badd() instead of bmul() inside bmul() (again! arg!)
 2002-07-07 v1.35 Tels
- * bfround() used accidentily BigInt math; is now about 5.6 times faster for
+ * bfround() used accidentally BigInt math; is now about 5.6 times faster for
    small numbers
  * bdiv()/badd() etc skip objectify() if possible and are thus faster
  * doc for accuracy()/precision()
@@ -489,7 +489,7 @@ Math::BigFloat:
  * fix bug #21586: Incorrect result when comparing with NaN
  * fix bug #15896: "==" overloading is broken for "NaN"
 2007-04-09 v1.54 Tels
- * fix bug #21747: Re: wierdity in bignum... (powers and high precision):
+ * fix bug #21747: Re: weirdity in bignum... (powers and high precision):
    infinite loops for blog() (and consequently bpow()) if you requested
    an accuracy greater than 67 digits (uses _log() now, and not blog())
    Thanx to darconc!
@@ -554,11 +554,11 @@ Math::BigInt:
  * bxor/band/bior work now correctly for subclasses
  * ++ and -- are now a tad (ca 5%) faster
 2001-02-16 v1.12 Tels
- * accidentily dropped self-multiply test in bigintpm.t
+ * accidentally dropped self-multiply test in bigintpm.t
  * fixed bug in overloading cmp
  * after correcting the overload for 'cmp', I got a lot of test failings and
-   finally dicsovered that the bstr()'s return of '[+-][0-9]+' instead of
-   Perls ways of '[-]?[0-9]+' breaks string comparisations with numbers :(
+   finally discovered that the bstr()'s return of '[+-][0-9]+' instead of
+   Perls ways of '[-]?[0-9]+' breaks string comparisons with numbers :(
    F.i. ok() from Test.pm uses 'eq' and you can not do ok($a,3*3) where $a
    is a BigInt. IMNSHO clearly wrong. And only changing the way cmp is
    overloaded would lead to the curios situation that the following:
@@ -603,7 +603,7 @@ Math::BigInt:
  * documented BigInts behaviour of bmod/bdiv and use integer
 2001-03-30 v1.21 Tels
  * bool() works now under 5_005
- * bug in bsub where numbers with at least 6 trailig digits after any op failed
+ * bug in bsub where numbers with at least 6 trailing digits after any op failed
 2001-04-05 v1.22 Tels
  * documented Peters OS/390 patch/changes (fix was in for quite some time)
  * fixed bug Math::BigInt->new(Math::BigFloat->new(3));
@@ -611,7 +611,7 @@ Math::BigInt:
  * $x->digit($n) to query fast value of Nth digit
  * as_number()
 2001-04-07 v1.23 Tels
- * speling errors in pod
+ * spelling errors in pod
 2001-04-23 v1.3 Tels
  * added (compatible to MBF) mantissa(), exponent() & parts() as well as tests
  * _trailing_zeros()
@@ -652,14 +652,14 @@ Math::BigInt:
  * fixed bior(), bxor(), band() for $x->bxxx(NaN,0), added modify() to them
 2001-07-04 v1.36 Tels
  * is_positive(), is_negative()
- * various pod fixes (overlong =item, speling erorrs etc)
+ * various pod fixes (overlong =item, spelling erorrs etc)
  * torn out the bones from under the flesh and moved them to Math::BigInt::Calc
  * added Math::BigInt::Calc, Math::BigInt::Small (and Math::BigInt::BitVect)
  * fixed tests for bacmp() (could never fail)
  * removed internal _set() and tests for it
  * +-inf handling in bcmp(), bpow()
 2001-07-15 v1.37 Tels
- * applied Philip Newtons speling and doc patch(s)
+ * applied Philip Newtons spelling and doc patch(s)
  * Benjamin Trott: _split() is faster for numbers that need no splitting
  * Benjamin Trott: don't take shortcut in badd(), or Pari won't work 
  * allow use Math::BigInt lib => 'Pari,BitVect,Foo,Bar';
@@ -781,11 +781,11 @@ Math::BigInt:
  * speedups in bpow(), bmodin() and bmodpow()
 2002-07-07 v1.60 Tels
  * shortcuts to avoid calls to objectify for add/sub/mul/div/mod/pow/bcmp etc
- * fix overloaded bcmp() so that the obectify()-avoidance kicks in
+ * fix overloaded bcmp() so that the objectify()-avoidance kicks in
  * avoid calling round() when BigFloat requested 'no rounding please'
  * bcmp()'s shortcut for comparing x <=> 0, 0 <=> 0, 0 <=> $y was making things
    slower than just handing the compare to Calc. Even more so for Pari et al.
- * $x->acuracy() and $x->precision() returned undef, instead of 0 if
+ * $x->accuracy() and $x->precision() returned undef, instead of 0 if
    A/P of $x was 0 and global A/P was undef.
  * $x->bmod() did not modify $x in place when returning NaN/inf/-inf
  * some binary ops (band/bxor/bior/bpow) were not properly rounding the result
@@ -799,8 +799,8 @@ Math::BigInt:
  * make testsuite so that it will pass under FastCalc easily
 2002-08-21 v1.62 Tels
  * bcmp()/bacmp() upgrade now if requested
- * bmodinv() uses an all-positive algorithmn, speeding it up by about 5-8%
-   and allowing to implement the same algorithmn in Calc for factor 4 speedup
+ * bmodinv() uses an all-positive algorithm, speeding it up by about 5-8%
+   and allowing to implement the same algorithm in Calc for factor 4 speedup
 2002-09-08 v1.63 Tels
  * bsqrt() did not modify $x but returned new object when lib does not have
    a _sqrt() routine (BareCalc, BitVect and Pari are affected, Calc, FastCalc
@@ -850,13 +850,13 @@ Math::BigInt:
    for "small" values (Calc and GMP)
  * small change for overload::constant
  * bfac(): do 0 or 1 check only if CALC cannot do _fac() (thus faster)
- * removed a needless _copy in bmod() with megative arguments (slightly faster)
+ * removed a needless _copy in bmod() with negative arguments (slightly faster)
 2003-12-26 v1.68 Tels
  * bfac(inf) is inf, not NaN 
  * added alias names: as_int() (as_number()), is_pos(), is_neg() and doc
  * factored out all the emulation code and moved it to Math::BigInt::CalcEmu
  * binary/hexadecimal input was twice as slow as v1.66 due to a typo in v1.67
- * streamlined overload for bolean context (20% faster "... if $x;")
+ * streamlined overload for boolean context (20% faster "... if $x;")
  * round() was missing a croak() in path testing for wrong roundmode
  * badd(): optimize away setting of sign if it is already right
  * bdec() is about 10% faster for negative numbers
@@ -898,7 +898,7 @@ Math::BigInt:
    makes some ops (bsstr(), bneg etc) about 2% faster for small numbers
  * restrict low-level math library names to sane chars to avoid
    exploitation of eval()
- * fill_can_cache() accidentily did checks for 'or' & 'xor'
+ * fill_can_cache() accidentally did checks for 'or' & 'xor'
  * inline _fill_can_cache
  * add _register_callback() to notify subclasses of lower math lib changes
  * bgcd() is now about 10% faster
@@ -980,6 +980,10 @@ Math::BigInt:
  * Re-upload v1.94 as a stable release
 2010-09-28 v1.96 rafl
  * Various documentation fixes provided by gregor herrmann
+2010-11-07 v1.97 rafl
+ * Reorder the list return of Math::BigInt::Calc::_base_len() (Nicholas Clark)
+   This change requires an update of Math::BigInt::FastCalc to version 0.24.
+ * Fix segfault when upgrading irrational numbers (Father Chrysostomos)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
