@@ -991,6 +991,13 @@ Math::BigInt:
    (Closes RT#62643).
  * Make digit($n) return 0 for "out of range"-digits (Peter John Acklam)
    (Closes RT#61812).
+2010-11-15 v1.99 rafl
+ * Stop as_int/as_number from losing precision (Peter John Acklam)
+   (Closes: RT#43694)
+ * Fix Math::BigInt::Calc::_modpow for (0 ** $x) % $y, with $x > 0
+   (Peter John Acklam) (Closes: RT#62918).
+ * Stop $x -> bmodpow(1, 1) from failing when $x is large (Peter John Acklam)
+   (Closes: RT#62949).
 
 Please send us test-reports, your experiences with this and your ideas - we love
 to hear about our work!
