@@ -1182,6 +1182,8 @@ numifyabc:NaN
 -5:-5
 100:100
 -100:-100
+1e999999:inf
+-1e999999:-inf
 &bneg
 bnegNaN:NaN
 +inf:-inf
