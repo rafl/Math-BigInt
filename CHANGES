@@ -617,7 +617,7 @@ Math::BigInt:
  * _trailing_zeros()
  * fixed as_number() to return copy of BigInt
  * added bround(), bfround() and support for round_mode() as well as $rnd_mode
- * fixed bug in bdiv() wich left reminder "-0", causing further op's to die()
+ * fixed bug in bdiv() wich left remainder "-0", causing further op's to die()
  * added is_valid to testsuite to see whether invalid objects are created
  * added bsqrt()
  * workaround coredump bug in bool() for v5.6.1
